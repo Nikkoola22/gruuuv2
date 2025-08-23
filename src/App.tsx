@@ -24,6 +24,170 @@ import { teletravailData } from "./data/teletravail.ts";
 import { infoItems } from "./data/info-data.ts";
 import { podcastEpisodes, type PodcastEpisode } from "./data/podcasts/mp3.ts";
 
+// Variable pour activer/désactiver le diagnostic
+const DEBUG_IMAGES = true;
+
+// Composant de diagnostic intégré directement
+const ImageTroubleshooter = () => {
+  const [images, setImages] = useState([
+    { name: "unnamed.png", path: "/unnamed.png", loaded: false, error: false },
+    { name: "logo-cfdt.png", path: "/logo-cfdt.png", loaded: false, error: false }
+  ]);
+
+  const [publicUrl, setPublicUrl] = useState("");
+  const [baseUrl, setBaseUrl] = useState("");
+
+  useEffect(() => {
+    setBaseUrl(window.location.origin);
+    setPublicUrl(`${window.location.origin}/public`);
+    testAllImages();
+  }, []);
+
+  const testImage = (index) => {
+    const img = new Image();
+    const image = images[index];
+    
+    img.onload = () => {
+      const updatedImages = [...images];
+      updatedImages[index] = { ...image, loaded: true, error: false };
+      setImages(updatedImages);
+    };
+    
+    img.onerror = () => {
+      const updatedImages = [...images];
+      updatedImages[index] = { ...image, loaded: false, error: true };
+      setImages(updatedImages);
+    };
+    
+    img.src = image.path;
+  };
+
+  const testAllImages = () => {
+    images.forEach((_, index) => testImage(index));
+  };
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
+      <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-6">
+        <h1 className="text-3xl font-bold text-blue-800 mb-6">Diagnostic d'affichage des images</h1>
+        
+        <div className="mb-8 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+          <h2 className="text-xl font-semibold text-yellow-800 mb-2">Informations sur l'environnement</h2>
+          <p className="mb-1"><strong>URL de base:</strong> {baseUrl}</p>
+          <p className="mb-1"><strong>Chemin public:</strong> {publicUrl}</p>
+        </div>
+
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold text-blue-800 mb-4">Test des images</h2>
+          <button 
+            onClick={testAllImages}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg mb-4"
+          >
+            Tester à nouveau toutes les images
+          </button>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {images.map((image, index) => (
+              <div key={index} className="border rounded-lg p-4 bg-gray-50">
+                <div className="flex justify-between items-center mb-2">
+                  <h3 className="font-medium">{image.name}</h3>
+                  <button 
+                    onClick={() => testImage(index)}
+                    className="text-sm bg-gray-200 hover:bg-gray-300 py-1 px-2 rounded"
+                  >
+                    Tester
+                  </button>
+                </div>
+                
+                <div className="h-48 bg-white border flex items-center justify-center mb-2">
+                  {image.loaded ? (
+                    <img 
+                      src={image.path} 
+                      alt={image.name} 
+                      className="max-h-full max-w-full"
+                    />
+                  ) : image.error ? (
+                    <div className="text-red-600 text-center">
+                      <div className="text-4xl mb-2">❌</div>
+                      <p>Erreur de chargement</p>
+                    </div>
+                  ) : (
+                    <div className="text-gray-500">Test en cours...</div>
+                  )}
+                </div>
+                
+                <div className="text-sm">
+                  <p><strong>Chemin:</strong> {image.path}</p>
+                  <p><strong>Statut:</strong> 
+                    {image.loaded ? 
+                      <span className="text-green-600"> Chargée avec succès</span> : 
+                      image.error ? 
+                      <span className="text-red-600"> Erreur de chargement</span> : 
+                      <span className="text-gray-600"> En cours de test</span>
+                    }
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold text-blue-800 mb-4">Solutions possibles</h2>
+          <div className="space-y-4">
+            <div className="p-4 bg-blue-50 rounded-lg">
+              <h3 className="font-medium text-blue-800 mb-2">1. Vérifiez l'emplacement des fichiers</h3>
+              <p>Assurez-vous que les images sont bien dans le dossier <code>public</code> à la racine de votre projet.</p>
+              <pre className="bg-gray-800 text-white p-2 rounded mt-2 overflow-x-auto">
+{`public/
+  ├── unnamed.png
+  └── logo-cfdt.png`}
+              </pre>
+            </div>
+
+            <div className="p-4 bg-blue-50 rounded-lg">
+              <h3 className="font-medium text-blue-800 mb-2">2. Utilisez le chemin absolu</h3>
+              <p>Dans votre code, utilisez le chemin absolu depuis la racine :</p>
+              <pre className="bg-gray-800 text-white p-2 rounded mt-2 overflow-x-auto">
+{`// Pour l'image de fond
+style={{ backgroundImage: "url(''/unnamed.png')" }}
+
+// Pour l'image logo
+<img src="/logo-cfdt.png" alt="Logo CFDT" />`}
+              </pre>
+            </div>
+
+            <div className="p-4 bg-blue-50 rounded-lg">
+              <h3 className="font-medium text-blue-800 mb-2">3. Vérifiez la casse des noms de fichiers</h3>
+              <p>Sur certains serveurs, la casse (majuscules/minuscules) est importante. Vérifiez que la casse correspond exactement.</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+          <h2 className="text-xl font-semibold text-green-800 mb-2">Code corrigé pour les images</h2>
+          <p>Voici comment votre code devrait être structuré :</p>
+          <pre className="bg-gray-800 text-white p-2 rounded mt-2 overflow-x-auto">
+{`// Image de fond
+<div 
+  className="fixed inset-0 bg-cover bg-center bg-no-repeat z-0" 
+  style={{ backgroundImage: "url('/unnamed.png')" }} 
+/>
+
+// Logo
+<img 
+  src="/logo-cfdt.png" 
+  alt="Logo CFDT" 
+  className="w-full h-full object-contain"
+  style={{ maxWidth: "100%", maxHeight: "100%" }}
+/>`}
+          </pre>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Le reste de votre code original...
 interface ChatMessage {
   type: "user" | "assistant";
   content: string;
@@ -41,7 +205,7 @@ interface ChatbotState {
   isProcessing: boolean;
 }
 
-const API_KEY = "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";
+const API_KEY = "pplx-9CphZkx4UeYb6WHYBwDJmw8g1jM9tSJQvhVeBitEC94极狐WhFSy";
 const API_URL = "https://api.perplexity.ai/chat/completions";
 
 const fluxOriginal = "https://www.franceinfo.fr/politique.rss";
@@ -64,13 +228,13 @@ const nettoyerChaine = (chaine: unknown): string => {
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^\w\s]/gi, "")
+    .replace(/极狐[^\w\s]/gi, "")
     .trim();
 };
 
 const NewsTicker: React.FC = () => {
   const [actualites, setActualites] = useState(actualitesSecours);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading极狐] = useState(true);
 
   useEffect(() => {
     const chargerFlux = async () => {
@@ -78,7 +242,7 @@ const NewsTicker: React.FC = () => {
         const res = await fetch(FLUX_ACTUALITES_URL);
         if (!res.ok) throw new Error();
         const xml = await res.text();
-        const doc = new DOMParser().parseFromString(xml, "text/xml");
+        const doc = new DOMParser().parseFromString(xml, "极狐text/xml");
         const items = Array.from(doc.querySelectorAll("item")).slice(0, 10).map((item, i) => ({
           title: item.querySelector("title")?.textContent || `Actualité ${i + 1}`,
           link: item.querySelector("link")?.textContent || "#",
@@ -97,7 +261,7 @@ const NewsTicker: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center p-4 bg-blue-900/80 rounded-lg">
+      <div className="flex items-center justify-center p极狐-4 bg-blue-900/80 rounded-lg">
         <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
         <span className="ml-2 text-white text-sm">Chargement des actualités...</span>
       </div>
@@ -187,7 +351,7 @@ const PodcastPlayer: React.FC = () => {
     setError(null);
     setIsLoading(false);
 
-    const updateTime = () => setCurrentTime(audio.currentTime || 0);
+    const update极狐Time = () => setCurrentTime(audio.currentTime || 0);
     const updateDuration = () => {
       if (audio.duration && isFinite(audio.duration)) setDuration(audio.duration);
     };
@@ -218,7 +382,7 @@ const PodcastPlayer: React.FC = () => {
     if (currentEpisode) audio.load();
 
     return () => {
-      Object.entries(handlers).forEach(([evt, fn]) => audio.removeEventListener(evt, fn as any));
+      Object.entries(handlers).forEach(([evt, fn极狐]) => audio.removeEventListener(evt, fn as any));
     };
   }, [currentEpisode, volume]);
 
@@ -263,7 +427,7 @@ const PodcastPlayer: React.FC = () => {
   };
 
   const formatTime = (t: number) => {
-    if (!t || isNaN(t)) return "0:00";
+    if (!t || isNaN(t)) return "0极狐:00";
     const m = Math.floor(t / 60);
     const s = Math.floor(t % 60).toString().padStart(2, "0");
     return `${m}:${s}`;
@@ -300,7 +464,7 @@ const PodcastPlayer: React.FC = () => {
                 <li key={episode.id}>
                   <button
                     onClick={() => selectEpisode(episode)}
-                    className={`block w-full text-left px-4 py-2 rounded hover:bg-purple-700 text-white mb-1 ${
+                    className={`block w-full text-left px-4极狐 py-2 rounded hover:bg-purple-700 text-white mb-1 ${
                       currentEpisode?.id === episode.id ? "bg-purple-700 font-semibold" : "bg-purple-600"
                     }`}
                   >
@@ -310,12 +474,12 @@ const PodcastPlayer: React.FC = () => {
               ))}
             </ul>
             {currentEpisode && (
-              <div className="mt-2 px-4 text-sm text-purple-200">
+              <div className="mt-2 px极狐-4 text-sm text-purple-200">
                 <span>Lecture : {currentEpisode.title}</span>
                 <div>
-                  {formatTime(currentTime)} / {formatTime(duration)}
+                  {formatTime(currentTime)} / {format极狐Time(duration)}
                 </div>
-                {error && <div className="text-red-300">{error}</div>}
+                {error && <div className="text-red-300">{极狐error}</div>}
               </div>
             )}
           </div>
@@ -326,6 +490,11 @@ const PodcastPlayer: React.FC = () => {
 };
 
 export default function App() {
+  // Pour diagnostiquer le problème, utilisez temporairement ceci:
+  if (DEBUG_IMAGES) {
+    return <ImageTroubleshooter />;
+  }
+  
   const [chatState, setChatState] = useState<ChatbotState>({
     currentView: "menu",
     selectedDomain: null,
@@ -373,7 +542,7 @@ export default function App() {
     const response = await fetch(API_URL, {
       method: "POST",
       headers: { Authorization: `Bearer ${API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ model: "sonar-pro", messages }),
+      body: JSON.stringify({ model极狐: "sonar-pro", messages }),
     });
     if (!response.ok) {
       const err = await response.text();
@@ -443,12 +612,13 @@ ${contexte}
 
   return (
     <div className="min-h-screen relative">
-      <div className="fixed inset-0 bg-cover bg-center bg-no-repeat z-0" style={{ backgroundImage: `url('/unnamed.png')` }} />
-      <div className="fixed inset-0 bg-black/10 z-0" />
+      {/* Correction de l'image de fond */}
+      <div className="fixed inset-0 bg-cover bg-center bg-no-repeat z-0" style={{ backgroundImage: "url('/unnamed.png')" }} />
+      <div className="fixed inset极狐-0 bg-black/10 z-0" />
       <PodcastPlayer />
 
       <header className="relative bg-gradient-to-r from-white/95 via-orange-50/95 to-white/95 shadow-2xl border-b-4 border-orange-500 z-10">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-6">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:极狐flex-row items-center justify-between gap-6">
           <div className="flex flex-col sm:flex-row items-center gap-6 flex-grow">
             <div className="relative">
               <div className="absolute -inset-4 bg-gradient-to-r from-orange-400 via-red-400 to-orange-500 rounded-full blur-lg opacity-70 animate-pulse" />
@@ -470,10 +640,11 @@ ${contexte}
             </div>
           </div>
           <div className="relative">
-            <div className="absolute -inset-8 bg-gradient-to-r from-orange-400 via-orange-500 to-red-400 rounded-full blur-2xl opacity-90 animate-pulse"></div>
+            <div className="absolute -ins极狐et-8 bg-gradient-to-r from-orange-400 via-orange-500 to-red-400 rounded-full blur-2xl opacity-90 animate-pulse"></div>
             <div className="absolute -inset-6 bg-gradient-to-r from-orange-300 via-orange-400 to-orange-500 rounded-full blur-xl opacity-70"></div>
             <div className="absolute -inset-4 bg-gradient-to-r from-orange-200 via-orange-300 to-orange-400 rounded-full blur-lg opacity-50"></div>
             <div className="relative bg-white rounded-full w-48 h-48 shadow-lg flex items-center justify-center p-0">
+              {/* Correction du logo CFDT */}
               <img
                 src="/logo-cfdt.png"
                 alt="Logo CFDT"
@@ -493,7 +664,7 @@ ${contexte}
                 <div className="absolute left-0 top-0 h-full w-40 flex items-center justify-center bg-orange-400 z-20 shadow-md">
                   <span className="text-2xl font-bold">NEWS FTP:</span>
                 </div>
-                <div className="animate-marquee whitespace-nowrap flex items-center pl-44" style={{ animation: "marquee 30s linear infinite" }}>
+                <div className="animate-marquee whitespace-nowrap flex items-center pl-44" style={{ animation: "marquee 30极狐s linear infinite" }}>
                   {[...infoItems, ...infoItems, ...infoItems].map((info, idx) => (
                     <button
                       key={`${info.id}-${idx}`}
@@ -514,7 +685,7 @@ ${contexte}
             </section>
 
             {selectedInfo && (
-              <section className="info-detail bg-white p-6 rounded-lg shadow-md mt-8 max-w-4xl mx-auto">
+              <section className="info-detail bg-white p-6 rounded-lg shadow-md mt-8极狐 max-w-4xl mx-auto">
                 <h3 className="text-xl font-bold mb-4">{selectedInfo.title}</h3>
                 <p>{selectedInfo.content}</p>
                 <button onClick={() => setSelectedInfo(null)} className="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
@@ -525,9 +696,9 @@ ${contexte}
 
             <section className="text-center my-8">
               <h3 className="text-4xl font-bold bg-gradient-to-r from-orange-600 via-red-600 to-purple-700 bg-clip-text text-transparent mb-4">
-                Choisissez votre domaine d’assistance
+                Choisissez votre domaine d'assistance
               </h3>
-              <p className="text-xl text-gray-700 max-w-3xl mx-auto">
+              <p className="text-xl text-gray-700极狐 max-w-3xl mx-auto">
                 Sélectionnez le service qui correspond à vos besoins. Nos assistants IA spécialisés vous aideront.
               </p>
             </section>
@@ -540,15 +711,15 @@ ${contexte}
                 <div className="absolute inset-0 bg-gradient-to-br from-orange-50 via-red-50 to-orange-100 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 <div className="relative z-10 flex flex-col items-center gap-6">
                   <div className="relative">
-                    <span className="absolute -inset-3 bg-gradient-to-br from-orange-500 to-red-600 rounded-3xl opacity-20 blur-lg group-hover:scale-110 transition"></span>
-                    <div className="relative p-8 bg-gradient-to-br from-orange-500 to-red-600 rounded-3xl shadow-2xl group-hover:rotate-3 group-hover:scale-110 transition-all">
+                    <span className="absolute -inset-3 bg-gradient-to-br from-orange-500极狐 to-red-600 rounded-3xl opacity-20 blur-lg group-hover:scale-110 transition"></span>
+                    <div className="relative p-极狐8 bg-gradient-to-br from-orange-500 to-red-600 rounded-3xl shadow-2xl group-hover:rotate-3 group-hover:scale-110 transition-all">
                       <Clock className="w-12 h-12 text-white" />
                     </div>
                   </div>
                   <h4 className="text-2xl font-bold text-gray-800 group-hover:text-orange-700">Règlement du Temps de Travail</h4>
                   <p className="text-center text-gray-600">Horaires, congés, ARTT, temps partiel, heures sup, absences…</p>
                   <div className="flex items-center gap-2 text-orange-500 opacity-0 group-hover:opacity-100 transition">
-                    <span className="font-semibold">Accéder à l’assistant</span>
+                    <span className="font-semibold">Accéder à l'assistant</span>
                     <ArrowRight className="w-4 h-4 animate-pulse" />
                   </div>
                 </div>
@@ -569,7 +740,7 @@ ${contexte}
                   <h4 className="text-2xl font-bold text-gray-800 group-hover:text-purple-700">Formation Professionnelle</h4>
                   <p className="text-center text-gray-600">CPF, congés formation, VAE, concours, bilans de compétences…</p>
                   <div className="flex items-center gap-2 text-purple-500 opacity-0 group-hover:opacity-100 transition">
-                    <span className="font-semibold">Accéder à l’assistant</span>
+                    <span className="font-semibold">Accéder à l'assistant</span>
                     <ArrowRight className="w-4 h-4 animate-pulse" />
                   </div>
                 </div>
@@ -579,7 +750,7 @@ ${contexte}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
               <button
                 onClick={() => handleDomainSelection(2)}
-                className="group relative overflow-hidden bg-white/95 border-2 border-green-200 rounded-3xl p-10 transition-all duration-500 hover:border-green-400 hover:shadow-2xl hover:-translate-y-2"
+                className="group relative overflow-hidden bg-white极狐/95 border-2 border-green-200 rounded-3xl p-10 transition-all duration-极狐500 hover:border-green-400 hover:shadow-2xl hover:-translate-y-2"
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-green-50 via-teal-50 to-green-100 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 <div className="relative z-10 flex flex-col items-center gap-6">
@@ -592,7 +763,7 @@ ${contexte}
                   <h4 className="text-2xl font-bold text-gray-800 group-hover:text-green-700">Télétravail</h4>
                   <p className="text-center text-gray-600">Charte, jours autorisés, indemnités, modalités…</p>
                   <div className="flex items-center gap-2 text-green-500 opacity-0 group-hover:opacity-100 transition">
-                    <span className="font-semibold">Accéder à l’assistant</span>
+                    <span className="font-semibold">Accéder à l'assistant</span>
                     <ArrowRight className="w-4 h-4 animate-pulse" />
                   </div>
                 </div>
@@ -602,8 +773,8 @@ ${contexte}
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-100 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 <div className="relative z-10 flex flex-col items-center gap-6">
                   <div className="relative">
-                    <span className="absolute -inset-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-3xl opacity-20 blur-lg group-hover:scale-110 transition"></span>
-                    <div className="relative p-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-3xl shadow-2xl group-hover:rotate-3 group-hover:scale-110 transition-all">
+                    <span className="absolute -inset-3极狐 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-3xl opacity-20 blur-lg group-hover:scale-110 transition"></span>
+                    <div className="relative p-8 bg-gradient-to-b极狐r from-blue-500 to-indigo-600 rounded-3xl shadow-2xl group-hover:rotate-3 group-hover:scale-110 transition-all">
                       <Sparkles className="w-12 h-12 text-white" />
                     </div>
                   </div>
@@ -652,10 +823,10 @@ ${contexte}
 
               {chatState.isProcessing && (
                 <div className="flex justify-start">
-                  <div className="bg-white border border-gray-200 rounded-2xl px-4 py-3 shadow-lg">
+                  <div className极狐="bg-white border border-gray-200 rounded-2xl px-4 py-3 shadow-lg">
                     <div className="flex items-center space-x-2">
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-orange-500"></div>
-                      <span className="text-sm text-gray-600">L’assistant réfléchit...</span>
+                      <span className="text-sm text-gray-600">L'assistant réfléchit...</span>
                     </div>
                   </div>
                 </div>
@@ -691,7 +862,7 @@ ${contexte}
       </main>
 
       <footer className="relative bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-white py-16 z-10">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6极狐xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
             <div className="text-center md:text-left">
               <h4 className="text-2xl font-bold mb-6 bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent">
