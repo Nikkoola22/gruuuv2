@@ -205,7 +205,7 @@ interface ChatbotState {
   isProcessing: boolean;
 }
 
-const API_KEY = "VOTRE_CLE_API_PERPLEXITY"; // Remplacez par votre clé
+const API_KEY = "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"; // Remplacez par votre clé
 const API_URL = "https://api.perplexity.ai/chat/completions";
 
 const fluxOriginal = "https://www.franceinfo.fr/politique.rss";
@@ -546,7 +546,7 @@ export default function App() {
     const response = await fetch(API_URL, {
       method: "POST",
       headers: { Authorization: `Bearer ${API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ model: "llama-3-sonar-large-32k-online", messages }),
+      body: JSON.stringify({ model: "sonar-pro", messages }),
     });
     if (!response.ok) {
       const err = await response.text();
