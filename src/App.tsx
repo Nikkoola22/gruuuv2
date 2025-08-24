@@ -30,8 +30,8 @@ const DEBUG_IMAGES = false;
 // Composant de diagnostic intégré directement
 const ImageTroubleshooter = () => {
   const [images, setImages] = useState([
-    { name: "unnamed.jpg", path: "/unnamed.jpg", loaded: false, error: false },
-    { name: "logo-cfdt.jpg", path: "/logo-cfdt.jpg", loaded: false, error: false }
+    { name: "unnamed.jpg", path: "./unnamed.jpg", loaded: false, error: false },
+    { name: "logo-cfdt.jpg", path: "./logo-cfdt.jpg", loaded: false, error: false }
   ]);
 
   const [publicUrl, setPublicUrl] = useState("");
@@ -149,10 +149,10 @@ const ImageTroubleshooter = () => {
               <p>Dans votre code, utilisez le chemin absolu depuis la racine :</p>
               <pre className="bg-gray-800 text-white p-2 rounded mt-2 overflow-x-auto">
 {`// Pour l'image de fond
-style={{ backgroundImage: "url('/unnamed.jpg')" }}
+style={{ backgroundImage: "url('./unnamed.jpg')" }}
 
 // Pour l'image logo
-<img src="/logo-cfdt.jpg" alt="Logo CFDT" />`}
+<img src="./logo-cfdt.jpg" alt="Logo CFDT" />`}
               </pre>
             </div>
 
@@ -170,12 +170,12 @@ style={{ backgroundImage: "url('/unnamed.jpg')" }}
 {`// Image de fond
 <div 
   className="fixed inset-0 bg-cover bg-center bg-no-repeat z-0" 
-  style={{ backgroundImage: "url('/unnamed.jpg')" }} 
+  style={{ backgroundImage: "url('./unnamed.jpg')" }} 
 />
 
 // Logo
 <img 
-  src="/logo-cfdt.jpg" 
+  src="./logo-cfdt.jpg" 
   alt="Logo CFDT" 
   className="w-full h-full object-contain"
   style={{ maxWidth: "100%", maxHeight: "100%" }}
@@ -356,18 +356,18 @@ const PodcastPlayer: React.FC = () => {
       if (audio.duration && isFinite(audio.duration)) setDuration(audio.duration);
     };
     const handleEnded = () => {
-        setIsPlaying(false);
-        const currentIndex = podcastEpisodes.findIndex((e) => e.id === currentEpisode?.id);
-        if (currentIndex !== -1 && currentIndex < podcastEpisodes.length - 1) {
-          setCurrentEpisode(podcastEpisodes[currentIndex + 1]);
-        }
+      setIsPlaying(false);
+      const currentIndex = podcastEpisodes.findIndex((e) => e.id === currentEpisode?.id);
+      if (currentIndex !== -1 && currentIndex < podcastEpisodes.length - 1) {
+        setCurrentEpisode(podcastEpisodes[currentIndex + 1]);
+      }
     };
     const handleError = () => {
-        setIsLoading(false);
-        setIsPlaying(false);
-        setError("Impossible de charger ce podcast. Vérifiez votre connexion.");
+      setIsLoading(false);
+      setIsPlaying(false);
+      setError("Impossible de charger ce podcast. Vérifiez votre connexion.");
     };
-    
+
     const handlers: { [key: string]: EventListener } = {
       timeupdate: updateTime,
       loadedmetadata: updateDuration,
@@ -413,8 +413,8 @@ const PodcastPlayer: React.FC = () => {
 
   const selectEpisode = (episode: PodcastEpisode) => {
     if (currentEpisode?.id !== episode.id) {
-        setCurrentEpisode(episode);
-        setIsPlaying(false); // Let useEffect handle loading and playing
+      setCurrentEpisode(episode);
+      setIsPlaying(false); // Let useEffect handle loading and playing
     }
   };
 
@@ -453,7 +453,15 @@ const PodcastPlayer: React.FC = () => {
         <audio ref={audioRef} src={currentEpisode?.url} preload="metadata" style={{ display: "none" }} crossOrigin="anonymous" />
         {!isMinimized && (
           <div className="mt-4">
-            <h4 className="text-white font-bold text-center mb-2">Épisodes disponibles</h4>
+            {/* Affichage de la vignette du podcast */}
+            <div className="flex flex-col items-center mb-4">
+              <img 
+                src="./podcast.jpg"  // <- Chemin identique, image dans 'public'
+                alt="Illustration Podcast"
+                className="w-32 h-32 object-cover rounded-full shadow-md border-2 border-purple-400"
+              />
+              <h4 className="text-white font-bold text-center mt-2">Épisodes disponibles</h4>
+            </div>
             <ul className="max-h-48 overflow-y-auto">
               {podcastEpisodes.map(episode => (
                 <li key={episode.id}>
@@ -483,6 +491,7 @@ const PodcastPlayer: React.FC = () => {
     </div>
   );
 };
+
 
 export default function App() {
   if (DEBUG_IMAGES) {
@@ -605,7 +614,7 @@ ${contexte}
 
   return (
     <div className="min-h-screen relative font-sans">
-      <div className="fixed inset-0 bg-cover bg-center bg-no-repeat z-0" style={{ backgroundImage: "url('/unnamed.jpg')" }} />
+      <div className="fixed inset-0 bg-cover bg-center bg-no-repeat z-0" style={{ backgroundImage: "url('./unnamed.jpg')" }} />
       <div className="fixed inset-0 bg-black/10 z-0" />
       <PodcastPlayer />
 
@@ -635,7 +644,7 @@ ${contexte}
             <div className="absolute -inset-8 bg-gradient-to-r from-orange-400 via-orange-500 to-red-400 rounded-full blur-2xl opacity-90 animate-pulse"></div>
             <div className="relative bg-white rounded-full w-40 h-40 sm:w-48 sm:h-48 shadow-lg flex items-center justify-center p-2">
               <img
-                src="/logo-cfdt.jpg" // CORRECTION APPLIQUÉE ICI
+                src="./logo-cfdt.jpg" // CORRECTION APPLIQUÉE ICI
                 alt="Logo CFDT"
                 className="w-full h-full object-contain"
               />
