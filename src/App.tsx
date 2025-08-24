@@ -205,7 +205,7 @@ interface ChatbotState {
   isProcessing: boolean;
 }
 
-const API_KEY = "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"; // Remplacez par votre clé
+const API_KEY = "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";
 const API_URL = "https://api.perplexity.ai/chat/completions";
 
 const fluxOriginal = "https://www.franceinfo.fr/politique.rss";
