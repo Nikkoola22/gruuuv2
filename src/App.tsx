@@ -31,7 +31,7 @@ const DEBUG_IMAGES = false;
 const ImageTroubleshooter = () => {
   const [images, setImages] = useState([
     { name: "unnamed.jpg", path: "/unnamed.jpg", loaded: false, error: false },
-    { name: "logo-cfdt.png", path: "/logo-cfdt.png", loaded: false, error: false }
+    { name: "logo-cfdt.jpg", path: "/logo-cfdt.jpg", loaded: false, error: false }
   ]);
 
   const [publicUrl, setPublicUrl] = useState("");
@@ -140,7 +140,7 @@ const ImageTroubleshooter = () => {
               <pre className="bg-gray-800 text-white p-2 rounded mt-2 overflow-x-auto">
 {`public/
   ├── unnamed.jpg
-  └── logo-cfdt.png`}
+  └── logo-cfdt.jpg`}
               </pre>
             </div>
 
@@ -152,7 +152,7 @@ const ImageTroubleshooter = () => {
 style={{ backgroundImage: "url('/unnamed.jpg')" }}
 
 // Pour l'image logo
-<img src="/logo-cfdt.png" alt="Logo CFDT" />`}
+<img src="/logo-cfdt.jpg" alt="Logo CFDT" />`}
               </pre>
             </div>
 
@@ -175,7 +175,7 @@ style={{ backgroundImage: "url('/unnamed.jpg')" }}
 
 // Logo
 <img 
-  src="/logo-cfdt.png" 
+  src="/logo-cfdt.jpg" 
   alt="Logo CFDT" 
   className="w-full h-full object-contain"
   style={{ maxWidth: "100%", maxHeight: "100%" }}
@@ -635,7 +635,7 @@ ${contexte}
             <div className="absolute -inset-8 bg-gradient-to-r from-orange-400 via-orange-500 to-red-400 rounded-full blur-2xl opacity-90 animate-pulse"></div>
             <div className="relative bg-white rounded-full w-40 h-40 sm:w-48 sm:h-48 shadow-lg flex items-center justify-center p-2">
               <img
-                src="/logo-cfdt.png"
+                src="/logo-cfdt.jpg" // CORRECTION APPLIQUÉE ICI
                 alt="Logo CFDT"
                 className="w-full h-full object-contain"
               />

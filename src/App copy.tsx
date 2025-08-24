@@ -298,7 +298,7 @@ function App() {
             <div className="absolute -inset-4 bg-gradient-to-r from-orange-200 via-orange-300 to-orange-400 rounded-full blur-lg opacity-50"></div>
             <div className="relative bg-white rounded-full p-2 shadow-lg">
               <img
-                src="/logo-cfdt-orange.png"
+                src="/logo-cfdt.png"
                 alt="Logo CFDT"
                 className="relative w-44 h-44 object-contain z-20"
                 style={{ maxHeight: "176px" }}
