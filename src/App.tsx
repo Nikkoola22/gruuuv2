@@ -205,7 +205,7 @@ interface ChatbotState {
   isProcessing: boolean;
 }
 
-const API_KEY = import.meta.env.VITE_APP_PERPLEXITY_KEY;
+const API_KEY = "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";
 const API_URL = "https://api.perplexity.ai/chat/completions";
 
 const fluxOriginal = "https://www.franceinfo.fr/politique.rss";
@@ -426,52 +426,31 @@ const PodcastPlayer: React.FC = () => {
   };
 
   return (
-    <div className={`fixed right-4 bottom-4 z-50 transition-all duration-300 ${isMinimized ? "w-64 h-16" : "w-80 h-auto"}`}>
+    <div className={`fixed right-4 bottom-4 z-50 transition-all duration-300 ${isMinimized ? "w-60 h-14" : "w-80 h-auto"}`}>
       <div className="flex flex-col bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 rounded-xl shadow-lg border border-purple-500/30 overflow-hidden p-2">
         <div className="flex items-center justify-between gap-2">
-          <button onClick={() => setIsMinimized(!isMinimized)} className="text-white p-1.5 hover:bg-white/10 rounded-full shrink-0">
+          <button onClick={() => setIsMinimized(!isMinimized)} className="text-white p-1.5 hover:bg-white/10 rounded-full">
             {isMinimized ? "🔼" : "🔽"}
           </button>
-          
-          {isMinimized && currentEpisode && (
-            <img 
-              src="./podcast.jpg" 
-              alt="Podcast" 
-              className="w-10 h-10 rounded-md object-cover"
-            />
-          )}
-
           {currentEpisode && (
-            <button onClick={playPause} className="bg-purple-600 hover:bg-purple-700 text-white rounded-full p-2 shrink-0">
+            <button onClick={playPause} className="bg-purple-600 hover:bg-purple-700 text-white rounded-full p-2">
               {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
             </button>
           )}
-          
-          {isMinimized && (
-            <div className="flex-grow flex flex-col justify-center overflow-hidden">
-              <p className="text-white text-xs font-bold truncate">{currentEpisode?.title || "Podcast"}</p>
-              <p className="text-purple-300 text-xs">{formatTime(currentTime)} / {formatTime(duration)}</p>
-            </div>
-          )}
-
-          {!isMinimized && (
-            <div className="flex-grow flex items-center gap-2">
-              <Volume2 className="w-5 h-5 text-gray-300" />
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.01"
-                value={volume}
-                onChange={e => setVolume(parseFloat(e.target.value))}
-                className="w-full h-1 bg-purple-300 rounded slider appearance-none"
-              />
-            </div>
-          )}
+          <div className="flex-grow flex items-center gap-2">
+            <Volume2 className="w-5 h-5 text-gray-300" />
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              value={volume}
+              onChange={e => setVolume(parseFloat(e.target.value))}
+              className="w-full h-1 bg-purple-300 rounded slider appearance-none"
+            />
+          </div>
         </div>
-        
         <audio ref={audioRef} src={currentEpisode?.url} preload="metadata" style={{ display: "none" }} crossOrigin="anonymous" />
-        
         {!isMinimized && (
           <div className="mt-4">
             {/* Affichage de la vignette du podcast */}
@@ -680,7 +659,7 @@ ${contexte}
             <section className="relative bg-orange-300 text-black overflow-hidden mx-auto max-w-5xl rounded-2xl shadow-lg z-10">
               <div className="relative h-20 flex items-center overflow-hidden">
                 <div className="absolute left-0 top-0 h-full w-40 flex items-center justify-center bg-orange-400 z-20 shadow-md">
-                  <span className="text-2xl font-bold">NEWS FPT:</span>
+                  <span className="text-2xl font-bold">NEWS FTP:</span>
                 </div>
                 <div className="animate-marquee whitespace-nowrap flex items-center pl-44" style={{ animation: "marquee 30s linear infinite" }}>
                   {[...infoItems, ...infoItems].map((info, idx) => (
@@ -713,7 +692,7 @@ ${contexte}
             )}
 
             <section className="text-center my-12">
-              <h3 className="text-4xl font-bold bg-gradient-to-r from-black-600 via-red-600 to-purple-700 bg-clip-text text-transparent mb-4">
+              <h3 className="text-4xl font-bold bg-gradient-to-r from-orange-600 via-red-600 to-purple-700 bg-clip-text text-transparent mb-4">
                 Choisissez votre domaine d'assistance
               </h3>
               <p className="text-xl text-gray-700 max-w-3xl mx-auto">
