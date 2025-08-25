@@ -659,7 +659,7 @@ ${contexte}
             <section className="relative bg-orange-300 text-black overflow-hidden mx-auto max-w-5xl rounded-2xl shadow-lg z-10">
               <div className="relative h-20 flex items-center overflow-hidden">
                 <div className="absolute left-0 top-0 h-full w-40 flex items-center justify-center bg-orange-400 z-20 shadow-md">
-                  <span className="text-2xl font-bold">NEWS FTP:</span>
+                  <span className="text-2xl font-bold">NEWS FPT:</span>
                 </div>
                 <div className="animate-marquee whitespace-nowrap flex items-center pl-44" style={{ animation: "marquee 30s linear infinite" }}>
                   {[...infoItems, ...infoItems].map((info, idx) => (
