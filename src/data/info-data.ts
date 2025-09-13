@@ -22,6 +22,11 @@ export const infoItems: InfoItem[] = [
   },
     {
     id: 4,
+    title: "Entretien avec son chef: accident de service?.",
+    content: "La circonstance qu’un chef de service, recevant en entretien individuel l’un de ses agents, ait pu adresser à ce dernier plusieurs reproches sur sa manière de servir et s’énerver en lui reprochant notamment « tricher sur ses horaires de travail », n’est pas constitutive d’un accident de service, dès lors que la restitution de cet entretien par l’intéressé ne fait apparaitre aucun propos ou comportement excédant l'exercice normal du pouvoir hiérarchique de ce supérieur.TA Besançon 2400131 du 19.06.2025."
+  },
+  {
+    id: 5,
     title: "Sanction: Utilisation WhatApp.",
     content: "La circonstance qu’un agent ait envoyé depuis son téléphone personnel et sa messagerie WhatsApp, à l'attention de plusieurs personnes, dont des élus, des photos montages assortis de sous-titre déshonorants à l'encontre de la maire de la ville et de son troisième adjoint, présente un caractère fautif et non humoristique, compte-tenu de la nature des photographies diffusées et des personnes visées par ces montages. Par suite, le comportement de l’intéressé constitue un manquement à son obligation de dignité, de réserve de probité, d'intégrité et de loyauté, justifiant son exclusion de fonctions durant deux ans. La circonstance que les messages incriminés soient provenus de la messagerie privée de l'intéressé et en dehors du service est sans incidence dès lors que le comportement d'un agent public peut avoir pour effet de perturber le service ou de jeter le discrédit sur l'administration, comme en l'espèce.TA Cergy-Pontoise 2201748 du 09.07.2025."
   
