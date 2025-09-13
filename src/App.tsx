@@ -44,7 +44,7 @@ interface ChatbotState {
   isProcessing: boolean;
 }
 
-const API_KEY = import.meta.env.VITE_PERPLEXITY_API_KEY;
+const API_KEY = import.meta.env.VITE_APP_PERPLEXITY_KEY;
 const API_URL = "https://api.perplexity.ai/chat/completions";
 
 const fluxOriginal = "https://www.franceinfo.fr/politique.rss";
