@@ -281,7 +281,7 @@ const NewsTicker: React.FC = () => {
               className="flex items-center mx-6 text-white hover:text-blue-200 transition-colors no-underline"
             >
               <span className="mr-2 text-yellow-300">📰</span>
-              <span className="font-medium text-sm sm:text-base">{item.title}</span>
+              <span className="font-medium text-xl sm:text-2xl">{item.title}</span>
               <span className="mx-4 text-blue-300">•</span>
             </a>
           ))}
@@ -614,7 +614,7 @@ ${contexte}
 
   return (
     <div className="min-h-screen relative font-sans">
-      <div className="fixed inset-0 bg-cover bg-center bg-no-repeat z-0" style={{ backgroundImage: "url('./unnamed.jpg')" }} />
+      <div className="fixed inset-0 bg-cover bg-center bg-no-repeat z-0" style={{ backgroundImage: "url('./mairie.jpeg')" }} />
       <div className="fixed inset-0 bg-black/10 z-0" />
       <PodcastPlayer />
 
@@ -641,8 +641,8 @@ ${contexte}
             </div>
           </div>
           <div className="relative shrink-0">
-            <div className="absolute -inset-2 bg-gradient-to-r from-orange-400 via-orange-500 to-red-400 rounded-full blur-lg opacity-60 animate-pulse"></div>
-            <div className="relative bg-white rounded-full w-56 h-56 sm:w-64 sm:h-64 shadow-lg overflow-hidden">
+            <div className="absolute -inset-4 bg-gradient-to-r from-orange-400 via-orange-500 to-red-400 rounded-full blur-2xl opacity-80 animate-pulse"></div>
+            <div className="relative bg-white rounded-full w-40 h-40 sm:w-48 sm:h-48 shadow-lg overflow-hidden">
               <img
                 src="./logo-cfdt.jpg"
                 alt="Logo CFDT"
@@ -843,7 +843,12 @@ ${contexte}
                 </div>
                 <div className="flex items-center justify-center md:justify-start gap-3">
                   <Mail className="w-5 h-5 text-orange-400" />
-                  <span>cfdt-interco@ville-gennevilliers.fr</span>
+                  <a 
+                    href="mailto:cfdt-interco@ville-gennevilliers.fr"
+                    className="text-white hover:text-orange-300 transition-colors"
+                  >
+                    cfdt-interco@ville-gennevilliers.fr
+                  </a>
                 </div>
                 <div className="flex items-center justify-center md:justify-start gap-3">
                   <MapPin className="w-5 h-5 text-orange-400" />
