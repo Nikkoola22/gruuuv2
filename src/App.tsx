@@ -25,167 +25,6 @@ import { infoItems } from "./data/info-data.ts";
 import { podcastEpisodes, type PodcastEpisode } from "./data/podcasts/mp3.ts";
 
 // Variable pour activer/désactiver le diagnostic
-const DEBUG_IMAGES = false;
-
-// Composant de diagnostic intégré directement
-const ImageTroubleshooter = () => {
-  const [images, setImages] = useState([
-    { name: "unnamed.jpg", path: "./unnamed.jpg", loaded: false, error: false },
-    { name: "logo-cfdt.jpg", path: "./logo-cfdt.jpg", loaded: false, error: false }
-  ]);
-
-  const [publicUrl, setPublicUrl] = useState("");
-  const [baseUrl, setBaseUrl] = useState("");
-
-  useEffect(() => {
-    setBaseUrl(window.location.origin);
-    setPublicUrl(`${window.location.origin}/public`);
-    testAllImages();
-  }, []);
-
-  const testImage = (index: number) => {
-    const img = new Image();
-    const image = images[index];
-    
-    img.onload = () => {
-      const updatedImages = [...images];
-      updatedImages[index] = { ...image, loaded: true, error: false };
-      setImages(updatedImages);
-    };
-    
-    img.onerror = () => {
-      const updatedImages = [...images];
-      updatedImages[index] = { ...image, loaded: false, error: true };
-      setImages(updatedImages);
-    };
-    
-    img.src = image.path;
-  };
-
-  const testAllImages = () => {
-    images.forEach((_, index) => testImage(index));
-  };
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
-      <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-6">
-        <h1 className="text-3xl font-bold text-blue-800 mb-6">Diagnostic d'affichage des images</h1>
-        
-        <div className="mb-8 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
-          <h2 className="text-xl font-semibold text-yellow-800 mb-2">Informations sur l'environnement</h2>
-          <p className="mb-1"><strong>URL de base:</strong> {baseUrl}</p>
-          <p className="mb-1"><strong>Chemin public:</strong> {publicUrl}</p>
-        </div>
-
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold text-blue-800 mb-4">Test des images</h2>
-          <button 
-            onClick={testAllImages}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg mb-4"
-          >
-            Tester à nouveau toutes les images
-          </button>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {images.map((image, index) => (
-              <div key={index} className="border rounded-lg p-4 bg-gray-50">
-                <div className="flex justify-between items-center mb-2">
-                  <h3 className="font-medium">{image.name}</h3>
-                  <button 
-                    onClick={() => testImage(index)}
-                    className="text-sm bg-gray-200 hover:bg-gray-300 py-1 px-2 rounded"
-                  >
-                    Tester
-                  </button>
-                </div>
-                
-                <div className="h-48 bg-white border flex items-center justify-center mb-2">
-                  {image.loaded ? (
-                    <img 
-                      src={image.path} 
-                      alt={image.name} 
-                      className="max-h-full max-w-full"
-                    />
-                  ) : image.error ? (
-                    <div className="text-red-600 text-center">
-                      <div className="text-4xl mb-2">❌</div>
-                      <p>Erreur de chargement</p>
-                    </div>
-                  ) : (
-                    <div className="text-gray-500">Test en cours...</div>
-                  )}
-                </div>
-                
-                <div className="text-sm">
-                  <p><strong>Chemin:</strong> {image.path}</p>
-                  <p><strong>Statut:</strong> 
-                    {image.loaded ? 
-                      <span className="text-green-600"> Chargée avec succès</span> : 
-                      image.error ? 
-                      <span className="text-red-600"> Erreur de chargement</span> : 
-                      <span className="text-gray-600"> En cours de test</span>
-                    }
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold text-blue-800 mb-4">Solutions possibles</h2>
-          <div className="space-y-4">
-            <div className="p-4 bg-blue-50 rounded-lg">
-              <h3 className="font-medium text-blue-800 mb-2">1. Vérifiez l'emplacement des fichiers</h3>
-              <p>Assurez-vous que les images sont bien dans le dossier <code>public</code> à la racine de votre projet.</p>
-              <pre className="bg-gray-800 text-white p-2 rounded mt-2 overflow-x-auto">
-{`public/
-  ├── unnamed.jpg
-  └── logo-cfdt.jpg`}
-              </pre>
-            </div>
-
-            <div className="p-4 bg-blue-50 rounded-lg">
-              <h3 className="font-medium text-blue-800 mb-2">2. Utilisez le chemin absolu</h3>
-              <p>Dans votre code, utilisez le chemin absolu depuis la racine :</p>
-              <pre className="bg-gray-800 text-white p-2 rounded mt-2 overflow-x-auto">
-{`// Pour l'image de fond
-style={{ backgroundImage: "url('./unnamed.jpg')" }}
-
-// Pour l'image logo
-<img src="./logo-cfdt.jpg" alt="Logo CFDT" />`}
-              </pre>
-            </div>
-
-            <div className="p-4 bg-blue-50 rounded-lg">
-              <h3 className="font-medium text-blue-800 mb-2">3. Vérifiez la casse des noms de fichiers</h3>
-              <p>Sur certains serveurs, la casse (majuscules/minuscules) est importante. Vérifiez que la casse correspond exactement.</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-          <h2 className="text-xl font-semibold text-green-800 mb-2">Code corrigé pour les images</h2>
-          <p>Voici comment votre code devrait être structuré :</p>
-          <pre className="bg-gray-800 text-white p-2 rounded mt-2 overflow-x-auto">
-{`// Image de fond
-<div 
-  className="fixed inset-0 bg-cover bg-center bg-no-repeat z-0" 
-  style={{ backgroundImage: "url('./unnamed.jpg')" }} 
-/>
-
-// Logo
-<img 
-  src="./logo-cfdt.jpg" 
-  alt="Logo CFDT" 
-  className="w-full h-full object-contain"
-  style={{ maxWidth: "100%", maxHeight: "100%" }}
-/>`}
-          </pre>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 // Le reste de votre code original...
 interface ChatMessage {
@@ -489,9 +328,9 @@ const PodcastPlayer: React.FC = () => {
 
 
 export default function App() {
-  if (DEBUG_IMAGES) {
-    return <ImageTroubleshooter />;
-  }
+  // if (DEBUG_IMAGES) {
+  //   return <ImageTroubleshooter />;
+  // }
   
   const [chatState, setChatState] = useState<ChatbotState>({
     currentView: "menu",
@@ -767,36 +606,49 @@ ${contexte}
               <Users className="w-8 h-8 text-white" />
             </div>
 
-            <div className="h-[60vh] overflow-y-auto p-6 space-y-4 bg-gradient-to-b from-gray-50 to-white">
-              {chatState.messages.map((msg, i) => (
-                <div key={i} className={`flex items-end gap-2 ${msg.type === "user" ? "justify-end" : "justify-start"}`}>
-                   {msg.type === 'assistant' && <div className="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center shrink-0">CFDT</div>}
-                  <div
-                    className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl shadow-md ${
-                      msg.type === "user"
-                        ? "bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-br-none"
-                        : "bg-white border border-gray-200 text-gray-800 rounded-bl-none"
-                    }`}
-                  >
-                    <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
-                    <p className="text-xs mt-2 opacity-70 text-right">{msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
-                  </div>
-                </div>
-              ))}
-
-              {chatState.isProcessing && (
-                <div className="flex items-end gap-2 justify-start">
-                  <div className="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center shrink-0">CFDT</div>
-                  <div className="bg-white border border-gray-200 rounded-2xl px-4 py-3 shadow-md rounded-bl-none">
-                    <div className="flex items-center space-x-2">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-orange-500"></div>
-                      <span className="text-sm text-gray-600">L'assistant réfléchit...</span>
+            {/* Bloc principal en flex horizontal */}
+            <div className="flex flex-row">
+              {/* Zone des messages/questions */}
+              <div className="flex-1 h-[60vh] overflow-y-auto p-6 space-y-4 bg-gradient-to-b from-gray-50 to-white">
+                {chatState.messages.map((msg, i) => (
+                  <div key={i} className={`flex items-end gap-2 ${msg.type === "user" ? "justify-end" : "justify-start"}`}>
+                    {msg.type === 'assistant' && <div className="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center shrink-0">CFDT</div>}
+                    <div
+                      className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl shadow-md ${
+                        msg.type === "user"
+                          ? "bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-br-none"
+                          : "bg-white border border-gray-200 text-gray-800 rounded-bl-none"
+                      }`}
+                    >
+                      <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                      <p className="text-xs mt-2 opacity-70 text-right">{msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                     </div>
                   </div>
-                </div>
-              )}
+                ))}
 
-              <div ref={messagesEndRef} />
+                {chatState.isProcessing && (
+                  <div className="flex items-end gap-2 justify-start">
+                    <div className="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center shrink-0">CFDT</div>
+                    <div className="bg-white border border-gray-200 rounded-2xl px-4 py-3 shadow-md rounded-bl-none">
+                      <div className="flex items-center space-x-2">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-orange-500"></div>
+                        <span className="text-sm text-gray-600">L'assistant réfléchit...</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div ref={messagesEndRef} />
+              </div>
+
+              {/* GIF à droite, remonté et agrandi */}
+              <div className="flex flex-col items-end pt-6 pr-8 min-w-[180px]">
+                <img
+                  src="./cfdtmanga.gif"
+                  alt="CFDT Manga"
+                  className="w-80 h-80 object-contain rounded-2xl shadow-lg border-4 border-orange-300"
+                />
+              </div>
             </div>
 
             <div className="p-4 bg-gray-50/80 border-t border-gray-200 backdrop-blur-sm">
