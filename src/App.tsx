@@ -287,7 +287,7 @@ const NewsTicker: React.FC = () => {
           ))}
         </div>
       </div>
-      <style jsx>{`
+      <style>{`
         @keyframes ticker {
           0% { transform: translateX(0); }
           100% { transform: translateX(-50%); }
@@ -641,12 +641,12 @@ ${contexte}
             </div>
           </div>
           <div className="relative shrink-0">
-            <div className="absolute -inset-8 bg-gradient-to-r from-orange-400 via-orange-500 to-red-400 rounded-full blur-2xl opacity-90 animate-pulse"></div>
-            <div className="relative bg-white rounded-full w-40 h-40 sm:w-48 sm:h-48 shadow-lg flex items-center justify-center p-2">
+            <div className="absolute -inset-2 bg-gradient-to-r from-orange-400 via-orange-500 to-red-400 rounded-full blur-lg opacity-60 animate-pulse"></div>
+            <div className="relative bg-white rounded-full w-56 h-56 sm:w-64 sm:h-64 shadow-lg overflow-hidden">
               <img
-                src="./logo-cfdt.jpg" // CORRECTION APPLIQUÉE ICI
+                src="./logo-cfdt.jpg"
                 alt="Logo CFDT"
-                className="w-full h-full object-contain"
+                className="w-full h-full object-cover"
               />
             </div>
           </div>
@@ -673,7 +673,7 @@ ${contexte}
                   ))}
                 </div>
               </div>
-              <style jsx>{`
+              <style>{`
                 @keyframes marquee {
                   0% { transform: translateX(0%); }
                   100% { transform: translateX(-50%); }
@@ -692,11 +692,11 @@ ${contexte}
             )}
 
             <section className="text-center my-12">
-              <h3 className="text-4xl font-bold bg-gradient-to-r from-green-600 via-blue-600 to-purple-700 bg-clip-text text-transparent mb-4">
+              <h3 className="text-4xl font-bold text-white mb-4">
                 Choisissez votre domaine d'assistance
               </h3>
-              <p className="text-xl text-gray-700 max-w-3xl mx-auto">
-              Nos assistants IA spécialisés vous aideront.
+              <p className="text-xl text-white max-w-3xl mx-auto">
+              Exclusivement a partir des documents de la mairie.
               </p>
             </section>
 
