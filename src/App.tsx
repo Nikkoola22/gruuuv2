@@ -336,7 +336,6 @@ const PodcastPlayer: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState(1);
   const [isMinimized, setIsMinimized] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -384,13 +383,13 @@ const PodcastPlayer: React.FC = () => {
     };
 
     Object.entries(handlers).forEach(([evt, fn]) => audio.addEventListener(evt, fn));
-    audio.volume = volume;
+    audio.volume = 1;
     if (currentEpisode) audio.load();
 
     return () => {
       Object.entries(handlers).forEach(([evt, fn]) => audio.removeEventListener(evt, fn));
     };
-  }, [currentEpisode, volume]);
+  }, [currentEpisode]);
 
   const playPause = async () => {
     const audio = audioRef.current;
@@ -426,7 +425,7 @@ const PodcastPlayer: React.FC = () => {
   };
 
   return (
-    <div className={`fixed right-4 bottom-4 z-50 transition-all duration-300 ${isMinimized ? "w-60 h-14" : "w-80 h-auto"}`}>
+    <div className={`fixed right-4 bottom-4 z-50 transition-all duration-300 ${isMinimized ? "w-48 h-20" : "w-80 h-auto"}`}>
       <div className="flex flex-col bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 rounded-xl shadow-lg border border-purple-500/30 overflow-hidden p-2">
         <div className="flex items-center justify-between gap-2">
           <button onClick={() => setIsMinimized(!isMinimized)} className="text-white p-1.5 hover:bg-white/10 rounded-full">
@@ -437,17 +436,13 @@ const PodcastPlayer: React.FC = () => {
               {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
             </button>
           )}
-          <div className="flex-grow flex items-center gap-2">
-            <Volume2 className="w-5 h-5 text-gray-300" />
-            <input
-              type="range"
-              min="0"
-              max="1"
-              step="0.01"
-              value={volume}
-              onChange={e => setVolume(parseFloat(e.target.value))}
-              className="w-full h-1 bg-purple-300 rounded slider appearance-none"
+          <div className="flex-grow flex flex-col items-center justify-center">
+            <img 
+              src="./podcast.jpg" 
+              alt="Podcast" 
+              className="w-8 h-8 rounded-full object-cover mb-1"
             />
+            <span className="text-white font-semibold text-xs">Podcast CFDT</span>
           </div>
         </div>
         <audio ref={audioRef} src={currentEpisode?.url} preload="metadata" style={{ display: "none" }} crossOrigin="anonymous" />
