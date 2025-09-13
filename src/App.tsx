@@ -868,7 +868,8 @@ ${contexte}
               </h4>
               <div className="space-y-2 text-gray-300">
                 <div>Lundi - Vendredi</div>
-                <div className="font-semibold text-white">9h00 - 17h00</div>
+                <div className="font-semibold text-white">9h00/12h00 - 13h30/17h00
+                </div>
                 <div className="text-sm">Permanences sur RDV</div>
               </div>
             </div>
