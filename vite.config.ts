@@ -9,4 +9,12 @@ export default defineConfig({
   // Si on déploie sur GitHub Pages, on garde /gruuuu/
   // Sinon (local ou Vercel), on met "./"
   base: process.env.GITHUB_PAGES ? '/gruuuu/' : './',
+  build: {
+    rollupOptions: {
+      input: {
+        main: './index.html',
+        admin: './admin.html'
+      }
+    }
+  }
 });

@@ -15,14 +15,19 @@ import {
   Play,
   Pause,
   Volume2,
+  Newspaper,
+  ChevronUp,
+  ChevronDown,
 } from "lucide-react";
 
 import { sommaire } from "./data/sommaire.ts";
 import { chapitres } from "./data/temps.ts";
 import { formation } from "./data/formation.ts";
 import { teletravailData } from "./data/teletravail.ts";
-import { infoItems } from "./data/info-data.ts";
+import { infoItems as defaultInfoItems } from "./data/info-data.ts";
 import { podcastEpisodes, type PodcastEpisode } from "./data/podcasts/mp3.ts";
+import PublicPage from "./PublicPage";
+import LoginModal from "./components/LoginModal";
 
 // Variable pour activer/désactiver le diagnostic
 
@@ -38,7 +43,7 @@ interface InfoItem {
   content: string;
 }
 interface ChatbotState {
-  currentView: "menu" | "chat";
+  currentView: "menu" | "chat" | "public";
   selectedDomain: number | null;
   messages: ChatMessage[];
   isProcessing: boolean;
@@ -132,7 +137,7 @@ const NewsTicker: React.FC = () => {
           100% { transform: translateX(-50%); }
         }
         .ticker-container { overflow: hidden; white-space: nowrap; }
-        .animate-ticker { display: inline-flex; animation: ticker 40s linear infinite; }
+        .animate-ticker { display: inline-flex; animation: ticker 60s linear infinite; }
       `}</style>
     </div>
   );
@@ -264,15 +269,15 @@ const PodcastPlayer: React.FC = () => {
   };
 
   return (
-    <div className={`fixed right-4 bottom-4 z-50 transition-all duration-300 ${isMinimized ? "w-48 h-20" : "w-80 h-auto"}`}>
-      <div className="flex flex-col bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 rounded-xl shadow-lg border border-purple-500/30 overflow-hidden p-2">
+    <div className={`fixed right-4 bottom-4 z-50 transition-all duration-300 ${isMinimized ? "w-64 h-24" : "w-96 h-auto"}`}>
+      <div className="flex flex-col bg-white rounded-xl shadow-lg border border-gray-300 overflow-hidden p-3">
         <div className="flex items-center justify-between gap-2">
-          <button onClick={() => setIsMinimized(!isMinimized)} className="text-white p-1.5 hover:bg-white/10 rounded-full">
-            {isMinimized ? "🔼" : "🔽"}
+          <button onClick={() => setIsMinimized(!isMinimized)} className="text-gray-700 p-1.5 hover:bg-gray-100 rounded-full border-2 border-orange-500">
+            {isMinimized ? <ChevronUp className="w-4 h-4 text-gray-700" /> : <ChevronDown className="w-4 h-4 text-gray-700" />}
           </button>
           {currentEpisode && (
             <button onClick={playPause} className="bg-purple-600 hover:bg-purple-700 text-white rounded-full p-2">
-              {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+              {isPlaying ? <Pause className="w-5 h-5 text-white" /> : <Play className="w-5 h-5 text-white" />}
             </button>
           )}
           <div className="flex-grow flex flex-col items-center justify-center">
@@ -281,7 +286,7 @@ const PodcastPlayer: React.FC = () => {
               alt="Podcast" 
               className="w-8 h-8 rounded-full object-cover mb-1"
             />
-            <span className="text-white font-semibold text-xs">Podcast CFDT</span>
+            <span className="text-gray-800 font-semibold text-sm">Podcast CFDT</span>
           </div>
         </div>
         <audio ref={audioRef} src={currentEpisode?.url} preload="metadata" style={{ display: "none" }} crossOrigin="anonymous" />
@@ -332,6 +337,12 @@ export default function App() {
   //   return <ImageTroubleshooter />;
   // }
   
+  // Charger les informations depuis le localStorage ou utiliser les données par défaut
+  const [infoItems, setInfoItems] = useState<InfoItem[]>(() => {
+    const savedInfo = localStorage.getItem('cfdt-info-items');
+    return savedInfo ? JSON.parse(savedInfo) : defaultInfoItems;
+  });
+  
   const [chatState, setChatState] = useState<ChatbotState>({
     currentView: "menu",
     selectedDomain: null,
@@ -340,6 +351,7 @@ export default function App() {
   });
   const [inputValue, setInputValue] = useState("");
   const [selectedInfo, setSelectedInfo] = useState<InfoItem | null>(null);
+  const [showLoginModal, setShowLoginModal] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -347,6 +359,33 @@ export default function App() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatState.messages]);
+
+  // Écouter les changements dans le localStorage pour mettre à jour les informations
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const savedInfo = localStorage.getItem('cfdt-info-items');
+      if (savedInfo) {
+        setInfoItems(JSON.parse(savedInfo));
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
+  // Fonction de vérification des identifiants
+  const handleLogin = (username: string, password: string): boolean => {
+    // Identifiants par défaut (dans un vrai projet, ceci serait vérifié côté serveur)
+    const validCredentials = [
+      { username: "admin", password: "cfdt2025" },
+      { username: "cfdt", password: "admin123" },
+      { username: "gennevilliers", password: "cfdt2025" }
+    ];
+    
+    return validCredentials.some(cred => 
+      cred.username === username && cred.password === password
+    );
+  };
 
   const scrollToChat = () => {
     setTimeout(() => {
@@ -488,14 +527,16 @@ ${contexte}
       </header>
 
       <main className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 z-10">
-        {chatState.currentView === "menu" ? (
+        {chatState.currentView === "public" ? (
+          <PublicPage onBack={() => setChatState({ currentView: "menu", selectedDomain: null, messages: [], isProcessing: false })} />
+        ) : chatState.currentView === "menu" ? (
           <>
             <section className="relative bg-orange-300 text-black overflow-hidden mx-auto max-w-5xl rounded-2xl shadow-lg z-10">
               <div className="relative h-20 flex items-center overflow-hidden">
                 <div className="absolute left-0 top-0 h-full w-40 flex items-center justify-center bg-orange-400 z-20 shadow-md">
                   <span className="text-2xl font-bold">NEWS FPT:</span>
                 </div>
-                <div className="animate-marquee whitespace-nowrap flex items-center pl-44" style={{ animation: "marquee 30s linear infinite" }}>
+                <div className="animate-marquee whitespace-nowrap flex items-center pl-44" style={{ animation: "marquee 45s linear infinite" }}>
                   {[...infoItems, ...infoItems].map((info, idx) => (
                     <button
                       key={`${info.id}-${idx}`}
@@ -526,10 +567,10 @@ ${contexte}
             )}
 
             <section className="text-center my-12">
-              <h3 className="text-4xl font-bold text-white mb-4">
+              <h3 className="text-4xl font-bold text-orange-500 mb-4">
                 Choisissez votre domaine d'assistance
               </h3>
-              <p className="text-xl text-white max-w-3xl mx-auto">
+              <p className="text-xl text-orange-500 max-w-3xl mx-auto">
               Exclusivement a partir des documents de la mairie.
               </p>
             </section>
@@ -586,6 +627,7 @@ ${contexte}
                   </div>
                 </div>
               </div>
+
           </>
         ) : (
           <div ref={chatContainerRef} className="bg-white/95 rounded-3xl shadow-2xl border border-gray-200 overflow-hidden backdrop-blur-sm">
@@ -605,13 +647,38 @@ ${contexte}
               </div>
               <Users className="w-8 h-8 text-white" />
             </div>
+            
+            {/* Zone avec message de bienvenue et GIF */}
+            <div className="flex items-center justify-between py-4 bg-gray-50/50 px-6">
+              {/* Message de bienvenue à gauche */}
+              <div className="flex-1 pr-6">
+                {chatState.messages.length > 0 && chatState.messages[0].type === 'assistant' && (
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center shrink-0">CFDT</div>
+                    <div className="bg-white border border-gray-200 text-gray-800 rounded-2xl px-4 py-3 shadow-md max-w-lg">
+                      <p className="text-base sm:text-lg leading-relaxed">{chatState.messages[0].content}</p>
+                      <p className="text-xs mt-2 opacity-70 text-right">{chatState.messages[0].timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              {/* GIF à droite */}
+              <div className="flex-shrink-0">
+                <img
+                  src="./cfdtmanga.gif"
+                  alt="CFDT Manga"
+                  className="w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 object-cover rounded-2xl shadow-lg border-2 border-orange-300"
+                />
+              </div>
+            </div>
 
             {/* Bloc principal en flex horizontal */}
             <div className="flex flex-row">
               {/* Zone des messages/questions */}
-              <div className="flex-1 h-[60vh] overflow-y-auto p-6 space-y-4 bg-gradient-to-b from-gray-50 to-white">
-                {chatState.messages.map((msg, i) => (
-                  <div key={i} className={`flex items-end gap-2 ${msg.type === "user" ? "justify-end" : "justify-start"}`}>
+              <div className="flex-1 min-h-[15vh] max-h-[40vh] overflow-y-auto p-6 space-y-4 bg-gradient-to-b from-gray-50 to-white">
+                {chatState.messages.slice(1).map((msg, i) => (
+                  <div key={i + 1} className={`flex items-end gap-2 ${msg.type === "user" ? "justify-end" : "justify-start"}`}>
                     {msg.type === 'assistant' && <div className="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center shrink-0">CFDT</div>}
                     <div
                       className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl shadow-md ${
@@ -641,14 +708,6 @@ ${contexte}
                 <div ref={messagesEndRef} />
               </div>
 
-              {/* GIF à droite, remonté et agrandi */}
-              <div className="flex flex-col items-end pt-6 pr-8 min-w-[180px]">
-                <img
-                  src="./cfdtmanga.gif"
-                  alt="CFDT Manga"
-                  className="w-80 h-80 object-contain rounded-2xl shadow-lg border-4 border-orange-300"
-                />
-              </div>
             </div>
 
             <div className="p-4 bg-gray-50/80 border-t border-gray-200 backdrop-blur-sm">
@@ -728,9 +787,25 @@ ${contexte}
           </div>
           <div className="border-t border-gray-700 mt-10 pt-6 text-center">
             <p className="text-gray-400">© 2025 CFDT Gennevilliers - Assistant IA pour les agents municipaux</p>
+            <div className="mt-4">
+              <button
+                onClick={() => setShowLoginModal(true)}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors shadow-md"
+                title="Administrer les actualités et informations"
+              >
+                ⚙️ Admin
+              </button>
+            </div>
           </div>
         </div>
       </footer>
+      
+      {/* Modal de connexion */}
+      <LoginModal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        onLogin={handleLogin}
+      />
     </div>
   );
 }
