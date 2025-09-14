@@ -1,5 +1,5 @@
 import type React from "react";
-import { useState, useRef, useEffect, type ChangeEvent, type KeyboardEvent } from "react";
+import { useState, useRef, useEffect, type KeyboardEvent } from "react";
 import {
   Clock,
   GraduationCap,
@@ -7,15 +7,12 @@ import {
   Phone,
   Mail,
   MapPin,
-  ArrowRight,
   Sparkles,
   Send,
   ArrowLeft,
   Home,
   Play,
   Pause,
-  Volume2,
-  Newspaper,
   ChevronUp,
   ChevronDown,
 } from "lucide-react";
@@ -26,7 +23,6 @@ import { formation } from "./data/formation.ts";
 import { teletravailData } from "./data/teletravail.ts";
 import { infoItems as defaultInfoItems } from "./data/info-data.ts";
 import { podcastEpisodes, type PodcastEpisode } from "./data/podcasts/mp3.ts";
-import PublicPage from "./PublicPage";
 import LoginModal from "./components/LoginModal";
 
 // Variable pour activer/désactiver le diagnostic
@@ -181,7 +177,6 @@ const PodcastPlayer: React.FC = () => {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isMinimized, setIsMinimized] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
 
@@ -192,7 +187,6 @@ const PodcastPlayer: React.FC = () => {
     setCurrentTime(0);
     setDuration(0);
     setError(null);
-    setIsLoading(false);
 
     const updateTime = () => setCurrentTime(audio.currentTime || 0);
     const updateDuration = () => {
@@ -206,7 +200,6 @@ const PodcastPlayer: React.FC = () => {
       }
     };
     const handleError = () => {
-      setIsLoading(false);
       setIsPlaying(false);
       setError("Impossible de charger ce podcast. Vérifiez votre connexion.");
     };
@@ -214,13 +207,12 @@ const PodcastPlayer: React.FC = () => {
     const handlers: { [key: string]: EventListener } = {
       timeupdate: updateTime,
       loadedmetadata: updateDuration,
-      canplay: () => setIsLoading(false),
+      canplay: () => {},
       ended: handleEnded,
       error: handleError,
-      loadstart: () => setIsLoading(true),
-      waiting: () => setIsLoading(true),
+      loadstart: () => {},
+      waiting: () => {},
       playing: () => {
-        setIsLoading(false);
         setIsPlaying(true);
       },
       pause: () => setIsPlaying(false),
@@ -242,14 +234,12 @@ const PodcastPlayer: React.FC = () => {
       if (isPlaying) {
         audio.pause();
       } else {
-        setIsLoading(true);
         setError(null);
         await audio.play();
       }
     } catch (err) {
       console.error("Error playing audio:", err);
       setError("Impossible de lire ce podcast.");
-      setIsLoading(false);
       setIsPlaying(false);
     }
   };
@@ -463,8 +453,29 @@ ${contexte}
     
     try {
       const reply = await traiterQuestion(q);
-      const assistantMsg: ChatMessage = { type: "assistant", content: reply, timestamp: new Date() };
-      setChatState((p) => ({ ...p, messages: [...p.messages, assistantMsg], isProcessing: false }));
+      
+      // Créer un message assistant vide pour l'affichage progressif
+      const assistantMsg: ChatMessage = { type: "assistant", content: "", timestamp: new Date() };
+      setChatState((p) => ({ ...p, messages: [...p.messages, assistantMsg] }));
+      
+      // Afficher la réponse progressivement
+      let currentText = "";
+      const messageIndex = chatState.messages.length; // Index du nouveau message
+      
+      for (let i = 0; i <= reply.length; i++) {
+        currentText = reply.slice(0, i);
+        setChatState((p) => {
+          const newMessages = [...p.messages];
+          newMessages[messageIndex] = { ...newMessages[messageIndex], content: currentText };
+          return { ...p, messages: newMessages };
+        });
+        
+        // Délai variable selon le caractère (plus rapide pour les espaces)
+        const delay = currentText.endsWith(' ') ? 20 : 30;
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+      
+      setChatState((p) => ({ ...p, isProcessing: false }));
     } catch (e) {
       console.error(e);
       const errMsg: ChatMessage = {
@@ -527,9 +538,7 @@ ${contexte}
       </header>
 
       <main className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 z-10">
-        {chatState.currentView === "public" ? (
-          <PublicPage onBack={() => setChatState({ currentView: "menu", selectedDomain: null, messages: [], isProcessing: false })} />
-        ) : chatState.currentView === "menu" ? (
+        {chatState.currentView === "menu" ? (
           <>
             <section className="relative bg-orange-300 text-black overflow-hidden mx-auto max-w-5xl rounded-2xl shadow-lg z-10">
               <div className="relative h-20 flex items-center overflow-hidden">
@@ -655,8 +664,8 @@ ${contexte}
                 {chatState.messages.length > 0 && chatState.messages[0].type === 'assistant' && (
                   <div className="flex items-start gap-3">
                     <div className="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center shrink-0">CFDT</div>
-                    <div className="bg-white border border-gray-200 text-gray-800 rounded-2xl px-4 py-3 shadow-md max-w-lg">
-                      <p className="text-base sm:text-lg leading-relaxed">{chatState.messages[0].content}</p>
+                    <div className="bg-white border border-gray-200 text-gray-800 rounded-2xl px-4 py-3 shadow-md max-w-2xl">
+                      <p className="text-lg sm:text-xl leading-relaxed">{chatState.messages[0].content}</p>
                       <p className="text-xs mt-2 opacity-70 text-right">{chatState.messages[0].timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                     </div>
                   </div>
@@ -668,7 +677,7 @@ ${contexte}
                 <img
                   src="./cfdtmanga.gif"
                   alt="CFDT Manga"
-                  className="w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 object-cover rounded-2xl shadow-lg border-2 border-orange-300"
+                  className="w-32 h-32 xs:w-40 xs:h-40 sm:w-48 sm:h-48 md:w-64 md:h-64 lg:w-80 lg:h-80 object-cover rounded-2xl shadow-lg border-2 border-orange-300"
                 />
               </div>
             </div>
@@ -681,13 +690,13 @@ ${contexte}
                   <div key={i + 1} className={`flex items-end gap-2 ${msg.type === "user" ? "justify-end" : "justify-start"}`}>
                     {msg.type === 'assistant' && <div className="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center shrink-0">CFDT</div>}
                     <div
-                      className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl shadow-md ${
+                      className={`max-w-sm lg:max-w-xl px-4 py-3 rounded-2xl shadow-md ${
                         msg.type === "user"
                           ? "bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-br-none"
                           : "bg-white border border-gray-200 text-gray-800 rounded-bl-none"
                       }`}
                     >
-                      <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                      <p className="text-base sm:text-lg leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                       <p className="text-xs mt-2 opacity-70 text-right">{msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                     </div>
                   </div>
@@ -696,10 +705,12 @@ ${contexte}
                 {chatState.isProcessing && (
                   <div className="flex items-end gap-2 justify-start">
                     <div className="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center shrink-0">CFDT</div>
-                    <div className="bg-white border border-gray-200 rounded-2xl px-4 py-3 shadow-md rounded-bl-none">
+                    <div className="bg-white border border-gray-200 rounded-2xl px-4 py-3 shadow-md rounded-bl-none max-w-2xl">
                       <div className="flex items-center space-x-2">
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-orange-500"></div>
-                        <span className="text-sm text-gray-600">L'assistant réfléchit...</span>
+                        <span className="text-sm text-gray-600">CFDT écrit</span>
+                        <div className="w-2 h-2 bg-orange-500 rounded-full animate-bounce"></div>
+                        <div className="w-2 h-2 bg-orange-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                        <div className="w-2 h-2 bg-orange-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                       </div>
                     </div>
                   </div>
