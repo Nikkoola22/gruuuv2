@@ -25,19 +25,18 @@ import { infoItems as defaultInfoItems } from "./data/info-data.ts";
 import { podcastEpisodes, type PodcastEpisode } from "./data/podcasts/mp3.ts";
 import LoginModal from "./components/LoginModal";
 
-// Variable pour activer/désactiver le diagnostic
-
-// Le reste de votre code original...
 interface ChatMessage {
   type: "user" | "assistant";
   content: string;
   timestamp: Date;
 }
+
 interface InfoItem {
   id: number;
   title: string;
   content: string;
 }
+
 interface ChatbotState {
   currentView: "menu" | "chat" | "public";
   selectedDomain: number | null;
