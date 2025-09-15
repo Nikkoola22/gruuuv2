@@ -47,55 +47,44 @@ interface ChatbotState {
 const API_KEY = import.meta.env.VITE_APP_PERPLEXITY_KEY;
 const API_URL = "https://api.perplexity.ai/chat/completions";
 
-const fluxOriginal = "https://www.franceinfo.fr/politique.rss";
-const proxyUrl = "https://corsproxy.io/?";
+const proxyUrl = "https://api.allorigins.win/get?url=";
 const FLUX_ACTUALITES_URL = proxyUrl + encodeURIComponent(fluxOriginal);
-
-const actualitesSecours = [
-  { title: "Réforme des retraites : nouvelles négociations prévues", link: "#", pubDate: new Date().toISOString(), guid: "1" },
-  { title: "Budget 2024 : les principales mesures votées", link: "#", pubDate: new Date().toISOString(), guid: "2" },
-  { title: "Fonction publique : accord sur les salaires", link: "#", pubDate: new Date().toISOString(), guid: "3" },
-  { title: "Télétravail : nouvelles directives gouvernementales", link: "#", pubDate: new Date().toISOString(), guid: "4" },
-  { title: "Dialogue social : rencontre avec les syndicats", link: "#", pubDate: new Date().toISOString(), guid: "5" },
-];
-
-const sommaireData = JSON.parse(sommaire);
-
-const nettoyerChaine = (chaine: unknown): string => {
-  if (typeof chaine !== "string") return "";
-  return chaine
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^\w\s]/gi, "")
-    .trim();
-};
+const REFRESH_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
 
 const NewsTicker: React.FC = () => {
   const [actualites, setActualites] = useState(actualitesSecours);
   const [loading, setLoading] = useState(true);
 
+  const chargerFlux = async () => {
+    try {
+      const res = await fetch(FLUX_ACTUALITES_URL);
+      if (!res.ok) throw new Error("Failed to fetch RSS feed");
+      const data = await res.json(); // AllOrigins renvoie { contents: "...RSS..." }
+      const doc = new DOMParser().parseFromString(data.contents, "text/xml");
+      const items = Array.from(doc.querySelectorAll("item")).slice(0, 10).map((item, i) => ({
+        title: item.querySelector("title")?.textContent || `Actualité ${i + 1}`,
+        link: item.querySelector("link")?.textContent || "#",
+        pubDate: item.querySelector("pubDate")?.textContent || new Date().toISOString(),
+        guid: item.querySelector("guid")?.textContent || `${i}`,
+      }));
+      if (items.length) setActualites(items);
+    } catch (err) {
+      console.error("Erreur lors du chargement du flux RSS :", err);
+      setActualites(actualitesSecours); // fallback
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const chargerFlux = async () => {
-      try {
-        const res = await fetch(FLUX_ACTUALITES_URL);
-        if (!res.ok) throw new Error("Failed to fetch RSS feed");
-        const xml = await res.text();
-        const doc = new DOMParser().parseFromString(xml, "text/xml");
-        const items = Array.from(doc.querySelectorAll("item")).slice(0, 10).map((item, i) => ({
-          title: item.querySelector("title")?.textContent || `Actualité ${i + 1}`,
-          link: item.querySelector("link")?.textContent || "#",
-          pubDate: item.querySelector("pubDate")?.textContent || new Date().toISOString(),
-          guid: item.querySelector("guid")?.textContent || `${i}`,
-        }));
-        if (items.length) setActualites(items);
-      } catch {
-        console.error("Failed to load RSS feed, using fallback data.");
-      } finally {
-        setLoading(false);
-      }
-    };
+    // Chargement initial
     chargerFlux();
+
+    // Mise à jour automatique toutes les 5 minutes
+    const intervalId = setInterval(chargerFlux, REFRESH_INTERVAL_MS);
+
+    // Nettoyage à la destruction du composant
+    return () => clearInterval(intervalId);
   }, []);
 
   if (loading) {
