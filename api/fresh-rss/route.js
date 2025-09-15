@@ -1,56 +1,61 @@
-// Fichier : /api/rss/route.js (Version finale pour Vercel / Bolt)
-
+// Fichier : /api/rss/route.js
 import { NextResponse } from 'next/server';
 
-// Instruction pour Vercel/Next.js : cette route est 100% dynamique.
-// Elle ne doit jamais être pré-calculée ou mise en cache statiquement.
 export const dynamic = 'force-dynamic';
 
+// Middleware CORS centralisé
+function corsHeaders() {
+  return {
+    'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGIN || '*', // ⚠️ mettre ton domaine en prod
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  };
+}
+
+// Gestion des pré-requêtes (OPTIONS)
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 204,
+    headers: corsHeaders(),
+  });
+}
+
+// Gestion des requêtes GET (flux RSS)
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const feedUrl = searchParams.get('feedUrl');
 
   if (!feedUrl) {
-    return NextResponse.json({ error: 'Le paramètre feedUrl est manquant' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Le paramètre feedUrl est manquant' },
+      { status: 400, headers: corsHeaders() }
+    );
   }
 
   try {
-    // On garde le "cache buster" par sécurité, c'est une bonne pratique.
-    const urlAvecCacheBuster = `${feedUrl}?_=${new Date().getTime()}`;
-    
-    const response = await fetch(urlAvecCacheBuster, {
-      // On redit à fetch de ne pas utiliser son propre cache interne.
-      cache: 'no-store', 
-    });
+    const urlAvecCacheBuster = `${feedUrl}?_=${Date.now()}`;
+    const response = await fetch(urlAvecCacheBuster, { cache: 'no-store' });
 
     if (!response.ok) {
       throw new Error(`Le serveur du flux a répondu avec le statut : ${response.status}`);
     }
 
     const xmlText = await response.text();
-    
-    // --- DÉBUT DE LA MODIFICATION SPÉCIFIQUE À VERCEL ---
-    // On crée des en-têtes de réponse pour donner des ordres stricts à Vercel.
-    const headers = new Headers();
-    headers.set('Content-Type', 'application/xml');
-    
-    // C'est l'en-tête le plus important. Il dit à Vercel et aux navigateurs :
-    // "Ne mettez jamais cette réponse en cache. Demandez-la à nouveau à chaque fois."
-    headers.set('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate');
-    
-    // En-têtes additionnels pour les anciens systèmes de cache.
-    headers.set('Pragma', 'no-cache');
-    headers.set('Expires', '0');
-    
-    // On renvoie la réponse avec ces nouveaux en-têtes.
-    return new Response(xmlText, { status: 200, headers });
-    // --- FIN DE LA MODIFICATION ---
 
+    const headers = {
+      ...corsHeaders(),
+      'Content-Type': 'application/xml; charset=utf-8',
+      'Cache-Control': 'no-cache, no-store, max-age=0, must-revalidate',
+      Pragma: 'no-cache',
+      Expires: '0',
+    };
+
+    return new Response(xmlText, { status: 200, headers });
   } catch (error) {
     console.error(`Erreur API pour le flux ${feedUrl}:`, error);
     return NextResponse.json(
-      { error: "Impossible de récupérer le flux RSS.", details: error.message },
-      { status: 502 }
+      { error: 'Impossible de récupérer le flux RSS.', details: error.message },
+      { status: 502, headers: corsHeaders() }
     );
   }
 }
