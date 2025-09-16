@@ -1,170 +1,168 @@
 import React, { useState, useEffect } from "react";
 
-interface NewsItem {
-  id: number;
-  title: string;
-  content: string;
+interface RssConfig {
+  url: string;
+  enabled: boolean;
 }
 
 const AdminNews: React.FC = () => {
-  const [news, setNews] = useState<NewsItem[]>([]);
-  const [newNews, setNewNews] = useState({ title: "", content: "" });
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [rssConfig, setRssConfig] = useState<RssConfig>({ url: "", enabled: false });
+  const [rssTestResult, setRssTestResult] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchNews();
+    loadRssConfig();
   }, []);
 
-  const fetchNews = async () => {
-    try {
-      const response = await fetch("http://localhost:4000/api/news");
-      if (!response.ok) {
-        throw new Error(`Erreur ${response.status}: ${response.statusText}`);
-      }
-      const data = await response.json();
-      setNews(data);
-      setLoading(false);
-      setError(null);
-    } catch (err) {
-      // Erreur silencieuse - affichée dans l'interface utilisateur
-      setError("Impossible de se connecter au serveur d'actualités. Veuillez vérifier que le serveur est démarré sur le port 4000.");
-      setLoading(false);
+  const loadRssConfig = () => {
+    const saved = localStorage.getItem('rssConfig');
+    if (saved) {
+      setRssConfig(JSON.parse(saved));
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const method = editingId ? "PUT" : "POST";
-    const url = editingId 
-      ? `http://localhost:4000/api/news/${editingId}`
-      : "http://localhost:4000/api/news";
-
-    fetch(url, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(editingId ? { ...newNews, id: editingId } : newNews),
-    })
-      .then(() => {
-        fetchNews();
-        setNewNews({ title: "", content: "" });
-        setEditingId(null);
-      });
+  const saveRssConfig = (config: RssConfig) => {
+    localStorage.setItem('rssConfig', JSON.stringify(config));
+    setRssConfig(config);
   };
 
-  const handleEdit = (item: NewsItem) => {
-    setNewNews({ title: item.title, content: item.content });
-    setEditingId(item.id);
+  const testRssFeed = async (url: string) => {
+    try {
+      setRssTestResult("Test en cours...");
+      const proxyUrl = "https://api.allorigins.win/get?url=";
+      const response = await fetch(proxyUrl + encodeURIComponent(url));
+      
+      if (!response.ok) {
+        throw new Error(`Erreur ${response.status}: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      const xml = data.contents;
+      const doc = new DOMParser().parseFromString(xml, "text/xml");
+      const items = doc.querySelectorAll("item");
+      
+      if (items.length > 0) {
+        setRssTestResult(`✅ Flux RSS valide ! ${items.length} articles trouvés.`);
+      } else {
+        setRssTestResult("⚠️ Flux RSS valide mais aucun article trouvé.");
+      }
+    } catch (err) {
+      setRssTestResult(`❌ Erreur: ${err instanceof Error ? err.message : 'Flux RSS invalide'}`);
+    }
   };
 
-  const handleDelete = (id: number) => {
-    fetch(`http://localhost:4000/api/news/${id}`, { method: "DELETE" })
-      .then(() => fetchNews());
-  };
+  // Fonction supprimée - plus besoin de se connecter au serveur
 
-  if (loading) {
-    return (
-      <div style={{ padding: "2rem", textAlign: "center" }}>
-        <h1>⚙️ Administration des actualités</h1>
-        <p>Chargement des actualités...</p>
-      </div>
-    );
-  }
+  // Fonctions de gestion des actualités supprimées - focus sur la configuration RSS
 
-  if (error) {
-    return (
-      <div style={{ padding: "2rem" }}>
-        <h1>⚙️ Administration des actualités</h1>
-        <div style={{ 
-          background: "#ffebee", 
-          border: "1px solid #f44336", 
-          borderRadius: "8px", 
-          padding: "1rem", 
-          color: "#c62828" 
-        }}>
-          <h3>⚠️ Erreur de connexion</h3>
-          <p>{error}</p>
-          <p style={{ marginTop: "0.5rem", fontSize: "0.9em" }}>
-            Pour démarrer le serveur d'actualités, exécutez : <code>npm run server</code>
-          </p>
-        </div>
-      </div>
-    );
-  }
+  // Suppression des conditions d'erreur - page toujours accessible
 
   return (
     <div style={{ padding: "2rem" }}>
       <h1>⚙️ Administration des actualités</h1>
       
-      <form onSubmit={handleSubmit} style={{ marginBottom: "2rem" }}>
-        <h2>{editingId ? "Modifier" : "Ajouter"} une actualité</h2>
+      {/* Configuration RSS */}
+      <div style={{ 
+        marginBottom: "2rem", 
+        padding: "1.5rem", 
+        border: "1px solid #ddd", 
+        borderRadius: "8px",
+        backgroundColor: "#f9f9f9"
+      }}>
+        <h2>📡 Configuration du flux RSS</h2>
+        <p style={{ color: "#666", marginBottom: "1rem" }}>
+          Configurez un flux RSS personnalisé qui remplacera le flux par défaut dans l'application principale.
+        </p>
+        
         <div style={{ marginBottom: "1rem" }}>
+          <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "bold" }}>
+            URL du flux RSS :
+          </label>
           <input
-            type="text"
-            placeholder="Titre"
-            value={newNews.title}
-            onChange={(e) => setNewNews({ ...newNews, title: e.target.value })}
-            style={{ width: "100%", padding: "0.5rem", marginBottom: "0.5rem" }}
-            required
+            type="url"
+            placeholder="https://example.com/rss.xml"
+            value={rssConfig.url}
+            onChange={(e) => setRssConfig({ ...rssConfig, url: e.target.value })}
+            style={{ 
+              width: "100%", 
+              padding: "0.5rem", 
+              marginBottom: "0.5rem",
+              border: "1px solid #ccc",
+              borderRadius: "4px"
+            }}
           />
         </div>
+        
         <div style={{ marginBottom: "1rem" }}>
-          <textarea
-            placeholder="Contenu"
-            value={newNews.content}
-            onChange={(e) => setNewNews({ ...newNews, content: e.target.value })}
-            style={{ width: "100%", padding: "0.5rem", height: "100px" }}
-            required
-          />
+          <label style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            <input
+              type="checkbox"
+              checked={rssConfig.enabled}
+              onChange={(e) => setRssConfig({ ...rssConfig, enabled: e.target.checked })}
+            />
+            Activer ce flux RSS
+          </label>
         </div>
-        <button type="submit" style={{ padding: "0.5rem 1rem", marginRight: "0.5rem" }}>
-          {editingId ? "Modifier" : "Ajouter"}
-        </button>
-        {editingId && (
+        
+        <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem" }}>
           <button
             type="button"
-            onClick={() => {
-              setNewNews({ title: "", content: "" });
-              setEditingId(null);
+            onClick={() => testRssFeed(rssConfig.url)}
+            disabled={!rssConfig.url}
+            style={{ 
+              padding: "0.5rem 1rem", 
+              backgroundColor: "#007bff", 
+              color: "white", 
+              border: "none", 
+              borderRadius: "4px",
+              cursor: rssConfig.url ? "pointer" : "not-allowed",
+              opacity: rssConfig.url ? 1 : 0.5
             }}
-            style={{ padding: "0.5rem 1rem" }}
           >
-            Annuler
+            Tester le flux
           </button>
-        )}
-      </form>
-
-      <div>
-        <h2>Actualités existantes</h2>
-        {news.map((item) => (
-          <div
-            key={item.id}
-            style={{
-              marginBottom: "1rem",
-              padding: "1rem",
-              border: "1px solid #ddd",
-              borderRadius: "8px",
+          
+          <button
+            type="button"
+            onClick={() => saveRssConfig(rssConfig)}
+            style={{ 
+              padding: "0.5rem 1rem", 
+              backgroundColor: "#28a745", 
+              color: "white", 
+              border: "none", 
+              borderRadius: "4px",
+              cursor: "pointer"
             }}
           >
-            <h3>{item.title}</h3>
-            <p>{item.content}</p>
-            <div style={{ marginTop: "0.5rem" }}>
-              <button
-                onClick={() => handleEdit(item)}
-                style={{ marginRight: "0.5rem", padding: "0.25rem 0.5rem" }}
-              >
-                Modifier
-              </button>
-              <button
-                onClick={() => handleDelete(item.id)}
-                style={{ padding: "0.25rem 0.5rem", background: "#ff4444", color: "white" }}
-              >
-                Supprimer
-              </button>
-            </div>
+            Sauvegarder
+          </button>
+        </div>
+        
+        {rssTestResult && (
+          <div style={{ 
+            padding: "0.5rem", 
+            backgroundColor: rssTestResult.includes("✅") ? "#d4edda" : rssTestResult.includes("❌") ? "#f8d7da" : "#fff3cd",
+            border: `1px solid ${rssTestResult.includes("✅") ? "#c3e6cb" : rssTestResult.includes("❌") ? "#f5c6cb" : "#ffeaa7"}`,
+            borderRadius: "4px",
+            color: rssTestResult.includes("✅") ? "#155724" : rssTestResult.includes("❌") ? "#721c24" : "#856404"
+          }}>
+            {rssTestResult}
           </div>
-        ))}
+        )}
+      </div>
+      
+      {/* Section d'information */}
+      <div style={{ 
+        marginBottom: "2rem", 
+        padding: "1rem", 
+        backgroundColor: "#e3f2fd", 
+        border: "1px solid #2196f3", 
+        borderRadius: "8px" 
+      }}>
+        <h3 style={{ margin: "0 0 0.5rem 0", color: "#1976d2" }}>ℹ️ Information</h3>
+        <p style={{ margin: 0, color: "#1565c0" }}>
+          Cette page vous permet de configurer un flux RSS personnalisé qui remplacera le flux par défaut 
+          dans l'application principale. Le flux configuré sera utilisé dans le bandeau "Actualités nationales".
+        </p>
       </div>
     </div>
   );

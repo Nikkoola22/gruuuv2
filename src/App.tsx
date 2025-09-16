@@ -50,7 +50,36 @@ const API_URL = "https://api.perplexity.ai/chat/completions";
 
 const fluxOriginal = "https://www.franceinfo.fr/politique.rss";
 const proxyUrl = "https://api.allorigins.win/get?url=";
-const FLUX_ACTUALITES_URL = proxyUrl + encodeURIComponent(fluxOriginal);
+
+// Fonction pour nettoyer les chaînes de caractères
+const nettoyerChaine = (chaine: string): string => {
+  return chaine
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // Supprime les accents
+    .replace(/[^a-z0-9\s]/g, "") // Garde seulement lettres, chiffres et espaces
+    .replace(/\s+/g, " ") // Remplace les espaces multiples par un seul
+    .trim();
+};
+
+// Parser les données du sommaire
+const sommaireData = JSON.parse(sommaire);
+
+// Fonction pour obtenir l'URL du flux RSS (personnalisé ou par défaut)
+const getRssUrl = (): string => {
+  try {
+    const savedConfig = localStorage.getItem('rssConfig');
+    if (savedConfig) {
+      const config = JSON.parse(savedConfig);
+      if (config.enabled && config.url) {
+        return proxyUrl + encodeURIComponent(config.url);
+      }
+    }
+  } catch (err) {
+    console.warn('Erreur lors du chargement de la configuration RSS:', err);
+  }
+  return proxyUrl + encodeURIComponent(fluxOriginal);
+};
 
 const actualitesSecours = [
   { title: "Réforme des retraites : nouvelles négociations prévues", link: "#", pubDate: new Date().toISOString(), guid: "1" },
@@ -67,7 +96,7 @@ const NewsTicker: React.FC = () => {
   useEffect(() => {
     const chargerFlux = async () => {
       try {
-        const res = await fetch(FLUX_ACTUALITES_URL);
+        const res = await fetch(getRssUrl());
         if (!res.ok) throw new Error("Échec de la récupération du flux RSS");
 
         const data = await res.json(); // AllOrigins renvoie un JSON { contents: "...xml..." }
@@ -338,7 +367,13 @@ export default function App() {
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'end',
+        inline: 'nearest'
+      });
+    }
   }, [chatState.messages]);
 
   // Écouter les changements dans le localStorage pour mettre à jour les informations
@@ -419,10 +454,10 @@ export default function App() {
 
     const systemPrompt = `
 Tu es un collègue syndical spécialiste pour la mairie de Gennevilliers.
-Ta mission est de répondre aux questions des agents en te basant EXCLUSIVEMENT sur la documentation fournie ci-dessous.
+Ta mission est de répondre aux questions des agents en te basant EXCLUSIVEMENT sur la documentation fournie dans le dossier /data.
 NE JAMAIS utiliser tes connaissances générales.
-Si la réponse ne se trouve pas dans la documentation, réponds : "Je ne trouve pas l'information dans les documents à ma disposition. Veuillez contacter le 64 64 pour plus de détails."
-Sois précis, utilise un ton AMICAL et cite le titre du chapitre si possible.
+Si la réponse ne se trouve pas dans la documentation, réponds : "Je ne trouve pas l'information dans les documents à ma disposition. Veuillez contacter la CFDT au 64 64 pour plus de détails."
+Sois précis mais synthetique , utilise un ton AMICAL et ne cite pas le titre du chapitre ni l"article .
 --- DEBUT DE LA DOCUMENTATION PERTINENTE ---
 ${contexte}
 --- FIN DE LA DOCUMENTATION PERTINENTE ---
@@ -460,6 +495,17 @@ ${contexte}
           newMessages[messageIndex] = { ...newMessages[messageIndex], content: currentText };
           return { ...p, messages: newMessages };
         });
+        
+        // Faire défiler vers le bas à chaque mise à jour du texte dans la zone de chat
+        setTimeout(() => {
+          if (messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ 
+              behavior: 'smooth',
+              block: 'end',
+              inline: 'nearest'
+            });
+          }
+        }, 0);
         
         // Délai variable selon le caractère (plus rapide pour les espaces)
         const delay = currentText.endsWith(' ') ? 20 : 30;
@@ -516,8 +562,8 @@ ${contexte}
             </div>
           </div>
           <div className="relative shrink-0">
-            <div className="absolute -inset-4 bg-gradient-to-r from-orange-400 via-orange-500 to-red-400 rounded-full blur-2xl opacity-80 animate-pulse"></div>
-            <div className="relative bg-white rounded-full w-40 h-40 sm:w-48 sm:h-48 shadow-lg overflow-hidden">
+            <div className="absolute -inset-3 bg-gradient-to-r from-orange-400 via-orange-500 to-red-400 rounded-full blur-2xl opacity-80 animate-pulse"></div>
+            <div className="relative bg-white rounded-full w-32 h-32 sm:w-36 sm:h-36 shadow-lg overflow-hidden">
               <img
                 src="./logo-cfdt.jpg"
                 alt="Logo CFDT"
@@ -553,6 +599,13 @@ ${contexte}
                   0% { transform: translateX(0%); }
                   100% { transform: translateX(-50%); }
                 }
+                @keyframes blink {
+                  0%, 50% { color: black; }
+                  51%, 100% { color: red; }
+                }
+                .animate-blink {
+                  animation: blink 2s infinite;
+                }
               `}</style>
             </section>
 
@@ -570,15 +623,15 @@ ${contexte}
               <h3 className="text-4xl font-bold text-orange-500 mb-4">
                 Choisissez votre domaine d'assistance
               </h3>
-              <p className="text-xl text-orange-500 max-w-3xl mx-auto">
-              Exclusivement a partir des documents de la mairie.
+              <p className="text-xl bg-white px-4 py-2 rounded-lg max-w-fit mx-auto shadow-md">
+              <span className="animate-blink">Exclusivement a partir des documents de la mairie.</span>
               </p>
             </section>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
               <button
                 onClick={() => handleDomainSelection(0)}
-                className="group relative overflow-hidden bg-white/95 border-2 border-orange-200 rounded-3xl p-8 transition-all duration-500 hover:border-orange-400 hover:shadow-2xl hover:-translate-y-2"
+                className="group relative overflow-hidden bg-orange-100/60 border-2 border-orange-200 rounded-3xl p-8 transition-all duration-500 hover:border-orange-400 hover:shadow-2xl hover:-translate-y-2"
               >
                 <div className="relative z-10 flex flex-col items-center gap-6">
                   <div className="relative p-6 bg-gradient-to-br from-orange-500 to-red-600 rounded-3xl shadow-xl group-hover:rotate-3 group-hover:scale-110 transition-transform">
@@ -591,7 +644,7 @@ ${contexte}
 
               <button
                 onClick={() => handleDomainSelection(1)}
-                className="group relative overflow-hidden bg-white/95 border-2 border-purple-200 rounded-3xl p-8 transition-all duration-500 hover:border-purple-400 hover:shadow-2xl hover:-translate-y-2"
+                className="group relative overflow-hidden bg-purple-100/60 border-2 border-purple-200 rounded-3xl p-8 transition-all duration-500 hover:border-purple-400 hover:shadow-2xl hover:-translate-y-2"
               >
                 <div className="relative z-10 flex flex-col items-center gap-6">
                   <div className="relative p-6 bg-gradient-to-br from-purple-500 to-blue-600 rounded-3xl shadow-xl group-hover:rotate-3 group-hover:scale-110 transition-transform">
@@ -604,7 +657,7 @@ ${contexte}
               
               <button
                 onClick={() => handleDomainSelection(2)}
-                className="group relative overflow-hidden bg-white/95 border-2 border-green-200 rounded-3xl p-8 transition-all duration-500 hover:border-green-400 hover:shadow-2xl hover:-translate-y-2 md:col-span-2 lg:col-span-1"
+                className="group relative overflow-hidden bg-green-100/60 border-2 border-green-200 rounded-3xl p-8 transition-all duration-500 hover:border-green-400 hover:shadow-2xl hover:-translate-y-2 md:col-span-2 lg:col-span-1"
               >
                 <div className="relative z-10 flex flex-col items-center gap-6">
                   <div className="relative p-6 bg-gradient-to-br from-green-500 to-teal-600 rounded-3xl shadow-xl group-hover:rotate-3 group-hover:scale-110 transition-transform">
@@ -616,7 +669,7 @@ ${contexte}
               </button>
             </div>
             
-             <div className="bg-white/95 border-2 border-blue-200 rounded-3xl p-8">
+             <div className="bg-white/60 border-2 border-blue-200 rounded-3xl p-8">
                 <div className="flex flex-col items-center gap-6">
                     <div className="relative p-6 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-3xl shadow-xl">
                       <Sparkles className="w-12 h-12 text-white" />
@@ -633,7 +686,7 @@ ${contexte}
           <div ref={chatContainerRef} className="bg-white/95 rounded-3xl shadow-2xl border border-gray-200 overflow-hidden backdrop-blur-sm">
             <div className="bg-gradient-to-r from-orange-500 via-red-500 to-purple-600 p-4 flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <button onClick={returnToMenu} className="text-white hover:text-orange-200 p-2 rounded-full hover:bg-white/10">
+                <button onClick={returnToMenu} className="text-orange-600 hover:text-orange-700 p-3 rounded-full hover:bg-orange-50 bg-white border-2 border-orange-300 hover:border-orange-400 transition-all duration-200 shadow-lg hover:shadow-xl">
                   <ArrowLeft className="w-6 h-6" />
                 </button>
                 <div>
@@ -668,7 +721,7 @@ ${contexte}
                 <img
                   src="./cfdtmanga.gif"
                   alt="CFDT Manga"
-                  className="w-32 h-32 xs:w-40 xs:h-40 sm:w-48 sm:h-48 md:w-64 md:h-64 lg:w-80 lg:h-80 object-cover rounded-2xl shadow-lg border-2 border-orange-300"
+                  className="w-24 h-24 xs:w-28 xs:h-28 sm:w-32 sm:h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 object-cover rounded-2xl shadow-lg border-2 border-orange-300"
                 />
               </div>
             </div>
@@ -688,7 +741,7 @@ ${contexte}
                       }`}
                     >
                       <p className="text-base sm:text-lg leading-relaxed whitespace-pre-wrap">{msg.content}</p>
-                      <p className="text-xs mt-2 opacity-70 text-right">{msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                      <p className={`text-xs mt-2 opacity-70 ${msg.type === "assistant" ? "text-left" : "text-right"}`}>{msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                     </div>
                   </div>
                 ))}
