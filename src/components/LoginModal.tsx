@@ -113,12 +113,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin }) => 
             </button>
           </div>
         </form>
-        
-        <div className="bg-gray-50 px-6 py-3 rounded-b-lg">
-          <p className="text-xs text-gray-500 text-center">
-            Identifiants par défaut : <strong>admin</strong> / <strong>cfdt2025</strong>
-          </p>
-        </div>
       </div>
     </div>
   );
