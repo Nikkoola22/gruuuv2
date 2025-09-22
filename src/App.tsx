@@ -1,5 +1,13 @@
 import type React from "react";
 import { useState, useRef, useEffect, type KeyboardEvent } from "react";
+
+// Déclarations TypeScript pour la reconnaissance vocale
+declare global {
+  interface Window {
+    SpeechRecognition: any;
+    webkitSpeechRecognition: any;
+  }
+}
 import {
   Clock,
   GraduationCap,
@@ -15,6 +23,8 @@ import {
   Pause,
   ChevronUp,
   ChevronDown,
+  Mic,
+  MicOff,
 } from "lucide-react";
 
 import { sommaire } from "./data/sommaire.ts";
@@ -362,9 +372,13 @@ export default function App() {
   const [inputValue, setInputValue] = useState("");
   const [selectedInfo, setSelectedInfo] = useState<InfoItem | null>(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [isVoiceSupported, setIsVoiceSupported] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const recognitionRef = useRef<any>(null);
+  const silenceTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -389,6 +403,122 @@ export default function App() {
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
+  // Initialisation de la reconnaissance vocale
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      console.log('SpeechRecognition disponible:', !!SpeechRecognition);
+      
+      if (SpeechRecognition) {
+        setIsVoiceSupported(true);
+        const recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = true; // Changé pour true pour voir les résultats intermédiaires
+        recognition.lang = 'fr-FR';
+        
+        recognition.onstart = () => {
+          console.log('Reconnaissance vocale démarrée');
+          setIsListening(true);
+        };
+        
+        recognition.onresult = (event: any) => {
+          console.log('Résultat de reconnaissance:', event);
+          let finalTranscript = '';
+          let interimTranscript = '';
+          
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+              finalTranscript += transcript;
+            } else {
+              interimTranscript += transcript;
+            }
+          }
+          
+          if (finalTranscript) {
+            console.log('Texte final:', finalTranscript);
+            setInputValue(finalTranscript);
+            // Envoyer automatiquement après un texte final
+            setTimeout(() => {
+              if (finalTranscript && finalTranscript.trim()) {
+                console.log('🎤 ENVOI AUTOMATIQUE TEXTE FINAL:', finalTranscript);
+                console.log('🎤 État avant envoi:', { 
+                  selectedDomain: chatState.selectedDomain,
+                  isProcessing: chatState.isProcessing,
+                  messagesCount: chatState.messages.length
+                });
+                setInputValue(finalTranscript);
+                handleSendMessage();
+              }
+            }, 500); // Petit délai pour laisser le temps à l'utilisateur de voir le texte
+            setIsListening(false);
+            // Arrêter explicitement la reconnaissance vocale
+            if (recognitionRef.current) {
+              recognitionRef.current.stop();
+            }
+          } else if (interimTranscript) {
+            console.log('Texte intermédiaire:', interimTranscript);
+            setInputValue(interimTranscript);
+            
+            // Réinitialiser le timer de silence
+            if (silenceTimeoutRef.current) {
+              clearTimeout(silenceTimeoutRef.current);
+            }
+            
+            // Programmer l'envoi automatique après 3 secondes de silence
+            silenceTimeoutRef.current = setTimeout(() => {
+              if (interimTranscript && interimTranscript.trim()) {
+                console.log('🎤 ENVOI AUTOMATIQUE APRÈS SILENCE:', interimTranscript);
+                console.log('🎤 État avant envoi:', { 
+                  selectedDomain: chatState.selectedDomain,
+                  isProcessing: chatState.isProcessing,
+                  messagesCount: chatState.messages.length
+                });
+                setInputValue(interimTranscript);
+                handleSendMessage();
+                setIsListening(false);
+                // Arrêter explicitement la reconnaissance vocale
+                if (recognitionRef.current) {
+                  recognitionRef.current.stop();
+                }
+              }
+            }, 3000);
+          }
+        };
+        
+        recognition.onerror = (event: any) => {
+          console.error('Erreur de reconnaissance vocale:', event.error, event.message);
+          setIsListening(false);
+          alert(`Erreur de reconnaissance vocale: ${event.error}`);
+        };
+        
+        recognition.onend = () => {
+          console.log('Reconnaissance vocale terminée');
+          setIsListening(false);
+          // Nettoyer le timeout de silence
+          if (silenceTimeoutRef.current) {
+            clearTimeout(silenceTimeoutRef.current);
+            silenceTimeoutRef.current = null;
+          }
+        };
+        
+        recognitionRef.current = recognition;
+      } else {
+        console.log('Reconnaissance vocale non supportée');
+        setIsVoiceSupported(false);
+      }
+    }
+  }, []);
+
+  // Nettoyage des timeouts lors du démontage
+  useEffect(() => {
+    return () => {
+      if (silenceTimeoutRef.current) {
+        clearTimeout(silenceTimeoutRef.current);
+      }
+    };
+  }, []);
+
   // Fonction de vérification des identifiants
   const handleLogin = (username: string, password: string): boolean => {
     // Identifiants par défaut (dans un vrai projet, ceci serait vérifié côté serveur)
@@ -407,6 +537,23 @@ export default function App() {
     setTimeout(() => {
       chatContainerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 100);
+  };
+
+  // Fonctions de reconnaissance vocale
+  const startListening = () => {
+    if (recognitionRef.current && !isListening) {
+      console.log('🎤 Démarrage de la reconnaissance vocale');
+      setInputValue("");
+      recognitionRef.current.start();
+    }
+  };
+
+  const stopListening = () => {
+    if (recognitionRef.current && isListening) {
+      console.log('🎤 Arrêt de la reconnaissance vocale');
+      recognitionRef.current.stop();
+      setIsListening(false);
+    }
   };
 
   const handleDomainSelection = (domainId: number) => {
@@ -457,7 +604,7 @@ Tu es un collègue syndical spécialiste pour la mairie de Gennevilliers.
 Ta mission est de répondre aux questions des agents en te basant EXCLUSIVEMENT sur la documentation fournie dans le dossier /data.
 NE JAMAIS utiliser tes connaissances générales.
 Si la réponse ne se trouve pas dans la documentation, réponds : "Je ne trouve pas l'information dans les documents à ma disposition. Veuillez contacter la CFDT au 64 64 pour plus de détails."
-Sois précis mais synthetique , utilise un ton AMICAL et ne cite pas le titre du chapitre ni l"article .
+Sois précis mais concis , utilise un ton AMICAL et ne cite pas le titre du chapitre ni l"article .
 --- DEBUT DE LA DOCUMENTATION PERTINENTE ---
 ${contexte}
 --- FIN DE LA DOCUMENTATION PERTINENTE ---
@@ -480,37 +627,20 @@ ${contexte}
     try {
       const reply = await traiterQuestion(q);
       
-      // Créer un message assistant vide pour l'affichage progressif
-      const assistantMsg: ChatMessage = { type: "assistant", content: "", timestamp: new Date() };
+      // Afficher la réponse directement
+      const assistantMsg: ChatMessage = { type: "assistant", content: reply, timestamp: new Date() };
       setChatState((p) => ({ ...p, messages: [...p.messages, assistantMsg] }));
       
-      // Afficher la réponse progressivement
-      let currentText = "";
-      const messageIndex = chatState.messages.length; // Index du nouveau message
-      
-      for (let i = 0; i <= reply.length; i++) {
-        currentText = reply.slice(0, i);
-        setChatState((p) => {
-          const newMessages = [...p.messages];
-          newMessages[messageIndex] = { ...newMessages[messageIndex], content: currentText };
-          return { ...p, messages: newMessages };
-        });
-        
-        // Faire défiler vers le bas à chaque mise à jour du texte dans la zone de chat
-        setTimeout(() => {
-          if (messagesEndRef.current) {
-            messagesEndRef.current.scrollIntoView({ 
-              behavior: 'smooth',
-              block: 'end',
-              inline: 'nearest'
-            });
-          }
-        }, 0);
-        
-        // Délai variable selon le caractère (plus rapide pour les espaces)
-        const delay = currentText.endsWith(' ') ? 20 : 30;
-        await new Promise(resolve => setTimeout(resolve, delay));
-      }
+      // Faire défiler vers le bas
+      setTimeout(() => {
+        if (messagesEndRef.current) {
+          messagesEndRef.current.scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'end',
+            inline: 'nearest'
+          });
+        }
+      }, 100);
       
       setChatState((p) => ({ ...p, isProcessing: false }));
     } catch (e) {
@@ -606,6 +736,32 @@ ${contexte}
                 .animate-blink {
                   animation: blink 2s infinite;
                 }
+                @keyframes slide-in-left {
+                  0% { 
+                    transform: translateX(-100%); 
+                    opacity: 0; 
+                  }
+                  100% { 
+                    transform: translateX(0); 
+                    opacity: 1; 
+                  }
+                }
+                @keyframes slide-in-right {
+                  0% { 
+                    transform: translateX(100%); 
+                    opacity: 0; 
+                  }
+                  100% { 
+                    transform: translateX(0); 
+                    opacity: 1; 
+                  }
+                }
+                .animate-slide-in-left {
+                  animation: slide-in-left 0.3s ease-out;
+                }
+                .animate-slide-in-right {
+                  animation: slide-in-right 0.3s ease-out;
+                }
               `}</style>
             </section>
 
@@ -631,7 +787,7 @@ ${contexte}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
               <button
                 onClick={() => handleDomainSelection(0)}
-                className="group relative overflow-hidden bg-orange-100/60 border-2 border-orange-200 rounded-3xl p-8 transition-all duration-500 hover:border-orange-400 hover:shadow-2xl hover:-translate-y-2"
+                className="group relative overflow-hidden bg-orange-100/60 border-2 border-orange-200 rounded-3xl p-8 transition-all duration-500 hover:border-orange-400 hover:shadow-2xl hover:-translate-y-2 hover:bg-orange-100/90"
               >
                 <div className="relative z-10 flex flex-col items-center gap-6">
                   <div className="relative p-6 bg-gradient-to-br from-orange-500 to-red-600 rounded-3xl shadow-xl group-hover:rotate-3 group-hover:scale-110 transition-transform">
@@ -644,7 +800,7 @@ ${contexte}
 
               <button
                 onClick={() => handleDomainSelection(1)}
-                className="group relative overflow-hidden bg-purple-100/60 border-2 border-purple-200 rounded-3xl p-8 transition-all duration-500 hover:border-purple-400 hover:shadow-2xl hover:-translate-y-2"
+                className="group relative overflow-hidden bg-purple-100/60 border-2 border-purple-200 rounded-3xl p-8 transition-all duration-500 hover:border-purple-400 hover:shadow-2xl hover:-translate-y-2 hover:bg-purple-100/90"
               >
                 <div className="relative z-10 flex flex-col items-center gap-6">
                   <div className="relative p-6 bg-gradient-to-br from-purple-500 to-blue-600 rounded-3xl shadow-xl group-hover:rotate-3 group-hover:scale-110 transition-transform">
@@ -657,7 +813,7 @@ ${contexte}
               
               <button
                 onClick={() => handleDomainSelection(2)}
-                className="group relative overflow-hidden bg-green-100/60 border-2 border-green-200 rounded-3xl p-8 transition-all duration-500 hover:border-green-400 hover:shadow-2xl hover:-translate-y-2 md:col-span-2 lg:col-span-1"
+                className="group relative overflow-hidden bg-green-100/60 border-2 border-green-200 rounded-3xl p-8 transition-all duration-500 hover:border-green-400 hover:shadow-2xl hover:-translate-y-2 hover:bg-green-100/90 md:col-span-2 lg:col-span-1"
               >
                 <div className="relative z-10 flex flex-col items-center gap-6">
                   <div className="relative p-6 bg-gradient-to-br from-green-500 to-teal-600 rounded-3xl shadow-xl group-hover:rotate-3 group-hover:scale-110 transition-transform">
@@ -702,13 +858,13 @@ ${contexte}
             </div>
             
             {/* Zone avec message de bienvenue et GIF */}
-            <div className="flex items-center justify-between py-4 bg-gray-50/50 px-6">
+            <div className="flex items-center py-4 bg-gray-50/50 px-6">
               {/* Message de bienvenue à gauche */}
-              <div className="flex-1 pr-6">
+              <div className="flex-1 mr-4">
                 {chatState.messages.length > 0 && chatState.messages[0].type === 'assistant' && (
                   <div className="flex items-start gap-3">
                     <div className="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center shrink-0">CFDT</div>
-                    <div className="bg-white border border-gray-200 text-gray-800 rounded-2xl px-4 py-3 shadow-md max-w-2xl">
+                    <div className="bg-white border border-gray-200 text-gray-800 rounded-2xl px-4 py-3 shadow-md flex-1">
                       <p className="text-lg sm:text-xl leading-relaxed">{chatState.messages[0].content}</p>
                       <p className="text-xs mt-2 opacity-70 text-right">{chatState.messages[0].timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                     </div>
@@ -721,7 +877,7 @@ ${contexte}
                 <img
                   src="./cfdtmanga.gif"
                   alt="CFDT Manga"
-                  className="w-24 h-24 xs:w-28 xs:h-28 sm:w-32 sm:h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 object-cover rounded-2xl shadow-lg border-2 border-orange-300"
+                  className="w-1/2 h-auto rounded-2xl shadow-lg border-2 border-orange-300"
                 />
               </div>
             </div>
@@ -734,11 +890,11 @@ ${contexte}
                   <div key={i + 1} className={`flex items-end gap-2 ${msg.type === "user" ? "justify-end" : "justify-start"}`}>
                     {msg.type === 'assistant' && <div className="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center shrink-0">CFDT</div>}
                     <div
-                      className={`max-w-sm lg:max-w-xl px-4 py-3 rounded-2xl shadow-md ${
+                      className={`px-4 py-3 rounded-2xl shadow-md ${
                         msg.type === "user"
                           ? "bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-br-none"
                           : "bg-white border border-gray-200 text-gray-800 rounded-bl-none"
-                      }`}
+                      } ${msg.type === "assistant" ? "text-left animate-slide-in-left" : "text-right animate-slide-in-right"}`}
                     >
                       <p className="text-base sm:text-lg leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                       <p className={`text-xs mt-2 opacity-70 ${msg.type === "assistant" ? "text-left" : "text-right"}`}>{msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
@@ -773,10 +929,24 @@ ${contexte}
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder="Tapez votre question ici..."
+                  placeholder={isListening ? "Écoute en cours..." : "Tapez votre question ici..."}
                   className="flex-1 px-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                  disabled={chatState.isProcessing}
+                  disabled={chatState.isProcessing || isListening}
                 />
+                {isVoiceSupported && (
+                  <button
+                    onClick={isListening ? stopListening : startListening}
+                    disabled={chatState.isProcessing}
+                    className={`p-3 rounded-full transition-all duration-200 flex items-center justify-center shadow-lg ${
+                      isListening 
+                        ? 'bg-red-500 hover:bg-red-600 text-white animate-pulse' 
+                        : 'bg-blue-500 hover:bg-blue-600 text-white'
+                    } disabled:opacity-50 disabled:cursor-not-allowed`}
+                    title={isListening ? "Arrêter l'écoute" : "Démarrer l'écoute vocale"}
+                  >
+                    {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                  </button>
+                )}
                 <button
                   onClick={handleSendMessage}
                   disabled={!inputValue.trim() || chatState.isProcessing}
