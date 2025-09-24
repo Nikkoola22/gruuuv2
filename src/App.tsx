@@ -840,40 +840,40 @@ ${contexte}
           </>
         ) : (
           <div ref={chatContainerRef} className="bg-white/95 rounded-3xl shadow-2xl border border-gray-200 overflow-hidden backdrop-blur-sm">
-            <div className="bg-gradient-to-r from-orange-500 via-red-500 to-purple-600 p-4 flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <button onClick={returnToMenu} className="text-orange-600 hover:text-orange-700 p-3 rounded-full hover:bg-orange-50 bg-white border-2 border-orange-300 hover:border-orange-400 transition-all duration-200 shadow-lg hover:shadow-xl">
-                  <ArrowLeft className="w-6 h-6" />
+            <div className="bg-gradient-to-r from-orange-500 via-red-500 to-purple-600 p-3 sm:p-4 flex items-center justify-between">
+              <div className="flex items-center gap-2 sm:gap-4">
+                <button onClick={returnToMenu} className="text-orange-600 hover:text-orange-700 p-2 sm:p-3 rounded-full hover:bg-orange-50 bg-white border-2 border-orange-300 hover:border-orange-400 transition-all duration-200 shadow-lg hover:shadow-xl">
+                  <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6" />
                 </button>
-                <div>
-                  <h3 className="text-xl font-bold text-white">
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-lg sm:text-xl font-bold text-white truncate">
                     {chatState.selectedDomain === 0 && "Assistant Temps de Travail"}
                     {chatState.selectedDomain === 1 && "Assistant Formation"}
                     {chatState.selectedDomain === 2 && "Assistant Télétravail"}
                   </h3>
-                  <p className="text-orange-100 text-sm">Posez vos questions, je suis là pour vous aider</p>
+                  <p className="text-orange-100 text-xs sm:text-sm hidden sm:block">Posez vos questions, je suis là pour vous aider</p>
                 </div>
               </div>
-              <Users className="w-8 h-8 text-white" />
+              <Users className="w-6 h-6 sm:w-8 sm:h-8 text-white flex-shrink-0" />
             </div>
             
             {/* Zone avec message de bienvenue et GIF */}
-            <div className="flex items-center py-4 bg-gray-50/50 px-6">
-              {/* Message de bienvenue à gauche */}
-              <div className="flex-1 mr-4">
+            <div className="flex flex-col sm:flex-row items-center py-4 bg-gray-50/50 px-4 sm:px-6 gap-4">
+              {/* Message de bienvenue */}
+              <div className="flex-1 w-full sm:w-auto">
                 {chatState.messages.length > 0 && chatState.messages[0].type === 'assistant' && (
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center shrink-0">CFDT</div>
-                    <div className="bg-white border border-gray-200 text-gray-800 rounded-2xl px-4 py-3 shadow-md flex-1">
-                      <p className="text-lg sm:text-xl leading-relaxed">{chatState.messages[0].content}</p>
+                  <div className="flex items-start gap-2 sm:gap-3">
+                    <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-orange-500 text-white flex items-center justify-center shrink-0 text-xs sm:text-sm">CFDT</div>
+                    <div className="bg-white border border-gray-200 text-gray-800 rounded-2xl px-3 sm:px-4 py-2 sm:py-3 shadow-md flex-1">
+                      <p className="text-sm sm:text-lg md:text-xl leading-relaxed">{chatState.messages[0].content}</p>
                       <p className="text-xs mt-2 opacity-70 text-right">{chatState.messages[0].timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                     </div>
                   </div>
                 )}
               </div>
               
-              {/* GIF à droite */}
-              <div className="flex-shrink-0">
+              {/* GIF à droite - masqué sur mobile */}
+              <div className="hidden sm:flex flex-shrink-0">
                 <img
                   src="./cfdtmanga.gif"
                   alt="CFDT Manga"
@@ -885,18 +885,18 @@ ${contexte}
             {/* Bloc principal en flex horizontal */}
             <div className="flex flex-row">
               {/* Zone des messages/questions */}
-              <div className="flex-1 min-h-[15vh] max-h-[40vh] overflow-y-auto p-6 space-y-4 bg-gradient-to-b from-gray-50 to-white">
+              <div className="flex-1 min-h-[20vh] max-h-[50vh] sm:min-h-[15vh] sm:max-h-[40vh] overflow-y-auto p-3 sm:p-6 space-y-3 sm:space-y-4 bg-gradient-to-b from-gray-50 to-white">
                 {chatState.messages.slice(1).map((msg, i) => (
                   <div key={i + 1} className={`flex items-end gap-2 ${msg.type === "user" ? "justify-end" : "justify-start"}`}>
-                    {msg.type === 'assistant' && <div className="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center shrink-0">CFDT</div>}
+                    {msg.type === 'assistant' && <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-orange-500 text-white flex items-center justify-center shrink-0 text-xs sm:text-sm">CFDT</div>}
                     <div
-                      className={`px-4 py-3 rounded-2xl shadow-md ${
+                      className={`px-3 sm:px-4 py-2 sm:py-3 rounded-2xl shadow-md ${
                         msg.type === "user"
                           ? "bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-br-none"
                           : "bg-white border border-gray-200 text-gray-800 rounded-bl-none"
                       } ${msg.type === "assistant" ? "text-left animate-slide-in-left" : "text-right animate-slide-in-right"}`}
                     >
-                      <p className="text-base sm:text-lg leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                      <p className="text-sm sm:text-base md:text-lg leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                       <p className={`text-xs mt-2 opacity-70 ${msg.type === "assistant" ? "text-left" : "text-right"}`}>{msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                     </div>
                   </div>
@@ -904,10 +904,10 @@ ${contexte}
 
                 {chatState.isProcessing && (
                   <div className="flex items-end gap-2 justify-start">
-                    <div className="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center shrink-0">CFDT</div>
-                    <div className="bg-white border border-gray-200 rounded-2xl px-4 py-3 shadow-md rounded-bl-none max-w-2xl">
+                    <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-orange-500 text-white flex items-center justify-center shrink-0 text-xs sm:text-sm">CFDT</div>
+                    <div className="bg-white border border-gray-200 rounded-2xl px-3 sm:px-4 py-2 sm:py-3 shadow-md rounded-bl-none max-w-2xl">
                       <div className="flex items-center space-x-2">
-                        <span className="text-sm text-gray-600">CFDT écrit</span>
+                        <span className="text-xs sm:text-sm text-gray-600">CFDT écrit</span>
                         <div className="w-2 h-2 bg-orange-500 rounded-full animate-bounce"></div>
                         <div className="w-2 h-2 bg-orange-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
                         <div className="w-2 h-2 bg-orange-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
@@ -921,7 +921,7 @@ ${contexte}
 
             </div>
 
-            <div className="p-4 bg-gray-50/80 border-t border-gray-200 backdrop-blur-sm">
+            <div className="p-3 sm:p-4 bg-gray-50/80 border-t border-gray-200 backdrop-blur-sm">
               <div className="flex items-center space-x-2">
                 <input
                   ref={inputRef}
@@ -930,29 +930,29 @@ ${contexte}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder={isListening ? "Écoute en cours..." : "Tapez votre question ici..."}
-                  className="flex-1 px-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                   disabled={chatState.isProcessing || isListening}
                 />
                 {isVoiceSupported && (
                   <button
                     onClick={isListening ? stopListening : startListening}
                     disabled={chatState.isProcessing}
-                    className={`p-3 rounded-full transition-all duration-200 flex items-center justify-center shadow-lg ${
+                    className={`p-2 sm:p-3 rounded-full transition-all duration-200 flex items-center justify-center shadow-lg ${
                       isListening 
                         ? 'bg-red-500 hover:bg-red-600 text-white animate-pulse' 
                         : 'bg-blue-500 hover:bg-blue-600 text-white'
                     } disabled:opacity-50 disabled:cursor-not-allowed`}
                     title={isListening ? "Arrêter l'écoute" : "Démarrer l'écoute vocale"}
                   >
-                    {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                    {isListening ? <MicOff className="w-4 h-4 sm:w-5 sm:h-5" /> : <Mic className="w-4 h-4 sm:w-5 sm:h-5" />}
                   </button>
                 )}
                 <button
                   onClick={handleSendMessage}
                   disabled={!inputValue.trim() || chatState.isProcessing}
-                  className="bg-gradient-to-r from-orange-500 to-red-500 text-white p-3 rounded-full hover:from-orange-600 hover:to-red-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-lg"
+                  className="bg-gradient-to-r from-orange-500 to-red-500 text-white p-2 sm:p-3 rounded-full hover:from-orange-600 hover:to-red-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-lg"
                 >
-                  <Send className="w-5 h-5" />
+                  <Send className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
               </div>
             </div>
