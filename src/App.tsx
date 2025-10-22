@@ -694,7 +694,7 @@ Mairie de <span className="text-cyan-400 font-bold">GENNEVILLIERS</span>
 <div className="flex items-center justify-center sm:justify-start gap-3 text-slate-400">
 <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
 <span className="text-sm sm:text-base font-medium">
-Assistant syndical intelligent pour les agents municipaux
+Assistant syndical pour les agents municipaux
 </span>
 <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
 </div>
