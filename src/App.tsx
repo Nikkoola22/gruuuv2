@@ -798,7 +798,7 @@ className="w-full h-full object-cover"
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
               <button
                 onClick={() => handleDomainSelection(0)}
-                className="group relative overflow-hidden bg-orange-100/80 border-2 border-orange-200 rounded-3xl p-8 transition-all duration-500 hover:border-orange-400 hover:shadow-2xl hover:-transl[...]
+                className="group relative overflow-hidden bg-orange-100/80 border-2 border-orange-200 rounded-3xl p-8 transition-all duration-500 hover:border-orange-400 hover:shadow-2xl hover:-translate-y-1"
               >
                 <div className="relative z-10 flex flex-col items-center gap-6">
                   <div className="relative p-6 bg-gradient-to-br from-orange-500 to-red-600 rounded-3xl shadow-xl group-hover:rotate-3 group-hover:scale-110 transition-transform">
@@ -811,7 +811,7 @@ className="w-full h-full object-cover"
 
               <button
                 onClick={() => handleDomainSelection(1)}
-                className="group relative overflow-hidden bg-purple-100/80 border-2 border-purple-200 rounded-3xl p-8 transition-all duration-500 hover:border-purple-400 hover:shadow-2xl hover:-transl[...]
+                className="group relative overflow-hidden bg-purple-100/80 border-2 border-purple-200 rounded-3xl p-8 transition-all duration-500 hover:border-purple-400 hover:shadow-2xl hover:-translate-y-1"
               >
                 <div className="relative z-10 flex flex-col items-center gap-6">
                   <div className="relative p-6 bg-gradient-to-br from-purple-500 to-blue-600 rounded-3xl shadow-xl group-hover:rotate-3 group-hover:scale-110 transition-transform">
@@ -824,7 +824,7 @@ className="w-full h-full object-cover"
               
               <button
                 onClick={() => handleDomainSelection(2)}
-                className="group relative overflow-hidden bg-green-100/80 border-2 border-green-200 rounded-3xl p-8 transition-all duration-500 hover:border-green-400 hover:shadow-2xl hover:-translate[...]
+                className="group relative overflow-hidden bg-green-100/80 border-2 border-green-200 rounded-3xl p-8 transition-all duration-500 hover:border-green-400 hover:shadow-2xl hover:-translate-y-1"
               >
                 <div className="relative z-10 flex flex-col items-center gap-6">
                   <div className="relative p-6 bg-gradient-to-br from-green-500 to-teal-600 rounded-3xl shadow-xl group-hover:rotate-3 group-hover:scale-110 transition-transform">
@@ -853,7 +853,7 @@ className="w-full h-full object-cover"
           <div ref={chatContainerRef} className="bg-white/95 rounded-3xl shadow-2xl border border-gray-200 overflow-hidden backdrop-blur-sm">
             <div className="bg-gradient-to-r from-orange-500 via-red-500 to-purple-600 p-3 sm:p-4 flex items-center justify-between">
               <div className="flex items-center gap-2 sm:gap-4">
-                <button onClick={returnToMenu} className="text-orange-600 hover:text-orange-700 p-2 sm:p-3 rounded-full hover:bg-orange-50 bg-white border-2 border-orange-300 hover:border-orange-[...]
+                <button onClick={returnToMenu} className="text-orange-600 hover:text-orange-700 p-2 sm:p-3 rounded-full hover:bg-orange-50 bg-white border-2 border-orange-300 hover:border-orange-400">
                   <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6" />
                 </button>
                 <div className="flex-1 min-w-0">
