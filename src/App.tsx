@@ -802,9 +802,8 @@ ${contexte}
               </button>
             </div>
             
-            <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('/unnamed.jpg')", opacity: 0.5 }} />
-            <div className="relative z-10 bg-white/70 p-4 rounded-2xl">
-              <div className="flex flex-col items-center gap-6">
+            <div className="relative z-10 bg-white/70 p-4 rounded-2xl bg-cover bg-center" style={{ backgroundImage: "url('/unnamed.jpg')", backgroundPosition: "center", backgroundSize: "cover" }}>
+              <div className="flex flex-col items-center gap-6 relative z-20">
                 <div className="relative p-6 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-3xl shadow-xl">
                   <Sparkles className="w-12 h-12 text-white" />
                 </div>
@@ -819,7 +818,7 @@ ${contexte}
           <div ref={chatContainerRef} className="bg-white/95 rounded-3xl shadow-2xl border border-gray-200 overflow-hidden backdrop-blur-sm">
             <div className="bg-gradient-to-r from-orange-500 via-red-500 to-purple-600 p-3 sm:p-4 flex items-center justify-between">
               <div className="flex items-center gap-2 sm:gap-4">
-                <button onClick={returnToMenu} className="text-orange-600 hover:text-orange-700 p-2 sm:p-3 rounded-full hover:bg-orange-50 bg-white border-2 border-orange-300 hover:border-orange-400 transition-all">
+                <button onClick={returnToMenu} className="text-orange-600 hover:text-orange-700 p-2 sm:p-3 rounded-full hover:bg-orange-50 bg-white border-2 border-orange-300 hover:border-orange-400 transition-colors">
                   <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6" />
                 </button>
                 <div className="flex-1 min-w-0">
