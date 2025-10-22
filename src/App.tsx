@@ -835,18 +835,20 @@ className="w-full h-full object-cover"
                 </div>
               </button>
             </div>
-            
-             <div className="bg-white/60 border-2 border-blue-200 rounded-3xl p-8">
-                <div className="flex flex-col items-center gap-6">
-                    <div className="relative p-6 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-3xl shadow-xl">
-                      <Sparkles className="w-12 h-12 text-white" />
-                    </div>
-                  <h4 className="text-2xl font-bold text-gray-800 text-blue-700">Actualités Nationales</h4>
-                  <div className="w-full">
-                    <NewsTicker />
-                  </div>
-                </div>
-              </div>
+           <div className="relative border-2 border-blue-200 rounded-3xl p-8 overflow-hidden">
+  <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url(\\'/unnamed.jpg\\')", opacity: 0.5 }} />
+  <div className="relative z-10 bg-white/50 p-4 rounded-2xl">
+    <div className="flex flex-col items-center gap-6">
+      <div className="relative p-6 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-3xl shadow-xl">
+        <Sparkles className="w-12 h-12 text-white" />
+      </div>
+      <h4 className="text-2xl font-bold text-gray-800 text-blue-700">Actualités Nationales</h4>
+      <div className="w-full">
+        <NewsTicker />
+      </div>
+    </div>
+  </div>
+</div>
 
           </>
         ) : (
