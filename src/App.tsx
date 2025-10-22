@@ -669,40 +669,50 @@ ${contexte}
       <div className="fixed inset-0 bg-black/10 z-0" />
       <PodcastPlayer />
 
-      <header className="relative bg-white/90 backdrop-blur-sm shadow-lg border-b-4 border-orange-500 z-10">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-6">
-          <div className="flex flex-col sm:flex-row items-center gap-6 flex-grow">
-            <div className="relative">
-              <div className="absolute -inset-4 bg-gradient-to-r from-orange-400 via-red-400 to-orange-500 rounded-full blur-lg opacity-70 animate-pulse" />
-              <div className="relative p-6 bg-gradient-to-br from-white to-orange-50 rounded-full shadow-2xl">
-                <Users className="w-20 h-20 text-orange-500" />
-              </div>
-            </div>
-            <div>
-              <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-orange-600 via-red-600 to-orange-700 bg-clip-text text-transparent drop-shadow-sm">
-                Atlas: Chatbot CFDT
-              </h1>
-              <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                Mairie de GENNEVILLIERS
-              </h2>
-              <p className="mt-4 flex justify-center sm:justify-start items-center gap-2 text-lg text-gray-700">
-                <Users className="text-orange-500 w-5 h-5 animate-pulse" />
-                Assistant syndical CFDT pour les agents municipaux
-              </p>
-            </div>
-          </div>
-          <div className="relative shrink-0">
-            <div className="absolute -inset-3 bg-gradient-to-r from-orange-400 via-orange-500 to-red-400 rounded-full blur-2xl opacity-80 animate-pulse"></div>
-            <div className="relative bg-white rounded-full w-32 h-32 sm:w-36 sm:h-36 shadow-lg overflow-hidden">
-              <img
-                src="./logo-cfdt.jpg"
-                alt="Logo CFDT"
-                className="w-full h-full object-cover"
-              />
-            </div>
-          </div>
-        </div>
-      </header>
+<header className="relative bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 shadow-2xl border-b border-slate-700 z-10">
+<div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-6">
+<div className="flex flex-col sm:flex-row items-center gap-8 flex-grow">
+<div className="relative">
+<div className="absolute -inset-3 bg-gradient-to-r from-blue-500 via-cyan-500 to-blue-600 rounded-2xl blur-xl opacity-30" />
+<div className="relative p-5 bg-gradient-to-br from-slate-100 to-white rounded-2xl shadow-2xl border border-slate-200">
+<Users className="w-16 h-16 text-slate-700" />
+</div>
+</div>
+<div className="text-center sm:text-left">
+<h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-2 tracking-tight">
+<span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent">
+Atlas
+</span>
+<span className="text-slate-200 mx-2">•</span>
+<span className="text-slate-100">
+Chatbot CFDT
+</span>
+</h1>
+<h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-slate-300 mb-3">
+Mairie de <span className="text-cyan-400 font-bold">GENNEVILLIERS</span>
+</h2>
+<div className="flex items-center justify-center sm:justify-start gap-3 text-slate-400">
+<div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
+<span className="text-sm sm:text-base font-medium">
+Assistant syndical intelligent pour les agents municipaux
+</span>
+<div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
+</div>
+</div>
+</div>
+<div className="relative shrink-0">
+<div className="absolute -inset-3 bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 rounded-full blur-2xl opacity-80 animate-pulse"></div>
+<div className="relative bg-white rounded-full w-28 h-28 sm:w-32 sm:h-32 shadow-2xl overflow-hidden border-2 border-slate-200">
+<img
+src="./logo-cfdt.jpg"
+alt="Logo CFDT"
+className="w-full h-full object-cover"
+/>
+</div>
+</div>
+</div>
+</header>
+
 
       <main className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 z-10">
         {chatState.currentView === "menu" ? (
