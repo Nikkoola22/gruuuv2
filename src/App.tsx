@@ -797,7 +797,7 @@ className="w-full h-full object-cover"
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
               <button
                 onClick={() => handleDomainSelection(0)}
-                className="group relative overflow-hidden bg-orange-100/60 border-2 border-orange-200 rounded-3xl p-8 transition-all duration-500 hover:border-orange-400 hover:shadow-2xl hover:-translate-y-2 hover:bg-orange-100/90"
+                className="group relative overflow-hidden bg-orange-100/80 border-2 border-orange-200 rounded-3xl p-8 transition-all duration-500 hover:border-orange-400 hover:shadow-2xl hover:-translate-y-2 hover:bg-orange-100/100"
               >
                 <div className="relative z-10 flex flex-col items-center gap-6">
                   <div className="relative p-6 bg-gradient-to-br from-orange-500 to-red-600 rounded-3xl shadow-xl group-hover:rotate-3 group-hover:scale-110 transition-transform">
@@ -810,7 +810,7 @@ className="w-full h-full object-cover"
 
               <button
                 onClick={() => handleDomainSelection(1)}
-                className="group relative overflow-hidden bg-purple-100/60 border-2 border-purple-200 rounded-3xl p-8 transition-all duration-500 hover:border-purple-400 hover:shadow-2xl hover:-translate-y-2 hover:bg-purple-100/90"
+                className="group relative overflow-hidden bg-purple-100/80 border-2 border-purple-200 rounded-3xl p-8 transition-all duration-500 hover:border-purple-400 hover:shadow-2xl hover:-translate-y-2 hover:bg-purple-100/100"
               >
                 <div className="relative z-10 flex flex-col items-center gap-6">
                   <div className="relative p-6 bg-gradient-to-br from-purple-500 to-blue-600 rounded-3xl shadow-xl group-hover:rotate-3 group-hover:scale-110 transition-transform">
@@ -823,7 +823,7 @@ className="w-full h-full object-cover"
               
               <button
                 onClick={() => handleDomainSelection(2)}
-                className="group relative overflow-hidden bg-green-100/60 border-2 border-green-200 rounded-3xl p-8 transition-all duration-500 hover:border-green-400 hover:shadow-2xl hover:-translate-y-2 hover:bg-green-100/90 md:col-span-2 lg:col-span-1"
+                className="group relative overflow-hidden bg-green-100/80 border-2 border-green-200 rounded-3xl p-8 transition-all duration-500 hover:border-green-400 hover:shadow-2xl hover:-translate-y-2 hover:bg-green-100/100 md:col-span-2 lg:col-span-1"
               >
                 <div className="relative z-10 flex flex-col items-center gap-6">
                   <div className="relative p-6 bg-gradient-to-br from-green-500 to-teal-600 rounded-3xl shadow-xl group-hover:rotate-3 group-hover:scale-110 transition-transform">
