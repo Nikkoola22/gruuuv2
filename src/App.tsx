@@ -57,7 +57,6 @@ interface ChatbotState {
 const API_KEY = import.meta.env.VITE_APP_PERPLEXITY_KEY;
 const API_URL = "https://api.perplexity.ai/chat/completions";
 
-
 const fluxOriginal = "https://www.franceinfo.fr/politique.rss";
 const proxyUrl = "https://api.allorigins.win/get?url=";
 
@@ -66,16 +65,16 @@ const nettoyerChaine = (chaine: string): string => {
   return chaine
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "") // Supprime les accents
-    .replace(/[^a-z0-9\s]/g, "") // Garde seulement lettres, chiffres et espaces
-    .replace(/\s+/g, " ") // Remplace les espaces multiples par un seul
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\s]/g, "")
+    .replace(/\s+/g, " ")
     .trim();
 };
 
 // Parser les données du sommaire
 const sommaireData = JSON.parse(sommaire);
 
-// Fonction pour obtenir l'URL du flux RSS (personnalisé ou par défaut)
+// Fonction pour obtenir l'URL du flux RSS
 const getRssUrl = (): string => {
   try {
     const savedConfig = localStorage.getItem('rssConfig');
@@ -109,7 +108,7 @@ const NewsTicker: React.FC = () => {
         const res = await fetch(getRssUrl());
         if (!res.ok) throw new Error("Échec de la récupération du flux RSS");
 
-        const data = await res.json(); // AllOrigins renvoie un JSON { contents: "...xml..." }
+        const data = await res.json();
         const xml = data.contents;
         const doc = new DOMParser().parseFromString(xml, "text/xml");
         const items = Array.from(doc.querySelectorAll("item")).slice(0, 10).map((item, i) => ({
@@ -169,6 +168,7 @@ const NewsTicker: React.FC = () => {
     </div>
   );
 };
+
 const trouverContextePertinent = (question: string): string => {
   const qNet = nettoyerChaine(question);
   const mots = qNet.split(/\s+/).filter(Boolean);
@@ -277,7 +277,7 @@ const PodcastPlayer: React.FC = () => {
   const selectEpisode = (episode: PodcastEpisode) => {
     if (currentEpisode?.id !== episode.id) {
       setCurrentEpisode(episode);
-      setIsPlaying(false); // Let useEffect handle loading and playing
+      setIsPlaying(false);
     }
   };
 
@@ -312,10 +312,9 @@ const PodcastPlayer: React.FC = () => {
         <audio ref={audioRef} src={currentEpisode?.url} preload="metadata" style={{ display: "none" }} crossOrigin="anonymous" />
         {!isMinimized && (
           <div className="mt-4">
-            {/* Affichage de la vignette du podcast */}
             <div className="flex flex-col items-center mb-4">
               <img 
-                src="./podcast.jpg"  // <- Chemin identique, image dans 'public'
+                src="./podcast.jpg"
                 alt="Illustration Podcast"
                 className="w-32 h-32 object-cover rounded-full shadow-md border-2 border-purple-400"
               />
@@ -351,13 +350,7 @@ const PodcastPlayer: React.FC = () => {
   );
 };
 
-
 export default function App() {
-  // if (DEBUG_IMAGES) {
-  //   return <ImageTroubleshooter />;
-  // }
-  
-  // Charger les informations depuis le localStorage ou utiliser les données par défaut
   const [infoItems, setInfoItems] = useState<InfoItem[]>(() => {
     const savedInfo = localStorage.getItem('cfdt-info-items');
     return savedInfo ? JSON.parse(savedInfo) : defaultInfoItems;
@@ -390,7 +383,6 @@ export default function App() {
     }
   }, [chatState.messages]);
 
-  // Écouter les changements dans le localStorage pour mettre à jour les informations
   useEffect(() => {
     const handleStorageChange = () => {
       const savedInfo = localStorage.getItem('cfdt-info-items');
@@ -403,7 +395,6 @@ export default function App() {
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
-  // Initialisation de la reconnaissance vocale
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -413,7 +404,7 @@ export default function App() {
         setIsVoiceSupported(true);
         const recognition = new SpeechRecognition();
         recognition.continuous = false;
-        recognition.interimResults = true; // Changé pour true pour voir les résultats intermédiaires
+        recognition.interimResults = true;
         recognition.lang = 'fr-FR';
         
         recognition.onstart = () => {
@@ -438,21 +429,14 @@ export default function App() {
           if (finalTranscript) {
             console.log('Texte final:', finalTranscript);
             setInputValue(finalTranscript);
-            // Envoyer automatiquement après un texte final
             setTimeout(() => {
               if (finalTranscript && finalTranscript.trim()) {
                 console.log('🎤 ENVOI AUTOMATIQUE TEXTE FINAL:', finalTranscript);
-                console.log('🎤 État avant envoi:', { 
-                  selectedDomain: chatState.selectedDomain,
-                  isProcessing: chatState.isProcessing,
-                  messagesCount: chatState.messages.length
-                });
                 setInputValue(finalTranscript);
                 handleSendMessage();
               }
-            }, 500); // Petit délai pour laisser le temps à l'utilisateur de voir le texte
+            }, 500);
             setIsListening(false);
-            // Arrêter explicitement la reconnaissance vocale
             if (recognitionRef.current) {
               recognitionRef.current.stop();
             }
@@ -460,24 +444,16 @@ export default function App() {
             console.log('Texte intermédiaire:', interimTranscript);
             setInputValue(interimTranscript);
             
-            // Réinitialiser le timer de silence
             if (silenceTimeoutRef.current) {
               clearTimeout(silenceTimeoutRef.current);
             }
             
-            // Programmer l'envoi automatique après 3 secondes de silence
             silenceTimeoutRef.current = setTimeout(() => {
               if (interimTranscript && interimTranscript.trim()) {
                 console.log('🎤 ENVOI AUTOMATIQUE APRÈS SILENCE:', interimTranscript);
-                console.log('🎤 État avant envoi:', { 
-                  selectedDomain: chatState.selectedDomain,
-                  isProcessing: chatState.isProcessing,
-                  messagesCount: chatState.messages.length
-                });
                 setInputValue(interimTranscript);
                 handleSendMessage();
                 setIsListening(false);
-                // Arrêter explicitement la reconnaissance vocale
                 if (recognitionRef.current) {
                   recognitionRef.current.stop();
                 }
@@ -495,7 +471,6 @@ export default function App() {
         recognition.onend = () => {
           console.log('Reconnaissance vocale terminée');
           setIsListening(false);
-          // Nettoyer le timeout de silence
           if (silenceTimeoutRef.current) {
             clearTimeout(silenceTimeoutRef.current);
             silenceTimeoutRef.current = null;
@@ -510,7 +485,6 @@ export default function App() {
     }
   }, []);
 
-  // Nettoyage des timeouts lors du démontage
   useEffect(() => {
     return () => {
       if (silenceTimeoutRef.current) {
@@ -519,9 +493,7 @@ export default function App() {
     };
   }, []);
 
-  // Fonction de vérification des identifiants
   const handleLogin = (username: string, password: string): boolean => {
-    // Identifiants par défaut (dans un vrai projet, ceci serait vérifié côté serveur)
     const validCredentials = [
       { username: "admin", password: "cfdt2025" },
       { username: "cfdt", password: "admin123" },
@@ -539,7 +511,6 @@ export default function App() {
     }, 100);
   };
 
-  // Fonctions de reconnaissance vocale
   const startListening = () => {
     if (recognitionRef.current && !isListening) {
       console.log('🎤 Démarrage de la reconnaissance vocale');
@@ -626,12 +597,9 @@ ${contexte}
     
     try {
       const reply = await traiterQuestion(q);
-      
-      // Afficher la réponse directement
       const assistantMsg: ChatMessage = { type: "assistant", content: reply, timestamp: new Date() };
       setChatState((p) => ({ ...p, messages: [...p.messages, assistantMsg] }));
       
-      // Faire défiler vers le bas
       setTimeout(() => {
         if (messagesEndRef.current) {
           messagesEndRef.current.scrollIntoView({ 
@@ -669,50 +637,49 @@ ${contexte}
       <div className="fixed inset-0 bg-black/10 z-0" />
       <PodcastPlayer />
 
-<header className="relative bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 shadow-2xl border-b border-slate-700 z-10">
-<div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-6">
-<div className="flex flex-col sm:flex-row items-center gap-8 flex-grow">
-<div className="relative">
-<div className="absolute -inset-3 bg-gradient-to-r from-blue-500 via-cyan-500 to-blue-600 rounded-2xl blur-xl opacity-30" />
-<div className="relative p-5 bg-gradient-to-br from-slate-100 to-white rounded-2xl shadow-2xl border border-slate-200">
-<Users className="w-16 h-16 text-slate-700" />
-</div>
-</div>
-<div className="text-center sm:text-left">
-<h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-2 tracking-tight">
-<span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent">
-Atlas
-</span>
-<span className="text-slate-200 mx-2">•</span>
-<span className="text-slate-100">
-Chatbot CFDT
-</span>
-</h1>
-<h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-slate-300 mb-3">
-Mairie de <span className="text-cyan-400 font-bold">GENNEVILLIERS</span>
-</h2>
-<div className="flex items-center justify-center sm:justify-start gap-3 text-slate-400">
-<div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
-<span className="text-sm sm:text-base font-medium">
-Assistant syndical pour les agents municipaux
-</span>
-<div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
-</div>
-</div>
-</div>
-<div className="relative shrink-0">
-<div className="absolute -inset-3 bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 rounded-full blur-2xl opacity-80 animate-pulse"></div>
-<div className="relative bg-white rounded-full w-28 h-28 sm:w-32 sm:h-32 shadow-2xl overflow-hidden border-2 border-slate-200">
-<img
-src="./logo-cfdt.jpg"
-alt="Logo CFDT"
-className="w-full h-full object-cover"
-/>
-</div>
-</div>
-</div>
-</header>
-
+      <header className="relative bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 shadow-2xl border-b border-slate-700 z-10">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div className="flex flex-col sm:flex-row items-center gap-8 flex-grow">
+            <div className="relative">
+              <div className="absolute -inset-3 bg-gradient-to-r from-blue-500 via-cyan-500 to-blue-600 rounded-2xl blur-xl opacity-30" />
+              <div className="relative p-5 bg-gradient-to-br from-slate-100 to-white rounded-2xl shadow-2xl border border-slate-200">
+                <Users className="w-16 h-16 text-slate-700" />
+              </div>
+            </div>
+            <div className="text-center sm:text-left">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-2 tracking-tight">
+                <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent">
+                  Atlas
+                </span>
+                <span className="text-slate-200 mx-2">•</span>
+                <span className="text-slate-100">
+                  Chatbot CFDT
+                </span>
+              </h1>
+              <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-slate-300 mb-3">
+                Mairie de <span className="text-cyan-400 font-bold">GENNEVILLIERS</span>
+              </h2>
+              <div className="flex items-center justify-center sm:justify-start gap-3 text-slate-400">
+                <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
+                <span className="text-sm sm:text-base font-medium">
+                  Assistant syndical pour les agents municipaux
+                </span>
+                <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
+              </div>
+            </div>
+          </div>
+          <div className="relative shrink-0">
+            <div className="absolute -inset-3 bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 rounded-full blur-2xl opacity-80 animate-pulse"></div>
+            <div className="relative bg-white rounded-full w-28 h-28 sm:w-32 sm:h-32 shadow-2xl overflow-hidden border-2 border-slate-200">
+              <img
+                src="./logo-cfdt.jpg"
+                alt="Logo CFDT"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+        </div>
+      </header>
 
       <main className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 z-10">
         {chatState.currentView === "menu" ? (
@@ -786,19 +753,18 @@ className="w-full h-full object-cover"
             )}
 
             <section className="text-center my-12">
-<h3 className="text-4xl font-bold text-white mb-4 bg-blue-500/70 p-2 rounded-lg">
-  Choisissez votre domaine d'assistance
-</h3>
-
+              <h3 className="text-4xl font-bold text-white mb-4 bg-blue-500/70 p-2 rounded-lg">
+                Choisissez votre domaine d'assistance
+              </h3>
               <p className="text-xl bg-white px-4 py-2 rounded-lg max-w-fit mx-auto shadow-md">
-              <span className="animate-blink">Exclusivement a partir des documents de la mairie.</span>
+                <span className="animate-blink">Exclusivement a partir des documents de la mairie.</span>
               </p>
             </section>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
               <button
                 onClick={() => handleDomainSelection(0)}
-                className="group relative overflow-hidden bg-orange-100/80 border-2 border-orange-200 rounded-3xl p-8 transition-all duration-500 hover:border-orange-400 hover:shadow-2xl hover:-translate-y-1"
+                className="group relative overflow-hidden bg-orange-100/80 border-2 border-orange-200 rounded-3xl p-8 transition-all duration-500 hover:border-orange-400 hover:shadow-2xl hover:-translate-y-2"
               >
                 <div className="relative z-10 flex flex-col items-center gap-6">
                   <div className="relative p-6 bg-gradient-to-br from-orange-500 to-red-600 rounded-3xl shadow-xl group-hover:rotate-3 group-hover:scale-110 transition-transform">
@@ -811,7 +777,7 @@ className="w-full h-full object-cover"
 
               <button
                 onClick={() => handleDomainSelection(1)}
-                className="group relative overflow-hidden bg-purple-100/80 border-2 border-purple-200 rounded-3xl p-8 transition-all duration-500 hover:border-purple-400 hover:shadow-2xl hover:-translate-y-1"
+                className="group relative overflow-hidden bg-purple-100/80 border-2 border-purple-200 rounded-3xl p-8 transition-all duration-500 hover:border-purple-400 hover:shadow-2xl hover:-translate-y-2"
               >
                 <div className="relative z-10 flex flex-col items-center gap-6">
                   <div className="relative p-6 bg-gradient-to-br from-purple-500 to-blue-600 rounded-3xl shadow-xl group-hover:rotate-3 group-hover:scale-110 transition-transform">
@@ -824,7 +790,7 @@ className="w-full h-full object-cover"
               
               <button
                 onClick={() => handleDomainSelection(2)}
-                className="group relative overflow-hidden bg-green-100/80 border-2 border-green-200 rounded-3xl p-8 transition-all duration-500 hover:border-green-400 hover:shadow-2xl hover:-translate-y-1"
+                className="group relative overflow-hidden bg-green-100/80 border-2 border-green-200 rounded-3xl p-8 transition-all duration-500 hover:border-green-400 hover:shadow-2xl hover:-translate-y-2"
               >
                 <div className="relative z-10 flex flex-col items-center gap-6">
                   <div className="relative p-6 bg-gradient-to-br from-green-500 to-teal-600 rounded-3xl shadow-xl group-hover:rotate-3 group-hover:scale-110 transition-transform">
@@ -835,25 +801,25 @@ className="w-full h-full object-cover"
                 </div>
               </button>
             </div>
-         <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('/unnamed.jpg')", opacity: 0.5 }} />
-  <div className="relative z-10 bg-white/70 p-4 rounded-2xl">
-    <div className="flex flex-col items-center gap-6">
-      <div className="relative p-6 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-3xl shadow-xl">
-        <Sparkles className="w-12 h-12 text-white" />
-      </div>
-      <h4 className="text-2xl font-bold text-gray-800 text-blue-700">Actualités Nationales</h4>
-      <div className="w-full">
-        <NewsTicker />
-      </div>
-    </div>
-  </div>
-</div>
+            
+            <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('/unnamed.jpg')", opacity: 0.5 }} />
+            <div className="relative z-10 bg-white/70 p-4 rounded-2xl">
+              <div className="flex flex-col items-center gap-6">
+                <div className="relative p-6 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-3xl shadow-xl">
+                  <Sparkles className="w-12 h-12 text-white" />
+                </div>
+                <h4 className="text-2xl font-bold text-gray-800 text-blue-700">Actualités Nationales</h4>
+                <div className="w-full">
+                  <NewsTicker />
+                </div>
+              </div>
+            </div>
           </>
         ) : (
           <div ref={chatContainerRef} className="bg-white/95 rounded-3xl shadow-2xl border border-gray-200 overflow-hidden backdrop-blur-sm">
             <div className="bg-gradient-to-r from-orange-500 via-red-500 to-purple-600 p-3 sm:p-4 flex items-center justify-between">
               <div className="flex items-center gap-2 sm:gap-4">
-                <button onClick={returnToMenu} className="text-orange-600 hover:text-orange-700 p-2 sm:p-3 rounded-full hover:bg-orange-50 bg-white border-2 border-orange-300 hover:border-orange-400">
+                <button onClick={returnToMenu} className="text-orange-600 hover:text-orange-700 p-2 sm:p-3 rounded-full hover:bg-orange-50 bg-white border-2 border-orange-300 hover:border-orange-400 transition-all">
                   <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6" />
                 </button>
                 <div className="flex-1 min-w-0">
@@ -868,9 +834,7 @@ className="w-full h-full object-cover"
               <Users className="w-6 h-6 sm:w-8 sm:h-8 text-white flex-shrink-0" />
             </div>
             
-            {/* Zone avec message de bienvenue et GIF */}
             <div className="flex flex-col sm:flex-row items-center py-4 bg-gray-50/50 px-4 sm:px-6 gap-4">
-              {/* Message de bienvenue */}
               <div className="flex-1 w-full sm:w-auto">
                 {chatState.messages.length > 0 && chatState.messages[0].type === 'assistant' && (
                   <div className="flex items-start gap-2 sm:gap-3">
@@ -883,7 +847,6 @@ className="w-full h-full object-cover"
                 )}
               </div>
               
-              {/* GIF à droite - masqué sur mobile */}
               <div className="hidden sm:flex flex-shrink-0">
                 <img
                   src="./cfdtmanga.gif"
@@ -893,9 +856,7 @@ className="w-full h-full object-cover"
               </div>
             </div>
 
-            {/* Bloc principal en flex horizontal */}
             <div className="flex flex-row">
-              {/* Zone des messages/questions */}
               <div className="flex-1 min-h-[20vh] max-h-[50vh] sm:min-h-[15vh] sm:max-h-[40vh] overflow-y-auto p-3 sm:p-6 space-y-3 sm:space-y-4 bg-gradient-to-b from-gray-50 to-white">
                 {chatState.messages.slice(1).map((msg, i) => (
                   <div key={i + 1} className={`flex items-end gap-2 ${msg.type === "user" ? "justify-end" : "justify-start"}`}>
@@ -929,7 +890,6 @@ className="w-full h-full object-cover"
 
                 <div ref={messagesEndRef} />
               </div>
-
             </div>
 
             <div className="p-3 sm:p-4 bg-gray-50/80 border-t border-gray-200 backdrop-blur-sm">
@@ -1015,8 +975,7 @@ className="w-full h-full object-cover"
               </h4>
               <div className="space-y-2 text-gray-300">
                 <div>Lundi - Vendredi</div>
-                <div className="font-semibold text-white">9h00/12h00 - 13h30/17h00
-                </div>
+                <div className="font-semibold text-white">9h00/12h00 - 13h30/17h00</div>
                 <div className="text-sm">Permanences sur RDV</div>
               </div>
             </div>
@@ -1036,7 +995,6 @@ className="w-full h-full object-cover"
         </div>
       </footer>
       
-      {/* Modal de connexion */}
       <LoginModal
         isOpen={showLoginModal}
         onClose={() => setShowLoginModal(false)}
