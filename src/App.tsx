@@ -835,24 +835,19 @@ className="w-full h-full object-cover"
                 </div>
               </button>
             </div>
-           <div className="relative border-2 border-blue-200 rounded-3xl p-8 overflow-hidden">
-             <div className="relative bg-white/85 border-2 border-blue-200 rounded-3xl p-8 overflow-hidden">
-                {/* Image de fond transparente */}
-                <div 
-                  className="absolute inset-0 opacity-25 bg-cover bg-center bg-no-repeat rounded-3xl"
-                  style={{ backgroundImage: "url('./unnamed.jpg')" }}
-                ></div>
-                <div className="relative z-10 flex flex-col items-center gap-6">
-                    <div className="relative p-6 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-3xl shadow-xl">
-                      <Sparkles className="w-12 h-12 text-white" />
-                    </div>
-                  <h4 className="text-2xl font-bold text-gray-800 text-blue-700">Actualités Nationales</h4>
-                  <div className="w-full">
-                    <NewsTicker />
-                  </div>
-                </div>
-              </div>
-
+         <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage:"url(\\\'/public/unnamed.jpg\\\'", opacity: 0.5 }} />
+  <div className="relative z-10 bg-white/70 p-4 rounded-2xl">
+    <div className="flex flex-col items-center gap-6">
+      <div className="relative p-6 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-3xl shadow-xl">
+        <Sparkles className="w-12 h-12 text-white" />
+      </div>
+      <h4 className="text-2xl font-bold text-gray-800 text-blue-700">Actualités Nationales</h4>
+      <div className="w-full">
+        <NewsTicker />
+      </div>
+    </div>
+  </div>
+</div>
           </>
         ) : (
           <div ref={chatContainerRef} className="bg-white/95 rounded-3xl shadow-2xl border border-gray-200 overflow-hidden backdrop-blur-sm">
