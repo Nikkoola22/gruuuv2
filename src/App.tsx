@@ -802,7 +802,7 @@ ${contexte}
               </button>
             </div>
             
-            <div className="relative z-10 bg-white/70 p-4 rounded-2xl bg-cover bg-center" style={{ backgroundImage: "url('/unnamed.jpg')", backgroundPosition: "center", backgroundSize: "cover" }}>
+            <div className="relative z-10 bg-white/40 p-4 rounded-2xl bg-cover bg-center" style={{ backgroundImage: "url('/unnamed.jpg')", backgroundPosition: "center", backgroundSize: "cover" }}>
               <div className="flex flex-col items-center gap-6 relative z-20">
                 <div className="relative p-6 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-3xl shadow-xl">
                   <Sparkles className="w-12 h-12 text-white" />
