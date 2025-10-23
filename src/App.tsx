@@ -753,10 +753,10 @@ ${contexte}
             )}
 
             <section className="text-center my-12">
-              <h3 className="text-4xl font-bold text-white mb-4 bg-blue-500/70 p-2 rounded-lg">
+              <h3 className="text-4xl font-bold text-white mb-4 bg-gradient-to-r from-blue-600/60 via-purple-600/60 to-indigo-600/60 p-4 rounded-2xl shadow-lg">
                 Choisissez votre domaine d'assistance
               </h3>
-              <p className="text-xl bg-white px-4 py-2 rounded-lg max-w-fit mx-auto shadow-md">
+              <p className="text-xl bg-white/90 px-4 py-2 rounded-lg max-w-fit mx-auto shadow-md backdrop-blur-sm">
                 <span className="animate-blink">Exclusivement a partir des documents de la mairie.</span>
               </p>
             </section>
@@ -764,7 +764,7 @@ ${contexte}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
               <button
                 onClick={() => handleDomainSelection(0)}
-                className="group relative overflow-hidden bg-orange-100/80 border-2 border-orange-200 rounded-3xl p-8 transition-all duration-500 hover:border-orange-400 hover:shadow-2xl hover:-translate-y-2"
+                className="group relative overflow-hidden bg-orange-100/70 border-2 border-orange-200 rounded-3xl p-8 transition-all duration-500 hover:bg-orange-100 hover:border-orange-400 hover:shadow-2xl hover:-translate-y-2"
               >
                 <div className="relative z-10 flex flex-col items-center gap-6">
                   <div className="relative p-6 bg-gradient-to-br from-orange-500 to-red-600 rounded-3xl shadow-xl group-hover:rotate-3 group-hover:scale-110 transition-transform">
@@ -777,7 +777,7 @@ ${contexte}
 
               <button
                 onClick={() => handleDomainSelection(1)}
-                className="group relative overflow-hidden bg-purple-100/80 border-2 border-purple-200 rounded-3xl p-8 transition-all duration-500 hover:border-purple-400 hover:shadow-2xl hover:-translate-y-2"
+                className="group relative overflow-hidden bg-purple-100/70 border-2 border-purple-200 rounded-3xl p-8 transition-all duration-500 hover:bg-purple-100 hover:border-purple-400 hover:shadow-2xl hover:-translate-y-2"
               >
                 <div className="relative z-10 flex flex-col items-center gap-6">
                   <div className="relative p-6 bg-gradient-to-br from-purple-500 to-blue-600 rounded-3xl shadow-xl group-hover:rotate-3 group-hover:scale-110 transition-transform">
@@ -790,7 +790,7 @@ ${contexte}
               
               <button
                 onClick={() => handleDomainSelection(2)}
-                className="group relative overflow-hidden bg-green-100/80 border-2 border-green-200 rounded-3xl p-8 transition-all duration-500 hover:border-green-400 hover:shadow-2xl hover:-translate-y-2"
+                className="group relative overflow-hidden bg-green-100/70 border-2 border-green-200 rounded-3xl p-8 transition-all duration-500 hover:bg-green-100 hover:border-green-400 hover:shadow-2xl hover:-translate-y-2"
               >
                 <div className="relative z-10 flex flex-col items-center gap-6">
                   <div className="relative p-6 bg-gradient-to-br from-green-500 to-teal-600 rounded-3xl shadow-xl group-hover:rotate-3 group-hover:scale-110 transition-transform">
@@ -802,7 +802,8 @@ ${contexte}
               </button>
             </div>
             
-            <div className="relative z-10 bg-white/40 p-4 rounded-2xl bg-cover bg-center" style={{ backgroundImage: "url('/unnamed.jpg')", backgroundPosition: "center", backgroundSize: "cover" }}>
+            <div className="relative z-10 bg-white/10 p-4 rounded-2xl overflow-hidden">
+              <div className="absolute inset-0 bg-cover bg-center opacity-50" style={{ backgroundImage: "url('/unnamed.jpg')", backgroundPosition: "center", backgroundSize: "cover" }}></div>
               <div className="flex flex-col items-center gap-6 relative z-20">
                 <div className="relative p-6 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-3xl shadow-xl">
                   <Sparkles className="w-12 h-12 text-white" />
@@ -930,9 +931,9 @@ ${contexte}
         )}
       </main>
 
-      <footer className="relative bg-gray-900 text-white py-12 z-10">
+      <footer className="relative bg-gray-900 text-white py-6 z-10">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center md:text-left">
               <h4 className="text-xl font-bold mb-4 bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent">
                 Contact CFDT
@@ -979,7 +980,7 @@ ${contexte}
               </div>
             </div>
           </div>
-          <div className="border-t border-gray-700 mt-10 pt-6 text-center">
+          <div className="border-t border-gray-700 mt-6 pt-4 text-center">
             <p className="text-gray-400">© 2025 CFDT Gennevilliers - Assistant IA pour les agents municipaux</p>
             <div className="mt-4">
               <button
@@ -1002,3 +1003,4 @@ ${contexte}
     </div>
   );
 }
+
