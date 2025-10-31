@@ -770,16 +770,16 @@ ${contexte}
               </div>
             </section>
 
-            <div className="relative w-full flex items-center justify-center mb-12 min-h-[60vh]">
+            <div className="relative w-full flex items-center justify-center mb-12">
               {/* fixed white circle behind the star (non-interactive) */}
-              <div className="absolute left-1/2 top-12 md:top-1/2 transform -translate-x-48 md:-translate-x-56 -translate-y-1/2 pointer-events-none z-10">
+              <div className="absolute left-1/2 top-12 md:top-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none z-10">
                 <div className="w-36 h-36 sm:w-48 md:w-64 sm:h-48 md:h-64 rounded-full bg-white shadow-lg" />
               </div>
 
-              {/* Center the QUIZZ star horizontally above the FAQ card */}
-              <div className="w-full flex justify-center relative z-20">
-                <button onClick={() => setChatState(p => ({ ...p, currentView: 'quiz' }))} aria-label="Ouvrir QUIZZ" className="focus:outline-none relative z-30">
-                  <div className="w-36 sm:w-44 md:w-56 h-36 sm:h-44 md:h-56 relative mx-auto">
+              {/* Center the QUIZZ star horizontally above the FAQ card (absolute to match background circle) */}
+              <div className="absolute left-1/2 top-12 md:top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-30">
+                <button onClick={() => setChatState(p => ({ ...p, currentView: 'quiz' }))} aria-label="Ouvrir QUIZZ" className="focus:outline-none">
+                  <div className="w-36 sm:w-44 md:w-56 h-36 sm:h-44 md:h-56">
                     <svg viewBox="0 0 100 100" className="w-full h-full star-anim cursor-pointer" aria-hidden="true">
                       <defs>
                         <linearGradient id="gStar" x1="0%" x2="100%">
@@ -795,8 +795,8 @@ ${contexte}
                 </button>
               </div>
 
-              <div className="pt-8">
-                <div className="relative z-10 p-3 rounded-2xl overflow-hidden w-full max-w-xs sm:max-w-sm mx-auto">
+              <div className="pt-8 w-full flex justify-end pr-6 md:pr-12">
+                <div className="relative z-10 p-3 rounded-2xl overflow-hidden w-auto max-w-[220px] mr-8 md:mr-24">
                   <div className="absolute inset-0 bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700 opacity-70" />
                   <div className="flex flex-col items-center gap-4 relative z-20 text-white">
                     <div className="relative p-4 bg-orange-500 rounded-3xl shadow-lg ring-2 ring-orange-300">
