@@ -759,13 +759,15 @@ ${contexte}
               </section>
             )}
 
-            <section className="text-center my-4">
-              <h3 className="text-2xl sm:text-3xl font-bold text-white mb-3 bg-gradient-to-r from-blue-600/60 via-purple-600/60 to-indigo-600/60 px-3 py-2 rounded-xl shadow-md">
-                Choisissez votre domaine d'assistance
-              </h3>
-              <p className="text-base bg-white/90 px-3 py-1 rounded-md max-w-fit mx-auto shadow-sm backdrop-blur-sm">
-                <span className="animate-blink">Exclusivement a partir des documents de la mairie.</span>
-              </p>
+            <section className="text-center my-4 max-w-xl mx-auto">
+              <div className="inline-block bg-gradient-to-r from-blue-600/60 via-purple-600/60 to-indigo-600/60 px-4 py-3 rounded-xl shadow-md">
+                <h3 className="text-2xl sm:text-3xl font-bold text-white mb-1">
+                  Choisissez votre domaine d'assistance
+                </h3>
+                <p className="text-sm text-white/90 max-w-md mx-auto">
+                  <span className="animate-blink">Exclusivement à partir des documents de la mairie.</span>
+                </p>
+              </div>
             </section>
 
             <div className="relative w-full flex items-center justify-center mb-12">
