@@ -770,7 +770,7 @@ ${contexte}
               </div>
             </section>
 
-            <div className="relative w-full flex items-center justify-center mb-12">
+            <div className="relative w-full flex items-center justify-center mb-12 min-h-[60vh]">
               {/* fixed white circle behind the star (non-interactive) */}
               <div className="absolute left-1/2 top-12 md:top-1/2 transform -translate-x-48 md:-translate-x-56 -translate-y-1/2 pointer-events-none z-10">
                 <div className="w-36 h-36 sm:w-48 md:w-64 sm:h-48 md:h-64 rounded-full bg-white shadow-lg" />
