@@ -34,6 +34,8 @@ import { teletravailData } from "./data/teletravail.ts";
 import { infoItems as defaultInfoItems } from "./data/info-data.ts";
 import { podcastEpisodes, type PodcastEpisode } from "./data/podcasts/mp3.ts";
 import LoginModal from "./components/LoginModal";
+import FAQ from "./pages/FAQ";
+import Quiz from "./pages/Quiz";
 
 interface ChatMessage {
   type: "user" | "assistant";
@@ -48,7 +50,7 @@ interface InfoItem {
 }
 
 interface ChatbotState {
-  currentView: "menu" | "chat" | "public";
+  currentView: "menu" | "chat" | "public" | "quiz";
   selectedDomain: number | null;
   messages: ChatMessage[];
   isProcessing: boolean;
@@ -139,7 +141,7 @@ const NewsTicker: React.FC = () => {
   }
 
   return (
-    <div className="w-full bg-blue-900/80 rounded-lg overflow-hidden border border-blue-500/30 shadow-inner">
+    <div className="w-full bg-transparent rounded-none overflow-hidden">
       <div className="flex items-center whitespace-nowrap py-3 ticker-container">
         <div className="flex animate-ticker hover:[animation-play-state:paused]">
           {[...actualites, ...actualites].map((item, idx) => (
@@ -148,10 +150,10 @@ const NewsTicker: React.FC = () => {
               href={item.link}
               target="_blank"
               rel="noreferrer"
-              className="flex items-center mx-6 text-white hover:text-blue-200 transition-colors no-underline"
+              className="flex items-center mx-4 sm:mx-6 text-white hover:text-blue-200 transition-colors no-underline"
             >
               <span className="mr-2 text-yellow-300">📰</span>
-              <span className="font-medium text-xl sm:text-2xl">{item.title}</span>
+              <span className="font-medium text-lg sm:text-xl md:text-2xl">{item.title}</span>
               <span className="mx-4 text-blue-300">•</span>
             </a>
           ))}
@@ -371,7 +373,7 @@ export default function App() {
   const inputRef = useRef<HTMLInputElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
-  const silenceTimeoutRef = useRef<number | null>(null);
+  const silenceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -633,8 +635,8 @@ ${contexte}
 
   return (
     <div className="min-h-screen relative font-sans">
-      <div className="fixed inset-0 bg-cover bg-center bg-no-repeat z-0" style={{ backgroundImage: "url('./mairie.jpeg')" }} />
-      <div className="fixed inset-0 bg-black/10 z-0" />
+  <div className="fixed inset-0 bg-cover bg-center bg-no-repeat z-0 filter blur-md" style={{ backgroundImage: "url('./mairie.jpeg')" }} />
+  <div className="fixed inset-0 bg-black/20 z-0" />
       <PodcastPlayer />
 
       <header className="relative bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 shadow-2xl border-b border-slate-700 z-10">
@@ -681,66 +683,71 @@ ${contexte}
         </div>
       </header>
 
-      <main className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 z-10">
-        {chatState.currentView === "menu" ? (
+      {/* Bandeau News FPT déplacé sous le header et en full width */}
+      <section className="relative bg-orange-300 text-black overflow-hidden w-full rounded-none shadow-lg z-10">
+        <div className="relative h-20 flex items-center overflow-hidden">
+            <div className="absolute left-0 top-0 h-full w-40 flex items-center justify-center bg-orange-400 z-20 shadow-md">
+            <span className="text-2xl font-bold">NEWS FPT:</span>
+          </div>
+              <div className="animate-marquee whitespace-nowrap flex items-center pl-44" style={{ animation: "marquee 45s linear infinite" }}>
+            {[...infoItems, ...infoItems].map((info, idx) => (
+              <button
+                key={`${info.id}-${idx}`}
+                onClick={() => setSelectedInfo(info)}
+                className="text-2xl font-medium mx-8 hover:text-blue-200 transition-colors underline decoration-dotted cursor-pointer"
+              >
+                #{info.id}: {info.title}
+              </button>
+            ))}
+          </div>
+        </div>
+        <style>{`
+          @keyframes marquee {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(-50%); }
+          }
+          @keyframes blink {
+            0%, 50% { color: black; }
+            51%, 100% { color: red; }
+          }
+          .animate-blink {
+            animation: blink 2s infinite;
+          }
+          @keyframes slide-in-left {
+            0% { 
+              transform: translateX(-100%); 
+              opacity: 0; 
+            }
+            100% { 
+              transform: translateX(0); 
+              opacity: 1; 
+            }
+          }
+          @keyframes slide-in-right {
+            0% { 
+              transform: translateX(100%); 
+              opacity: 0; 
+            }
+            100% { 
+              transform: translateX(0); 
+              opacity: 1; 
+            }
+          }
+          .animate-slide-in-left {
+            animation: slide-in-left 0.3s ease-out;
+          }
+          .animate-slide-in-right {
+            animation: slide-in-right 0.3s ease-out;
+          }
+        `}</style>
+      </section>
+  <main className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 z-10">
+        {chatState.currentView === 'quiz' ? (
+          <Quiz onBack={() => setChatState({ currentView: 'menu', selectedDomain: null, messages: [], isProcessing: false })} />
+        ) : chatState.currentView === 'public' ? (
+          <FAQ onBack={() => setChatState({ currentView: 'menu', selectedDomain: null, messages: [], isProcessing: false })} />
+        ) : chatState.currentView === "menu" ? (
           <>
-            <section className="relative bg-orange-300 text-black overflow-hidden mx-auto max-w-5xl rounded-2xl shadow-lg z-10">
-              <div className="relative h-20 flex items-center overflow-hidden">
-                <div className="absolute left-0 top-0 h-full w-40 flex items-center justify-center bg-orange-400 z-20 shadow-md">
-                  <span className="text-2xl font-bold">NEWS FPT:</span>
-                </div>
-                <div className="animate-marquee whitespace-nowrap flex items-center pl-44" style={{ animation: "marquee 45s linear infinite" }}>
-                  {[...infoItems, ...infoItems].map((info, idx) => (
-                    <button
-                      key={`${info.id}-${idx}`}
-                      onClick={() => setSelectedInfo(info)}
-                      className="text-2xl font-medium mx-8 hover:text-blue-200 transition-colors underline decoration-dotted cursor-pointer"
-                    >
-                      #{info.id}: {info.title}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <style>{`
-                @keyframes marquee {
-                  0% { transform: translateX(0%); }
-                  100% { transform: translateX(-50%); }
-                }
-                @keyframes blink {
-                  0%, 50% { color: black; }
-                  51%, 100% { color: red; }
-                }
-                .animate-blink {
-                  animation: blink 2s infinite;
-                }
-                @keyframes slide-in-left {
-                  0% { 
-                    transform: translateX(-100%); 
-                    opacity: 0; 
-                  }
-                  100% { 
-                    transform: translateX(0); 
-                    opacity: 1; 
-                  }
-                }
-                @keyframes slide-in-right {
-                  0% { 
-                    transform: translateX(100%); 
-                    opacity: 0; 
-                  }
-                  100% { 
-                    transform: translateX(0); 
-                    opacity: 1; 
-                  }
-                }
-                .animate-slide-in-left {
-                  animation: slide-in-left 0.3s ease-out;
-                }
-                .animate-slide-in-right {
-                  animation: slide-in-right 0.3s ease-out;
-                }
-              `}</style>
-            </section>
 
             {selectedInfo && (
               <section className="info-detail bg-white/95 backdrop-blur-sm p-6 rounded-lg shadow-md mt-8 max-w-4xl mx-auto">
@@ -752,14 +759,73 @@ ${contexte}
               </section>
             )}
 
-            <section className="text-center my-12">
-              <h3 className="text-4xl font-bold text-white mb-4 bg-gradient-to-r from-blue-600/60 via-purple-600/60 to-indigo-600/60 p-4 rounded-2xl shadow-lg">
+            <section className="text-center my-4">
+              <h3 className="text-2xl sm:text-3xl font-bold text-white mb-3 bg-gradient-to-r from-blue-600/60 via-purple-600/60 to-indigo-600/60 px-3 py-2 rounded-xl shadow-md">
                 Choisissez votre domaine d'assistance
               </h3>
-              <p className="text-xl bg-white/90 px-4 py-2 rounded-lg max-w-fit mx-auto shadow-md backdrop-blur-sm">
+              <p className="text-base bg-white/90 px-3 py-1 rounded-md max-w-fit mx-auto shadow-sm backdrop-blur-sm">
                 <span className="animate-blink">Exclusivement a partir des documents de la mairie.</span>
               </p>
             </section>
+
+            <div className="relative w-full flex items-center justify-center mb-12">
+              {/* fixed white circle behind the star (non-interactive) */}
+              <div className="absolute left-1/2 top-12 md:top-1/2 transform -translate-x-48 md:-translate-x-56 -translate-y-1/2 pointer-events-none z-10">
+                <div className="w-36 h-36 sm:w-48 md:w-64 sm:h-48 md:h-64 rounded-full bg-white shadow-lg" />
+              </div>
+
+              {/* Center the QUIZZ star horizontally above the FAQ card */}
+              <div className="w-full flex justify-center relative z-20">
+                <button onClick={() => setChatState(p => ({ ...p, currentView: 'quiz' }))} aria-label="Ouvrir QUIZZ" className="focus:outline-none relative z-30">
+                  <div className="w-36 sm:w-44 md:w-56 h-36 sm:h-44 md:h-56 relative mx-auto">
+                    <svg viewBox="0 0 100 100" className="w-full h-full star-anim cursor-pointer" aria-hidden="true">
+                      <defs>
+                        <linearGradient id="gStar" x1="0%" x2="100%">
+                          <stop offset="0%" stopColor="#FFD54A" />
+                          <stop offset="50%" stopColor="#F59E0B" />
+                          <stop offset="100%" stopColor="#D97706" />
+                        </linearGradient>
+                      </defs>
+                      <polygon points="50,3 61,36 98,36 67,57 78,91 50,70 22,91 33,57 2,36 39,36" fill="url(#gStar)" />
+                      <text x="50%" y="56%" textAnchor="middle" dominantBaseline="middle" fontSize="30" fontWeight="700" fill="#3B2F00" stroke="#3B2F00" strokeWidth="1.2" paintOrder="stroke fill" letterSpacing="-0.5">QUIZZ</text>
+                    </svg>
+                  </div>
+                </button>
+              </div>
+
+              <div className="pt-8">
+                <div className="relative z-10 p-3 rounded-2xl overflow-hidden w-full max-w-xs sm:max-w-sm mx-auto">
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700 opacity-70" />
+                  <div className="flex flex-col items-center gap-4 relative z-20 text-white">
+                    <div className="relative p-4 bg-orange-500 rounded-3xl shadow-lg ring-2 ring-orange-300">
+                      <Sparkles className="w-8 h-8 text-white" />
+                    </div>
+                    <button onClick={() => setChatState(p => ({ ...p, currentView: 'public' }))} className="px-4 py-2 bg-orange-500 hover:bg-orange-600 rounded-full text-lg font-bold text-white shadow-md">
+                      Questions fréquentes
+                    </button>
+                    {/* NewsTicker déplacé en bas de la page (au-dessus du footer) pour être full-width */}
+                  </div>
+                </div>
+              </div>
+
+              <style>{`
+                @keyframes quizz-pulse {
+                  0% { transform: scale(1); }
+                  50% { transform: scale(1.16); }
+                  100% { transform: scale(1); }
+                }
+                @keyframes quizz-blink {
+                  0% { opacity: 1; }
+                  50% { opacity: 0.35; }
+                  100% { opacity: 1; }
+                }
+                .star-anim {
+                  transform-origin: 50% 50%;
+                  animation: quizz-pulse 1.1s ease-in-out infinite, quizz-blink 1.3s linear infinite;
+                  filter: drop-shadow(0 10px 30px rgba(217,119,6,0.45));
+                }
+              `}</style>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
               <button
@@ -800,19 +866,6 @@ ${contexte}
                   <p className="text-center text-gray-600">Charte, jours autorisés, indemnités, modalités…</p>
                 </div>
               </button>
-            </div>
-            
-            <div className="relative z-10 bg-white/10 p-4 rounded-2xl overflow-hidden">
-              <div className="absolute inset-0 bg-cover bg-center opacity-50" style={{ backgroundImage: "url('/unnamed.jpg')", backgroundPosition: "center", backgroundSize: "cover" }}></div>
-              <div className="flex flex-col items-center gap-6 relative z-20">
-                <div className="relative p-6 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-3xl shadow-xl">
-                  <Sparkles className="w-12 h-12 text-white" />
-                </div>
-                <h4 className="text-2xl font-bold text-gray-800 text-blue-700">Actualités Nationales</h4>
-                <div className="w-full">
-                  <NewsTicker />
-                </div>
-              </div>
             </div>
           </>
         ) : (
@@ -930,6 +983,22 @@ ${contexte}
           </div>
         )}
       </main>
+
+      {/* Bandeau Flux RSS — full width, collé au-dessus du footer (fond bleu) */}
+  <section className="w-full bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white z-10">
+        <div className="w-full px-0">
+          <div className="relative bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white overflow-hidden w-full rounded-none shadow-none z-10">
+            <div className="relative h-20 flex items-center overflow-hidden">
+              <div className="absolute left-0 top-0 h-full w-40 flex items-center justify-center bg-blue-800 z-20 shadow-md">
+                <span className="text-2xl font-bold text-white">FLUX RSS:</span>
+              </div>
+              <div className="w-full pl-44">
+                <NewsTicker />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <footer className="relative bg-gray-900 text-white py-6 z-10">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
