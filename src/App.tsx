@@ -36,6 +36,7 @@ import { podcastEpisodes, type PodcastEpisode } from "./data/podcasts/mp3.ts";
 import LoginModal from "./components/LoginModal";
 import FAQ from "./pages/FAQ";
 import Quiz from "./pages/Quiz";
+import Snow from "./components/Snow";
 
 interface ChatMessage {
   type: "user" | "assistant";
@@ -635,6 +636,7 @@ ${contexte}
 
   return (
     <div className="min-h-screen relative font-sans">
+      <Snow />
   <div className="fixed inset-0 bg-cover bg-center bg-no-repeat z-0 filter blur-md" style={{ backgroundImage: "url('./mairie.jpeg')" }} />
   <div className="fixed inset-0 bg-black/20 z-0" />
       <PodcastPlayer />
