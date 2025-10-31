@@ -759,7 +759,7 @@ ${contexte}
               </section>
             )}
 
-            <section className="text-center my-4 max-w-xl mx-auto">
+            <section className="text-center -mt-6 mb-6 max-w-xl mx-auto">
               <div className="inline-block bg-gradient-to-r from-blue-600/60 via-purple-600/60 to-indigo-600/60 px-4 py-3 rounded-xl shadow-md">
                 <h3 className="text-2xl sm:text-3xl font-bold text-white mb-1">
                   Choisissez votre domaine d'assistance
