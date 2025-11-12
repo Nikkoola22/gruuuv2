@@ -10,6 +10,17 @@ const AdminInfo: React.FC = () => {
   const [infoItems, setInfoItems] = useState<InfoItem[]>([]);
   const [newInfo, setNewInfo] = useState({ title: "", content: "" });
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [isPrimesBlocked, setIsPrimesBlocked] = useState(() => {
+    const saved = localStorage.getItem('primes-blocked');
+    return saved ? JSON.parse(saved) : false;
+  });
+
+  const togglePrimesBlock = () => {
+    const newValue = !isPrimesBlocked;
+    setIsPrimesBlocked(newValue);
+    localStorage.setItem('primes-blocked', JSON.stringify(newValue));
+    window.dispatchEvent(new CustomEvent('primes-blocked-changed', { detail: newValue }));
+  };
 
   useEffect(() => {
     // Charger les données depuis le localStorage ou utiliser les données par défaut
@@ -104,6 +115,40 @@ const AdminInfo: React.FC = () => {
   return (
     <div style={{ padding: "2rem" }}>
       <h1>📰 Administration des informations NEWS FPT</h1>
+      
+      {/* Bouton Bloquer/Débloquer PRIMES */}
+      <div style={{
+        marginBottom: "2rem",
+        padding: "1rem",
+        background: isPrimesBlocked ? "#ffebee" : "#e8f5e9",
+        border: `2px solid ${isPrimesBlocked ? "#f44336" : "#4caf50"}`,
+        borderRadius: "8px",
+        textAlign: "center"
+      }}>
+        <h3 style={{ marginTop: 0, marginBottom: "0.5rem" }}>🔒 Contrôle du bouton PRIMES</h3>
+        <p style={{ marginBottom: "1rem", color: "#666" }}>
+          État actuel : <strong>{isPrimesBlocked ? "🔒 BLOQUÉ" : "🔓 DÉVERROUILLÉ"}</strong>
+        </p>
+        <button
+          onClick={togglePrimesBlock}
+          style={{
+            padding: "0.75rem 1.5rem",
+            fontSize: "1rem",
+            fontWeight: "bold",
+            color: "white",
+            background: isPrimesBlocked ? "#f44336" : "#4caf50",
+            border: "none",
+            borderRadius: "6px",
+            cursor: "pointer",
+            transition: "background 0.3s"
+          }}
+          onMouseOver={(e) => e.currentTarget.style.background = isPrimesBlocked ? "#d32f2f" : "#388e3c"}
+          onMouseOut={(e) => e.currentTarget.style.background = isPrimesBlocked ? "#f44336" : "#4caf50"}
+        >
+          {isPrimesBlocked ? "🔓 Débloquer PRIMES" : "🔒 Bloquer PRIMES"}
+        </button>
+      </div>
+
       <p style={{ color: "#666", marginBottom: "2rem" }}>
         Gérez les informations qui apparaissent dans le bandeau déroulant "NEWS FPT"
       </p>

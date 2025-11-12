@@ -9,31 +9,21 @@ interface NewsItem {
 const NewsList: React.FC = () => {
   const [news, setNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const loadNews = async () => {
+    const loadNews = () => {
       try {
-        // Vérification de la disponibilité du serveur
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000); // Timeout de 5 secondes
-        
-        const response = await fetch("http://localhost:4000/api/news", {
-          signal: controller.signal,
-          mode: 'cors'
-        });
-        
-        clearTimeout(timeoutId);
-        
-        if (!response.ok) {
-          throw new Error(`Erreur ${response.status}: ${response.statusText}`);
+        // Charger depuis localStorage
+        const savedNews = localStorage.getItem('cfdt-news-items');
+        if (savedNews) {
+          setNews(JSON.parse(savedNews));
+        } else {
+          // Données par défaut vides
+          setNews([]);
         }
-        const data = await response.json();
-        setNews(data);
         setLoading(false);
       } catch (err) {
-        // Erreur silencieuse - affichée dans l'interface utilisateur
-        setError("Impossible de se connecter au serveur d'actualités. Veuillez vérifier que le serveur est démarré sur le port 4000.");
+        setNews([]);
         setLoading(false);
       }
     };
@@ -50,32 +40,19 @@ const NewsList: React.FC = () => {
     );
   }
 
-  if (error) {
-    return (
-      <div style={{ padding: "2rem" }}>
-        <h1>📰 Dernières actualités</h1>
-        <div style={{ 
-          background: "#ffebee", 
-          border: "1px solid #f44336", 
-          borderRadius: "8px", 
-          padding: "1rem", 
-          color: "#c62828" 
-        }}>
-          <h3>⚠️ Erreur de connexion</h3>
-          <p>{error}</p>
-          <p style={{ marginTop: "0.5rem", fontSize: "0.9em" }}>
-            Pour démarrer le serveur d'actualités, exécutez : <code>npm run server</code>
-          </p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div style={{ padding: "2rem" }}>
       <h1>📰 Dernières actualités</h1>
       {news.length === 0 ? (
-        <p>Aucune actualité pour le moment.</p>
+        <div style={{ 
+          background: "#e3f2fd", 
+          border: "1px solid #2196f3", 
+          borderRadius: "8px", 
+          padding: "1rem", 
+          color: "#1565c0" 
+        }}>
+          <p>Aucune actualité pour le moment. Allez dans <strong>⚙️ Actualités API</strong> pour en ajouter.</p>
+        </div>
       ) : (
         <ul>
           {news.map((item) => (

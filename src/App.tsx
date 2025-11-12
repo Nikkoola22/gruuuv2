@@ -25,6 +25,10 @@ import {
   ChevronDown,
   Mic,
   MicOff,
+  TrendingUp,
+  Shield,
+  CheckCircle,
+  Zap,
 } from "lucide-react";
 
 import { sommaire } from "./data/sommaire.ts";
@@ -36,6 +40,7 @@ import { podcastEpisodes, type PodcastEpisode } from "./data/podcasts/mp3.ts";
 import LoginModal from "./components/LoginModal";
 import FAQ from "./pages/FAQ";
 import Quiz from "./pages/Quiz";
+import Calculateurs from "./pages/Calculateurs";
 import Snow from "./components/Snow";
 
 interface ChatMessage {
@@ -370,6 +375,28 @@ export default function App() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [isVoiceSupported, setIsVoiceSupported] = useState(false);
+  const [showCalculator, setShowCalculator] = useState(false);
+  const [isPrimesBlocked, setIsPrimesBlockedState] = useState(() => {
+    const saved = localStorage.getItem('primes-blocked');
+    return saved ? JSON.parse(saved) : false;
+  });
+
+  const setIsPrimesBlocked = (value: boolean) => {
+    setIsPrimesBlockedState(value);
+    localStorage.setItem('primes-blocked', JSON.stringify(value));
+    // Émettre un événement personnalisé pour notifier les autres onglets
+    window.dispatchEvent(new CustomEvent('primes-blocked-changed', { detail: value }));
+  };
+
+  useEffect(() => {
+    const handlePrimesBlockedChanged = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      setIsPrimesBlockedState(customEvent.detail);
+    };
+    window.addEventListener('primes-blocked-changed', handlePrimesBlockedChanged);
+    return () => window.removeEventListener('primes-blocked-changed', handlePrimesBlockedChanged);
+  }, []);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -748,6 +775,8 @@ ${contexte}
           <Quiz onBack={() => setChatState({ currentView: 'menu', selectedDomain: null, messages: [], isProcessing: false })} />
         ) : chatState.currentView === 'public' ? (
           <FAQ onBack={() => setChatState({ currentView: 'menu', selectedDomain: null, messages: [], isProcessing: false })} />
+        ) : showCalculator ? (
+          <Calculateurs onBack={() => setShowCalculator(false)} />
         ) : chatState.currentView === "menu" ? (
           <>
 
@@ -776,6 +805,27 @@ ${contexte}
               {/* fixed white circle behind the star (non-interactive) */}
               <div className="absolute left-1/2 top-12 md:top-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none z-10">
                 <div className="w-24 h-24 sm:w-32 md:w-44 sm:h-32 md:h-44 rounded-full bg-white shadow-lg" />
+              </div>
+
+              {/* PRIMES Button on the left */}
+              <div className="absolute left-12 md:left-20 top-12 md:top-1/2 transform md:-translate-y-1/2 z-30">
+                <button 
+                  onClick={() => {
+                    if (!isPrimesBlocked) {
+                      setShowCalculator(true);
+                    }
+                  }}
+                  disabled={isPrimesBlocked}
+                  aria-label="Ouvrir Calculateur PRIMES"
+                  className={`group focus:outline-none ${isPrimesBlocked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  title={isPrimesBlocked ? "Le bouton PRIMES est désactivé" : "Ouvrir Calculateur PRIMES"}
+                >
+                  <div className={`relative p-6 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-3xl shadow-xl group-hover:rotate-3 group-hover:scale-110 transition-transform w-32 h-32 sm:w-36 sm:h-36 md:w-44 md:h-44 flex items-center justify-center ${isPrimesBlocked ? 'opacity-60' : ''}`}>
+                    <TrendingUp className="w-16 h-16 sm:w-18 sm:h-18 md:w-24 md:h-24 text-white" />
+                  </div>
+                  <p className="text-center text-white font-bold text-sm sm:text-base md:text-lg mt-2">PRIMES</p>
+                  <p className="text-center text-orange-400 font-bold text-xs sm:text-sm mt-1 animate-pulse">À VENIR</p>
+                </button>
               </div>
 
               {/* Center the QUIZZ star horizontally above the FAQ card (absolute to match background circle) */}
@@ -1004,65 +1054,130 @@ ${contexte}
         </div>
       </section>
 
-      <footer className="relative bg-gray-900 text-white py-6 z-10">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <footer className="relative backdrop-blur-xl bg-white/10 border-t border-white/20 py-6 z-10">
+        <div className="absolute inset-0 bg-gradient-to-r from-orange-500/5 via-red-500/5 to-purple-500/5" />
+        
+        <div className="relative max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Contact CFDT */}
             <div className="text-center md:text-left">
-              <h4 className="text-xl font-bold mb-4 bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center">
+                  <Users className="w-5 h-5 text-white" />
+                </div>
+                <h4 className="text-xl font-bold bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent">
                 Contact CFDT
               </h4>
-              <div className="space-y-3">
-                <div className="flex items-center justify-center md:justify-start gap-3">
-                  <Phone className="w-5 h-5 text-orange-400" />
+              </div>
+              <div className="space-y-4">
+                <div className="flex items-center justify-center md:justify-start gap-3 text-white/80 hover:text-white transition-colors">
+                  <div className="w-8 h-8 bg-orange-500/20 rounded-full flex items-center justify-center">
+                    <Phone className="w-4 h-4 text-orange-400" />
+                  </div>
                   <span>01 40 85 64 64</span>
                 </div>
-                <div className="flex items-center justify-center md:justify-start gap-3">
-                  <Mail className="w-5 h-5 text-orange-400" />
-                  <a 
+                <div className="flex items-center justify-center md:justify-start gap-3 text-white/80 hover:text-white transition-colors">
+                  <div className="w-8 h-8 bg-orange-500/20 rounded-full flex items-center justify-center">
+                    <Mail className="w-4 h-4 text-orange-400" />
+                  </div>
+                  <a
                     href="mailto:cfdt-interco@ville-gennevilliers.fr"
-                    className="text-white hover:text-orange-300 transition-colors"
+                    className="hover:text-orange-300 transition-colors"
                   >
                     cfdt-interco@ville-gennevilliers.fr
                   </a>
                 </div>
-                <div className="flex items-center justify-center md:justify-start gap-3">
-                  <MapPin className="w-5 h-5 text-orange-400" />
+                <div className="flex items-center justify-center md:justify-start gap-3 text-white/80">
+                  <div className="w-8 h-8 bg-orange-500/20 rounded-full flex items-center justify-center">
+                    <MapPin className="w-4 h-4 text-orange-400" />
+                  </div>
                   <span>Mairie de Gennevilliers</span>
                 </div>
               </div>
             </div>
+            
+            {/* Services */}
             <div className="text-center">
-              <h4 className="text-xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+              <div className="flex items-center justify-center gap-3 mb-6">
+                <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
+                  <Shield className="w-5 h-5 text-white" />
+                </div>
+                <h4 className="text-xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
                 Services
               </h4>
-              <ul className="space-y-2 text-gray-300">
-                <li>Santé</li>
-                <li>Retraite</li>
-                <li>Juridique</li>
-                <li>Accompagnement syndical</li>
+              </div>
+              <ul className="space-y-3 text-white/80">
+                <li className="flex items-center justify-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-400" />
+                  <span>Santé</span>
+                </li>
+                <li className="flex items-center justify-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-400" />
+                  <span>Retraite</span>
+                </li>
+                <li className="flex items-center justify-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-400" />
+                  <span>Juridique</span>
+                </li>
+                <li className="flex items-center justify-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-400" />
+                  <span>Accompagnement syndical</span>
+                </li>
               </ul>
             </div>
+            
+            {/* Horaires */}
             <div className="text-center md:text-right">
-              <h4 className="text-xl font-bold mb-4 bg-gradient-to-r from-green-400 to-teal-400 bg-clip-text text-transparent">
+              <div className="flex items-center justify-center md:justify-end gap-3 mb-6">
+                <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-teal-500 rounded-full flex items-center justify-center">
+                  <Clock className="w-5 h-5 text-white" />
+                </div>
+                <h4 className="text-xl font-bold bg-gradient-to-r from-green-400 to-teal-400 bg-clip-text text-transparent">
                 Horaires
               </h4>
-              <div className="space-y-2 text-gray-300">
-                <div>Lundi - Vendredi</div>
-                <div className="font-semibold text-white">9h00/12h00 - 13h30/17h00</div>
-                <div className="text-sm">Permanences sur RDV</div>
+              </div>
+              <div className="space-y-3 text-white/80">
+                <div className="text-lg font-medium text-white">Lundi - Vendredi</div>
+                <div className="text-xl font-bold text-white bg-gradient-to-r from-green-400 to-teal-400 bg-clip-text text-transparent">
+                  9h00-12h00 / 13h30-17h00
+            </div>
+                <div className="text-sm text-white/60">Permanences sur RDV</div>
+                <div className="flex items-center justify-center md:justify-end gap-2 mt-4">
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                  <span className="text-sm text-green-300">Ouvert maintenant</span>
+              </div>
               </div>
             </div>
           </div>
-          <div className="border-t border-gray-700 mt-6 pt-4 text-center">
-            <p className="text-gray-400">© 2025 CFDT Gennevilliers - Assistant IA pour les agents municipaux</p>
-            <div className="mt-4">
-              <button
-                onClick={() => setShowLoginModal(true)}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors shadow-md"
-                title="Administrer les actualités et informations"
-              >
-                ⚙️ Admin
-              </button>
+          
+          <div className="border-t border-white/20 mt-6 pt-4">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="text-white/80">
+                  © 2025 CFDT Gennevilliers
+                </div>
+                <div className="w-1 h-1 bg-white/40 rounded-full" />
+                <div className="text-white/60">
+                  Assistant IA pour les agents municipaux
+                </div>
+              </div>
+              <div className="flex items-center gap-6">
+                <div className="flex items-center gap-2 text-white/70">
+                  <Zap className="w-4 h-4 text-orange-400" />
+                  <span className="text-sm">Powered by AI</span>
+                </div>
+                <div className="flex items-center gap-2 text-white/70">
+                  <Shield className="w-4 h-4 text-green-400" />
+                  <span className="text-sm">Sécurisé</span>
+                </div>
+                <button
+                  onClick={() => setShowLoginModal(true)}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors shadow-md"
+                  title="Administrer les actualités et informations"
+                >
+                  ⚙️ Admin
+                </button>
+              </div>
             </div>
           </div>
         </div>
