@@ -1,0 +1,424 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atlas  CFDT Interco - Vos Métiers</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { 
+                font-family: Arial, sans-serif; 
+                background: #ffffff;
+                min-height: 100vh; 
+            }
+            .container { 
+                max-width: 1200px; 
+                margin: 0 auto; 
+                background: white; 
+                box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.1); 
+            }
+
+            /* Header style CFDT */
+            .atlas-header { 
+                background: #ff6600;
+                padding: 40px 20px;
+                color: white;
+            }
+            .header-content { 
+                max-width: 1200px; 
+                margin: 0 auto; 
+                display: flex; 
+                align-items: center; 
+                justify-content: space-between; 
+                gap: 2rem; 
+                flex-wrap: wrap; 
+            }
+            .header-left { 
+                display: flex; 
+                align-items: center; 
+                gap: 2rem; 
+                flex-grow: 1; 
+            }
+            .header-icon { 
+                padding: 1.25rem;
+                background: white;
+                border-radius: 50%;
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+                width: 8rem;
+                height: 8rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .atlas-title { 
+                font-size: 3rem; 
+                font-weight: 700; 
+                margin-bottom: 0.5rem; 
+            }
+            .atlas-subtitle { 
+                font-size: 1.5rem; 
+                font-weight: 600; 
+                color: #ffd700;
+                margin-bottom: 0.75rem; 
+            }
+            .atlas-badge { 
+                display: flex; 
+                align-items: center; 
+                gap: 0.75rem; 
+                color: #90ee90;
+            }
+            .pulse-dot { 
+                width: 8px; 
+                height: 8px; 
+                background: #90ee90;
+                border-radius: 50%; 
+                animation: pulse 2s infinite; 
+            }
+            .header-logo { 
+                background: white; 
+                border-radius: 50%; 
+                width: 8rem; 
+                height: 8rem; 
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); 
+                display: flex; 
+                align-items: center; 
+                justify-content: center; 
+            }
+
+            /* Content */
+            .intro-section { 
+                padding: 40px;
+                text-align: center; 
+                background: #f8f9fa;
+            }
+            .intro-section h2 { 
+                color: #ff6600;
+                font-size: 2rem; 
+                margin-bottom: 20px; 
+            }
+            .intro-section p { 
+                font-size: 1.1rem; 
+                color: #666; 
+                line-height: 1.6; 
+                max-width: 800px; 
+                margin: 0 auto; 
+            }
+
+            .metiers-grid { 
+                display: grid; 
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+                gap: 30px; 
+                padding: 40px; 
+            }
+            .metier-card { 
+                background: white; 
+                border-radius: 15px; 
+                padding: 30px; 
+                text-align: center; 
+                transition: all 0.3s ease; 
+                border: 2px solid transparent; 
+                cursor: pointer; 
+                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            }
+            .metier-card:hover { 
+                transform: translateY(-10px); 
+                box-shadow: 0 20px 40px -12px rgba(255, 102, 0, 0.15); 
+                border-color: #ff6600;
+            }
+            .metier-icon { 
+                font-size: 3rem; 
+                margin-bottom: 20px; 
+                color: #ff6600;
+                transition: all 0.3s ease; 
+            }
+            .metier-card:hover .metier-icon { 
+                transform: scale(1.1); 
+            }
+            .metier-title { 
+                font-size: 1.3rem; 
+                font-weight: 600; 
+                margin-bottom: 15px; 
+                display: flex; 
+                align-items: center; 
+                justify-content: center; 
+                gap: 0.75rem; 
+                color: #333;
+            }
+            .metier-description { 
+                color: #666; 
+                font-size: 0.95rem; 
+                line-height: 1.5; 
+                margin-bottom: 20px; 
+            }
+            .metier-link { 
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                background: #ff6600;
+                color: white;
+                font-weight: 500;
+                padding: 12px 24px;
+                border-radius: 25px;
+                text-decoration: none;
+                transition: all 0.3s ease;
+                cursor: pointer;
+            }
+            .metier-link:hover { 
+                background: #e55a00;
+                transform: scale(1.05);
+            }
+
+            /* Footer style CFDT */
+            .atlas-footer { 
+                background: #333333;
+                backdrop-filter: blur(12px); 
+                border-top: 1px solid rgba(255, 255, 255, 0.2); 
+                padding: 2rem 0; 
+                color: white; 
+            }
+            .footer-grid { 
+                display: grid; 
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+                gap: 2rem; 
+                max-width: 1200px; 
+                margin: 0 auto; 
+                padding: 0 1.5rem; 
+            }
+            .footer-section { 
+                text-align: center; 
+            }
+            .footer-title { 
+                font-size: 1.25rem; 
+                font-weight: 700; 
+                margin-bottom: 1rem; 
+                display: flex; 
+                align-items: center; 
+                justify-content: center; 
+                gap: 0.75rem; 
+                color: white;
+            }
+            .footer-icon { 
+                width: 2.5rem; 
+                height: 2.5rem; 
+                border-radius: 50%; 
+                display: flex; 
+                align-items: center; 
+                justify-content: center; 
+            }
+            .contact-icon { 
+                background: #ff6600;
+            }
+            .services-icon { 
+                background: #ff6600;
+            }
+            .social-icon { 
+                background: #ff6600;
+            }
+            .footer-links { 
+                display: flex; 
+                justify-content: center; 
+                gap: 1rem; 
+                margin-top: 1rem; 
+            }
+            .footer-links a { 
+                color: rgba(255, 255, 255, 0.7); 
+                font-size: 1.5rem; 
+                transition: all 0.3s ease; 
+            }
+            .footer-links a:hover { 
+                transform: scale(1.2); 
+            }
+            .footer-bottom { 
+                border-top: 1px solid rgba(255, 255, 255, 0.2); 
+                margin-top: 1.5rem; 
+                padding-top: 1rem; 
+                text-align: center; 
+                color: rgba(255, 255, 255, 0.8); 
+            }
+
+            @keyframes pulse { 
+                0% { transform: scale(1); } 
+                50% { transform: scale(1.05); } 
+                100% { transform: scale(1); } 
+            }
+
+            @media (max-width: 768px) { 
+                .atlas-title { font-size: 2rem; } 
+                .header-content { flex-direction: column; text-align: center; } 
+                .metiers-grid { grid-template-columns: 1fr; padding: 20px; } 
+            }
+        </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER ATLAS -->
+        <header class="atlas-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="header-icon">
+                        <i class="fas fa-users" style="font-size: 4rem; color: #334155;"></i>
+                    </div>
+                    <div>
+                        <h1 class="atlas-title">
+                            <span class="atlas-gradient">Atlas</span>
+                            <span style="color: #e2e8f0; margin: 0 0.5rem;"></span>
+                            <span style="color: #f1f5f9;">CFDT Interco</span>
+                        </h1>
+                        <h2 class="atlas-subtitle">
+                            <span style="color: #22d3ee; font-weight: bold;">Vos Métiers</span> - Fonction Publique
+                        </h2>
+                        <div class="atlas-badge">
+                            <div class="pulse-dot"></div>
+                            <span style="font-size: 1rem; font-weight: 500;">Filières et grilles indiciaires</span>
+                            <div class="pulse-dot"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="header-logo">
+                    <i class="fas fa-building" style="font-size: 2.5rem; color: #1e3c72;"></i>
+                </div>
+            </div>
+        </header>
+
+        <section class="intro-section">
+            <h2><i class="fas fa-briefcase"></i> Vos métiers</h2>
+            <p>Retrouvez l'actualité qui vous concerne en sélectionnant ci-dessous votre métier, votre filière ou mission. Accédez aux grilles indiciaires et aux informations spécifiques à votre domaine d'activité.</p>
+        </section>
+
+        <section class="metiers-grid">
+            <div class="metier-card" onclick="navigateToFiliere('culturelle')">
+                <div class="metier-icon"><i class="fas fa-palette"></i></div>
+                <h3 class="metier-title">Filière Culturelle</h3>
+                <p class="metier-description">Professionnels de la culture, du patrimoine, des bibliothèques, des musées et des activités artistiques.</p>
+                <div class="metier-link"><span>Voir les grilles</span> <i class="fas fa-arrow-right"></i></div>
+            </div>
+
+            <div class="metier-card" onclick="navigateToFiliere('emplois-fonctionnels')">
+                <div class="metier-icon"><i class="fas fa-chess-king"></i></div>
+                <h3 class="metier-title">Emplois Fonctionnels et Experts</h3>
+                <p class="metier-description">Postes de direction, d'encadrement supérieur et d'expertise technique de haut niveau.</p>
+                <div class="metier-link"><span>Voir les grilles</span> <i class="fas fa-arrow-right"></i></div>
+            </div>
+
+            <div class="metier-card" onclick="navigateToFiliere('administrative')">
+                <div class="metier-icon"><i class="fas fa-file-alt"></i></div>
+                <h3 class="metier-title">Filière Administrative</h3>
+                <p class="metier-description">Administrateurs, attachés, rédacteurs et adjoints administratifs territoriaux.</p>
+                <div class="metier-link"><span>Voir les grilles</span> <i class="fas fa-arrow-right"></i></div>
+            </div>
+
+            <div class="metier-card" onclick="navigateToFiliere('technique')">
+                <div class="metier-icon"><i class="fas fa-hard-hat"></i></div>
+                <h3 class="metier-title">Filière Technique</h3>
+                <p class="metier-description">Ingénieurs, techniciens et agents techniques spécialisés dans les infrastructures et l'environnement.</p>
+                <div class="metier-link"><span>Voir les grilles</span> <i class="fas fa-arrow-right"></i></div>
+            </div>
+
+            <div class="metier-card" onclick="navigateToFiliere('animation')">
+                <div class="metier-icon"><i class="fas fa-child"></i></div>
+                <h3 class="metier-title">Filière Animation</h3>
+                <p class="metier-description">Animateurs territoriaux, coordinateurs d'activités socio-éducatives et culturelles.</p>
+                <div class="metier-link"><span>Voir les grilles</span> <i class="fas fa-arrow-right"></i></div>
+            </div>
+
+            <div class="metier-card" onclick="navigateToFiliere('sportive')">
+                <div class="metier-icon"><i class="fas fa-running"></i></div>
+                <h3 class="metier-title">Filière Sportive</h3>
+                <p class="metier-description">Conseillers et éducateurs territoriaux des activités physiques et sportives.</p>
+                <div class="metier-link"><span>Voir les grilles</span> <i class="fas fa-arrow-right"></i></div>
+            </div>
+
+            <div class="metier-card" onclick="navigateToFiliere('medico-sociale')">
+                <div class="metier-icon"><i class="fas fa-heartbeat"></i></div>
+                <h3 class="metier-title">Filière Médico-Sociale</h3>
+                <p class="metier-description">Professionnels de la santé, du social et de l'aide à la personne dans les collectivités.</p>
+                <div class="metier-link"><span>Voir les grilles</span> <i class="fas fa-arrow-right"></i></div>
+            </div>
+        </section>
+
+        <!-- FOOTER ATLAS -->
+        <footer class="atlas-footer">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h4 class="footer-title">
+                        <div class="footer-icon contact-icon"><i class="fas fa-users" style="color: white;"></i></div>
+                        Contact CFDT
+                    </h4>
+                    <p style="color: rgba(255, 255, 255, 0.8); margin-bottom: 0.5rem;"><i class="fas fa-phone" style="color: #fb923c; margin-right: 0.5rem;"></i> 01 56 41 52 52</p>
+                    <p style="color: rgba(255, 255, 255, 0.8); margin-bottom: 0.5rem;"><i class="fas fa-envelope" style="color: #fb923c; margin-right: 0.5rem;"></i> accueil@interco.cfdt.fr</p>
+                    <p style="color: rgba(255, 255, 255, 0.8);"><i class="fas fa-map-marker-alt" style="color: #fb923c; margin-right: 0.5rem;"></i> 47-49 Avenue Simon Bolivar, 75019 Paris</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h4 class="footer-title">
+                        <div class="footer-icon services-icon"><i class="fas fa-shield-alt" style="color: white;"></i></div>
+                        Services
+                    </h4>
+                    <p style="color: rgba(255, 255, 255, 0.8); margin-bottom: 0.5rem;"><i class="fas fa-check-circle" style="color: #4ade80; margin-right: 0.5rem;"></i> Grilles indiciaires</p>
+                    <p style="color: rgba(255, 255, 255, 0.8); margin-bottom: 0.5rem;"><i class="fas fa-check-circle" style="color: #4ade80; margin-right: 0.5rem;"></i> Information métiers</p>
+                    <p style="color: rgba(255, 255, 255, 0.8); margin-bottom: 0.5rem;"><i class="fas fa-check-circle" style="color: #4ade80; margin-right: 0.5rem;"></i> Accompagnement syndical</p>
+                    <p style="color: rgba(255, 255, 255, 0.8);"><i class="fas fa-check-circle" style="color: #4ade80; margin-right: 0.5rem;"></i> Défense des droits</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h4 class="footer-title">
+                        <div class="footer-icon social-icon"><i class="fas fa-share-alt" style="color: white;"></i></div>
+                        Suivez-nous
+                    </h4>
+                    <div class="footer-links">
+                        <a href="https://www.facebook.com/intercocfdt" title="Facebook" onmouseover="this.style.color='#1877f2'" onmouseout="this.style.color='rgba(255, 255, 255, 0.7)'"><i class="fab fa-facebook"></i></a>
+                        <a href="https://www.linkedin.com/company/la-cfdt-interco/" title="LinkedIn" onmouseover="this.style.color='#0a66c2'" onmouseout="this.style.color='rgba(255, 255, 255, 0.7)'"><i class="fab fa-linkedin"></i></a>
+                        <a href="https://www.instagram.com/interco_cfdt_officiel/" title="Instagram" onmouseover="this.style.color='#e4405f'" onmouseout="this.style.color='rgba(255, 255, 255, 0.7)'"><i class="fab fa-instagram"></i></a>
+                        <a href="https://interco.cfdt.fr/feed/rss" title="RSS" onmouseover="this.style.color='#ff6600'" onmouseout="this.style.color='rgba(255, 255, 255, 0.7)'"><i class="fas fa-rss"></i></a>
+                    </div>
+                    <p style="color: #4ade80; font-size: 0.875rem; margin-top: 1rem;"><i class="fas fa-circle" style="animation: pulse 2s infinite; margin-right: 0.5rem;"></i>Site officiel disponible</p>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p> 2025 CFDT Interco  Portail des métiers de la fonction publique</p>
+                <p style="margin-top: 0.5rem; font-size: 0.875rem;"><i class="fas fa-bolt" style="color: #fb923c; margin-right: 0.5rem;"></i>Navigation rapide <i class="fas fa-shield-alt" style="color: #4ade80; margin-left: 1rem; margin-right: 0.5rem;"></i>Données officielles</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        function navigateToFiliere(filiere) {
+            const urls = {
+                'culturelle': 'https://interco.cfdt.fr/vos-metiers/fonction-publique-territoriale/filiere-culturelle/',
+                'emplois-fonctionnels': 'https://interco.cfdt.fr/vos-metiers/fonction-publique-territoriale/metiers-de-direction/',
+                'administrative': 'https://interco.cfdt.fr/vos-metiers/fonction-publique-territoriale/filiere-administrative/',
+                'technique': 'https://interco.cfdt.fr/vos-metiers/fonction-publique-territoriale/filiere-technique/',
+                'animation': 'https://interco.cfdt.fr/vos-metiers/fonction-publique-territoriale/filiere-animation/',
+                'sportive': 'https://interco.cfdt.fr/vos-metiers/fonction-publique-territoriale/filiere-sportive/',
+                'medico-sociale': 'https://interco.cfdt.fr/vos-metiers/fonction-publique-territoriale/filiere-medico-sociale/'
+            };
+            if (urls[filiere]) {
+                window.open(urls[filiere], '_blank');
+            }
+        }
+
+        // Animations
+        const cards = document.querySelectorAll('.metier-card');
+        cards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(50px)';
+            card.style.transition = "opacity 0.6s ease, transform 0.6s ease";
+            
+            setTimeout(() => {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
