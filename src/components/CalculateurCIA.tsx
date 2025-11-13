@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Euro, ArrowLeft, AlertCircle, CheckCircle, ChevronRight } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Euro, ArrowLeft, CheckCircle, ChevronRight } from 'lucide-react';
 
 interface CalculateurCIAProps {
   onClose: () => void;
@@ -10,6 +10,29 @@ export default function CalculateurCIA({ onClose }: CalculateurCIAProps) {
   const [tauxEvaluation, setTauxEvaluation] = useState<number>(100);
   const [joursAbsenceN1, setJoursAbsenceN1] = useState<number>(0);
   const [etapeActive, setEtapeActive] = useState<number>(1); // Suivi de l'étape active
+  const [absencesTouched, setAbsencesTouched] = useState<boolean>(false); // Track if user touched absences field
+  const [evaluationTouched, setEvaluationTouched] = useState<boolean>(false); // Track if user touched evaluation
+  
+  // Auto-advance to next step when IFSE is filled (only advance to step 2, not beyond)
+  useEffect(() => {
+    if (etapeActive === 1 && ifseMensuel > 0) {
+      setTimeout(() => setEtapeActive(2), 300);
+    }
+  }, [ifseMensuel, etapeActive]);
+
+  // Auto-advance to next step when Évaluation is selected
+  useEffect(() => {
+    if (etapeActive === 2 && evaluationTouched) {
+      setTimeout(() => setEtapeActive(3), 300);
+    }
+  }, [evaluationTouched, etapeActive]);
+
+  // Auto-advance to next step when Absences is filled by user
+  useEffect(() => {
+    if (etapeActive === 3 && absencesTouched) {
+      setTimeout(() => setEtapeActive(4), 300);
+    }
+  }, [absencesTouched, etapeActive]);
   
   // Calcul du CIA
   const calculerCIA = () => {
@@ -89,30 +112,32 @@ Calcul détaillé du CIA:
   const ciaMensuel = resultat.ciaFinal / 12;
 
   return (
-    <div className="w-full">
-      <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-600 p-6">
+    <div className="flex flex-col h-full">
+      {/* Header avec bouton retour */}
+      <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-600 py-6 text-left border-b border-orange-600 px-6">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={onClose}
-              className="text-amber-600 hover:text-amber-700 p-2 rounded-full hover:bg-amber-50 bg-white border-2 border-amber-300 transition-all shadow-lg"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </button>
-            <div className="flex items-center gap-3">
-              <div className="relative p-4 bg-white/20 rounded-full">
-                <Euro className="w-8 h-8 text-white" />
-              </div>
-              <div>
-                <h3 className="text-2xl font-bold text-white">Calculateur CIA</h3>
-                <p className="text-amber-100">Complément Indemnitaire Annuel - Calcul pas à pas</p>
-              </div>
+          <div className="flex items-center gap-3">
+            <div className="relative p-4 bg-white/20 rounded-full">
+              <Euro className="w-8 h-8 text-white" />
+            </div>
+            <div>
+              <h3 className="text-3xl font-bold text-white">Calculateur CIA</h3>
+              <p className="text-amber-100 text-sm">Complément Indemnitaire Annuel - Calcul pas à pas</p>
             </div>
           </div>
+          {onClose && (
+            <button
+              onClick={onClose}
+              className="flex items-center gap-2 px-4 py-2 bg-red-700 hover:bg-red-800 text-white rounded-full font-semibold transition-all text-sm"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Retour
+            </button>
+          )}
         </div>
       </div>
 
-      <div className="p-6 space-y-6 bg-slate-50">
+      <div className="space-y-6 flex-1 overflow-y-auto p-6 max-w-2xl mx-auto w-full">
         {/* PROGRESS TRACKER - Suivi des étapes */}
         <div className="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
           <h4 className="font-bold text-gray-800 mb-4 text-center">Votre parcours de calcul</h4>
@@ -220,6 +245,7 @@ Calcul détaillé du CIA:
                       key={option.value}
                       onClick={() => {
                         setTauxEvaluation(option.value);
+                        setEvaluationTouched(true);
                         if (etapeActive === 2) setEtapeActive(3);
                       }}
                       className={`p-4 rounded-lg font-bold transition-all transform hover:scale-105 text-center ${
@@ -282,7 +308,10 @@ Calcul détaillé du CIA:
                     type="number"
                     min="0"
                     value={joursAbsenceN1}
-                    onChange={(e) => setJoursAbsenceN1(Math.max(0, Number(e.target.value)))}
+                    onChange={(e) => {
+                      setJoursAbsenceN1(Math.max(0, Number(e.target.value)));
+                      setAbsencesTouched(true);
+                    }}
                     placeholder="Ex: 3"
                     className="w-24 px-4 py-3 text-2xl font-bold border-2 border-red-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-center"
                   />
@@ -365,7 +394,6 @@ Calcul détaillé du CIA:
                   <div className="text-3xl font-bold text-white">
                     {resultat.ciaFinal.toFixed(2)}€
                   </div>
-                  <div className="text-sm text-orange-100 mt-2 font-bold">{ciaMensuel.toFixed(2)}€/mois</div>
                 </div>
               </div>
 
@@ -405,10 +433,6 @@ Calcul détaillé du CIA:
                     <span>CIA ANNUEL TOTAL</span>
                     <span className="font-bold text-lg">{resultat.ciaFinal.toFixed(2)}€</span>
                   </div>
-                  <div className="flex justify-between text-green-700">
-                    <span>CIA MENSUEL</span>
-                    <span className="font-bold text-lg">{ciaMensuel.toFixed(2)}€</span>
-                  </div>
                 </div>
               </div>
 
@@ -416,30 +440,30 @@ Calcul détaillé du CIA:
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-800">
                 <strong>💡 Important:</strong> Ce calcul est fourni à titre informatif. Pour une vérification officielle, consultez votre dossier personnel ou la Direction des Ressources Humaines.
               </div>
+
+              {/* Boutons d'action */}
+              <div className="flex justify-end gap-3 pt-4 border-t bg-white rounded-lg p-4">
+                <button
+                  onClick={onClose}
+                  className="px-6 py-2 text-gray-700 bg-slate-200 rounded-lg hover:bg-slate-300 transition-colors font-medium"
+                >
+                  Fermer
+                </button>
+                <button
+                  onClick={() => {
+                    setIfseMensuel(0);
+                    setTauxEvaluation(100);
+                    setJoursAbsenceN1(0);
+                    setEtapeActive(1);
+                  }}
+                  className="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-medium"
+                >
+                  Recommencer
+                </button>
+              </div>
             </div>
           </div>
         )}
-
-        {/* Boutons d'action */}
-        <div className="flex justify-end gap-3 pt-4 border-t bg-white rounded-lg p-4">
-          <button
-            onClick={onClose}
-            className="px-6 py-2 text-gray-700 bg-slate-200 rounded-lg hover:bg-slate-300 transition-colors font-medium"
-          >
-            Fermer
-          </button>
-          <button
-            onClick={() => {
-              setIfseMensuel(0);
-              setTauxEvaluation(100);
-              setJoursAbsenceN1(0);
-              setEtapeActive(1);
-            }}
-            className="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-medium"
-          >
-            Recommencer
-          </button>
-        </div>
       </div>
     </div>
   );

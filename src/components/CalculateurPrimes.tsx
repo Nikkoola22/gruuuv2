@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react'
-import { ChevronRight, CheckCircle2, AlertCircle, TrendingUp } from 'lucide-react'
-import { ifse1Data, ifse2Data, getAllDirections, getIFSE2ByDirection, getDirectionFullName } from '../data/rifseep-data'
+import { ChevronRight, CheckCircle2, AlertCircle, TrendingUp, ArrowLeft } from 'lucide-react'
+import { ifse1Data, getAllDirections, getIFSE2ByDirection, getDirectionFullName } from '../data/rifseep-data'
 
 interface CalculateurPrimesProps {
   onClose?: () => void
@@ -10,7 +10,7 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
   const [currentStep, setCurrentStep] = useState(1)
   const [selectedCategory, setSelectedCategory] = useState('')
   const [selectedFunctionCode, setSelectedFunctionCode] = useState('')
-  const [selectedJob, setSelectedJob] = useState('')
+  // const [selectedJob, setSelectedJob] = useState('') // Kept for future advanced filtering
   const [selectedDirection, setSelectedDirection] = useState('')
   const [selectedIFSE2, setSelectedIFSE2] = useState<Set<number>>(new Set())
   const [weekendSaturdays, setWeekendSaturdays] = useState(0)
@@ -19,29 +19,21 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
   const [weekendRateSun, setWeekendRateSun] = useState(40)
 
   // Get all unique jobs from IFSE2 data, sorted
-  const allJobs = useMemo(() => {
-    const jobs = new Set<string>();
-    ifse2Data.forEach(item => {
-      if (item.jobs) {
-        item.jobs.forEach(job => jobs.add(job));
-      }
-    });
-    return Array.from(jobs).sort((a, b) => a.localeCompare(b, 'fr'))
-  }, [])
+  // Note: allJobs kept for future use in advanced filtering
 
-  const matchedJobDirections = useMemo(() => {
-    if (!selectedJob) return []
-    // Find all directions that contain this job
-    const matches: string[] = []
-    ifse2Data.forEach(item => {
-      if (item.jobs?.some(j => j.toLowerCase().includes(selectedJob.toLowerCase()))) {
-        if (!matches.includes(item.direction)) {
-          matches.push(item.direction)
-        }
-      }
-    })
-    return matches
-  }, [selectedJob])
+  // Note: matchedJobDirections kept for future use in advanced filtering
+  // const matchedJobDirections = useMemo(() => {
+  //   if (!selectedJob) return []
+  //   const matches: string[] = []
+  //   ifse2Data.forEach(item => {
+  //     if (item.jobs?.some(j => j.toLowerCase().includes(selectedJob.toLowerCase()))) {
+  //       if (!matches.includes(item.direction)) {
+  //         matches.push(item.direction)
+  //       }
+  //     }
+  //   })
+  //   return matches
+  // }, [selectedJob])
 
   // Calculs
   const ifse1Amount = useMemo(() => {
@@ -64,27 +56,29 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
 
   const totalMonthly = ifse1Amount + ifse2Amount + ifse3Total
 
-  const stepDescriptions = [
-    { num: 1, label: 'Catégorie', desc: 'Votre grille indiciaire' },
-    { num: 2, label: 'Fonction', desc: 'IFSE 1 - Prime de base' },
-    { num: 3, label: 'Primes sujétion', desc: 'IFSE 2 - Services' },
-    { num: 4, label: 'Primes week-end', desc: 'IFSE 3 - Samedis/Dimanches' },
-    { num: 5, label: 'Résultat', desc: 'Total mensuel' },
-  ]
+  // Note: Commented out for future enhancement of UI
+  // const stepDescriptions = [
+  //   { num: 1, label: 'Catégorie', desc: 'Votre grille indiciaire' },
+  //   { num: 2, label: 'Fonction', desc: 'IFSE 1 - Prime de base' },
+  //   { num: 3, label: 'Primes sujétion', desc: 'IFSE 2 - Services' },
+  //   { num: 4, label: 'Primes week-end', desc: 'IFSE 3 - Samedis/Dimanches' },
+  //   { num: 5, label: 'Résultat', desc: 'Total mensuel' },
+  // ]
 
-  const isStepComplete = (step: number) => {
-    if (step === 1) return selectedCategory !== ''
-    if (step === 2) return selectedFunctionCode !== ''
-    if (step === 3) return selectedDirection !== ''
-    if (step === 4) return true
-    if (step === 5) return true
-    return false
-  }
+  // Note: Commented out for future enhancement
+  // const isStepComplete = (step: number) => {
+  //   if (step === 1) return selectedCategory !== ''
+  //   if (step === 2) return selectedFunctionCode !== ''
+  //   if (step === 3) return selectedDirection !== ''
+  //   if (step === 4) return true
+  //   if (step === 5) return true
+  //   return false
+  // }
 
-  const handleJobChange = (value: string) => {
-    setSelectedJob(value)
-    setSelectedDirection('')
-  }
+    // Note: Commented out for future enhancement
+  // const handleJobChange = (value: string) => {
+  //   setSelectedJob(value)
+  // }
 
   const handleDirectionSelect = (dir: string) => {
     setSelectedDirection(dir)
@@ -131,37 +125,60 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
   )
 
   return (
-    <div className="space-y-6 flex-1">
-      {/* PROGRESS TRACKER */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="text-sm font-semibold text-slate-300">Progression du calcul</h3>
-          <span className="text-xs font-medium text-slate-400">{progressPercent}%</span>
+    <div className="flex flex-col h-full">
+      {/* Header avec bouton retour */}
+      <div className="bg-slate-800/50 py-6 text-left border-b border-slate-700 px-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-3xl font-bold text-white flex items-center gap-2">
+            <TrendingUp className="w-8 h-8 text-cyan-400" />
+            Calculateur PRIMES
+          </h2>
+          {onClose && (
+            <button
+              onClick={onClose}
+              className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-full font-semibold transition-all text-sm"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Retour
+            </button>
+          )}
         </div>
-        <div className="w-full h-2 bg-slate-700/50 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-gradient-to-r from-blue-500 via-cyan-500 to-teal-500 transition-all duration-500"
-            style={{ width: `${progressPercent}%` }}
-          ></div>
-        </div>
+        <p className="text-slate-300 text-sm leading-relaxed">
+          Calculez vos primes IFSE (base, sujétion de service, week-end) pas à pas
+        </p>
       </div>
 
-      {/* ÉTAPE 1: CATÉGORIE */}
-      <div className={`transition-all duration-300 ${currentStep === 1 ? 'ring-2 ring-blue-400/50' : ''} bg-gradient-to-br from-slate-800/60 to-slate-800/40 rounded-xl p-6 border border-slate-700/50 hover:border-slate-600/50`}>
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
+      <div className="space-y-6 flex-1 overflow-y-auto p-6 max-w-2xl mx-auto w-full">
+        {/* PROGRESS TRACKER */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-sm font-semibold text-slate-300">Progression du calcul</h3>
+            <span className="text-xs font-medium text-slate-400">{progressPercent}%</span>
+          </div>
+          <div className="w-full h-2 bg-slate-700/50 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-gradient-to-r from-blue-500 via-cyan-500 to-teal-500 transition-all duration-500"
+              style={{ width: `${progressPercent}%` }}
+            ></div>
+          </div>
+        </div>
+
+        {/* ÉTAPE 1: CATÉGORIE */}
+        <div className={`transition-all duration-300 ${currentStep === 1 ? 'ring-2 ring-blue-400/50' : ''} bg-gradient-to-br from-slate-800/60 to-slate-800/40 rounded-xl p-6 border border-slate-700/50 hover:border-slate-600/50`}>
+        <div className="flex flex-col items-center justify-center text-center mb-6">
+          <div className="flex items-center justify-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-sm">
               1
             </div>
             <div>
-              <h4 className="text-lg font-semibold text-white">Catégorie d'emploi</h4>
+              <h4 className="text-xl font-bold text-white">Catégorie d'emploi</h4>
               <p className="text-xs text-slate-400">Sélectionnez votre grille indiciaire (A, B ou C)</p>
             </div>
           </div>
           {selectedCategory && <CheckCircle2 className="w-5 h-5 text-green-400" />}
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-3 max-w-xs mx-auto">
           {['A', 'B', 'C'].map(cat => (
             <button
               key={cat}
@@ -169,7 +186,7 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
                 setSelectedCategory(cat)
                 setCurrentStep(2)
               }}
-              className={`w-full p-3 rounded-lg text-left transition-all font-medium ${ selectedCategory === cat
+              className={`w-full p-4 rounded-lg text-center transition-all font-semibold text-lg ${ selectedCategory === cat
                 ? 'bg-blue-500/80 border border-blue-400 text-white shadow-lg'
                 : 'bg-slate-700/40 border border-slate-600/30 text-slate-300 hover:bg-slate-700/60 hover:border-slate-500/50'
               }`}
@@ -189,7 +206,7 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
                 2
               </div>
               <div>
-                <h4 className="text-lg font-semibold text-white">Fonction & IFSE 1</h4>
+                <h4 className="text-xl font-bold text-white">Fonction & IFSE 1</h4>
                 <p className="text-xs text-slate-400">Prime de base selon votre poste</p>
               </div>
             </div>
@@ -249,55 +266,6 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
         </div>
       )}
 
-            {/* ÉTAPE 2B: MÉTIER (OPTIONNEL) */}
-      {selectedFunctionCode && (
-        <div className="bg-gradient-to-br from-slate-800/40 to-slate-800/30 rounded-xl p-5 border border-slate-700/40">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400/60 to-pink-400/60 flex items-center justify-center text-white text-xs font-bold">
-              ⚡
-            </div>
-            <div>
-              <h5 className="text-sm font-semibold text-slate-200">Sélectionner un métier (optionnel)</h5>
-              <p className="text-xs text-slate-500">Pré-remplit les IFSE 2 applicables à votre service</p>
-            </div>
-          </div>
-
-          <select
-            value={selectedJob}
-            onChange={(e) => handleJobChange(e.target.value)}
-            className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600/30 rounded-lg text-white text-sm focus:border-purple-400 focus:ring-2 focus:ring-purple-400/30 outline-none transition"
-          >
-            <option value="">Choisir un métier...</option>
-            {allJobs.map(job => (
-              <option key={job} value={job}>
-                {job}
-              </option>
-            ))}
-          </select>
-
-          {matchedJobDirections.length > 0 && selectedJob && (
-            <div className="mt-3 space-y-2">
-              <p className="text-xs text-slate-400">Directions correspondantes:</p>
-              <div className="space-y-1">
-                {matchedJobDirections.map(dir => (
-                  <button
-                    key={dir}
-                    onClick={() => handleDirectionSelect(dir)}
-                    className={`w-full p-2 rounded text-sm text-left transition-all ${
-                      selectedDirection === dir
-                        ? 'bg-purple-500/70 text-white font-medium'
-                        : 'bg-slate-700/30 text-slate-300 hover:bg-slate-700/50'
-                    }`}
-                  >
-                    {getDirectionFullName(dir)}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
       {/* ÉTAPE 3: PRIMES COMPLÉMENTAIRES (IFSE 2 & 3) */}
       {selectedFunctionCode && (
         <div className={`transition-all duration-300 ${currentStep === 3 ? 'ring-2 ring-teal-400/50' : ''} bg-gradient-to-br from-slate-800/60 to-slate-800/40 rounded-xl p-6 border border-slate-700/50 hover:border-slate-600/50`}>
@@ -307,8 +275,8 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
                 3
               </div>
               <div>
-                <h4 className="text-lg font-semibold text-white">Primes complémentaires</h4>
-                <p className="text-xs text-slate-400">IFSE 2 (sujétions) et IFSE 3 (week-end)</p>
+                                <h4 className="text-xl font-bold text-white">Primes complémentaires</h4>
+                <p className="text-xs text-slate-400">IFSE 2 - Services et sujétions</p>
               </div>
             </div>
             {(selectedDirection || ifse3Total > 0) && <CheckCircle2 className="w-5 h-5 text-green-400" />}
@@ -336,6 +304,50 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
                 ))}
               </select>
             </div>
+
+            {/* Section Sélectionner un métier */}
+            {selectedDirection && (
+              <div className="mb-4 p-4 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/30 rounded-lg">
+                <h6 className="text-sm font-semibold text-blue-300 mb-3 flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 bg-blue-400 rounded-full" />
+                  Sélectionner un métier (optionnel)
+                </h6>
+                <p className="text-xs text-slate-300 mb-3 italic">
+                  Pré-remplit les IFSE 2 applicables à votre service
+                </p>
+                
+                <div className="space-y-2 max-h-40 overflow-y-auto">
+                  {getIFSE2ByDirection(selectedDirection)
+                    .flatMap(p => p.jobs || [])
+                    .filter((job, idx, arr) => arr.indexOf(job) === idx)
+                    .sort()
+                    .map((job, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => {
+                        // Récupérer tous les primes associés à ce métier dans cette direction
+                        const directionPrimes = getIFSE2ByDirection(selectedDirection);
+                        const jobPrimes = directionPrimes.filter(p => p.jobs?.includes(job));
+                        
+                        // Pré-sélectionner les primes associées
+                        jobPrimes.forEach(jobPrime => {
+                          const primeIdx = directionPrimes.findIndex(p => p === jobPrime);
+                          if (primeIdx >= 0 && !selectedIFSE2.has(primeIdx)) {
+                            handleToggleIFSE2(primeIdx);
+                          }
+                        });
+                      }}
+                      className="w-full p-2.5 rounded-lg text-left transition-all border bg-slate-700/30 border-slate-600/20 hover:bg-blue-500/20 hover:border-blue-400/40 text-slate-200 text-sm font-medium"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-blue-400">→</span>
+                        {job}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {selectedDirection && (
               <div className="space-y-2 max-h-48 overflow-y-auto">
@@ -392,7 +404,7 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
                 4
               </div>
               <div>
-                <h4 className="text-lg font-semibold text-white">Primes week-end</h4>
+                <h4 className="text-xl font-bold text-white">Primes week-end</h4>
                 <p className="text-xs text-slate-400">IFSE 3 - Samedis et dimanches travaillés</p>
               </div>
             </div>
@@ -561,7 +573,7 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
                 5
               </div>
               <div>
-                <h4 className="text-lg font-semibold text-white">Résumé total</h4>
+                <h4 className="text-xl font-bold text-white">Résumé total</h4>
                 <p className="text-xs text-slate-300">Somme de toutes vos primes</p>
               </div>
             </div>
@@ -604,16 +616,7 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
           </div>
         </div>
       )}
-
-      {/* Bouton Retour */}
-      {onClose && (
-        <button
-          onClick={onClose}
-          className="w-full px-4 py-2 bg-slate-700/50 hover:bg-slate-700/70 text-slate-300 rounded-lg transition-all font-light text-sm"
-        >
-          ← Retour aux calculateurs
-        </button>
-      )}
+      </div>
     </div>
   )
 }

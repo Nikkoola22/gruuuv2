@@ -1054,8 +1054,8 @@ ${contexte}
         </div>
       </section>
 
-      <footer className="relative backdrop-blur-xl bg-white/10 border-t border-white/20 py-6 z-10">
-        <div className="absolute inset-0 bg-gradient-to-r from-orange-500/5 via-red-500/5 to-purple-500/5" />
+      <footer className="relative backdrop-blur-xl bg-slate-900/80 border-t border-slate-800 py-6 z-10">
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900" />
         
         <div className="relative max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

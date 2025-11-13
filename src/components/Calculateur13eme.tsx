@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import { ChevronRight, CheckCircle2 } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { ChevronRight, CheckCircle2, ArrowLeft, DollarSign } from 'lucide-react'
 
 interface Calculateur13emeProps {
   onClose?: () => void
@@ -111,7 +111,32 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col h-full">
+      {/* Header avec bouton retour */}
+      <div className="bg-gradient-to-b from-green-800/50 via-emerald-800/50 to-teal-800/50 py-6 text-left border-b border-green-700 px-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="relative p-4 bg-white/20 rounded-full">
+              <DollarSign className="w-8 h-8 text-white" />
+            </div>
+            <div>
+              <h3 className="text-3xl font-bold text-white">Calculateur 13ème Mois</h3>
+              <p className="text-green-100 text-sm">Simulation du 13ème mois - Calcul pas à pas</p>
+            </div>
+          </div>
+          {onClose && (
+            <button
+              onClick={onClose}
+              className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-full font-semibold transition-all text-sm"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Retour
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div className="space-y-6 flex-1 overflow-y-auto p-6 max-w-2xl mx-auto w-full">
       {/* Progress Bar */}
       <div className="bg-slate-700/30 border border-slate-600/30 rounded-lg p-4">
         <div className="flex justify-between mb-3">
@@ -365,15 +390,9 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
         </div>
       )}
 
-      {/* Bouton Retour */}
-      {onClose && (
-        <button
-          onClick={onClose}
-          className="w-full px-4 py-2 bg-slate-700/50 hover:bg-slate-700/70 text-slate-300 rounded-lg transition-all font-light text-sm"
-        >
-          ← Retour aux calculateurs
-        </button>
-      )}
+      {/* Bouton Retour - removed as header button is sufficient */}
+
+      </div>
     </div>
   )
 }

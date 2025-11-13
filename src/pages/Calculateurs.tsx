@@ -1,15 +1,16 @@
 import { useState } from 'react'
-import { ArrowLeft, TrendingUp, Calculator, DollarSign } from 'lucide-react'
+import { ArrowLeft, TrendingUp, Calculator, DollarSign, BookOpen } from 'lucide-react'
 import CalculateurPrimes from '../components/CalculateurPrimes'
 import CalculateurCIA from '../components/CalculateurCIA'
 import Calculateur13eme from '../components/Calculateur13eme'
+import Metiers from './Metiers'
 
 interface CalculateursProps {
   onBack?: () => void
 }
 
 export default function Calculateurs({ onBack }: CalculateursProps) {
-  const [selectedCalculator, setSelectedCalculator] = useState<'primes' | 'cia' | '13eme' | null>(null)
+  const [selectedCalculator, setSelectedCalculator] = useState<'primes' | 'cia' | '13eme' | 'metiers' | null>(null)
 
   if (selectedCalculator === 'primes') {
     return <CalculateurPrimes onClose={() => setSelectedCalculator(null)} />
@@ -21,6 +22,10 @@ export default function Calculateurs({ onBack }: CalculateursProps) {
 
   if (selectedCalculator === '13eme') {
     return <Calculateur13eme onClose={() => setSelectedCalculator(null)} />
+  }
+
+  if (selectedCalculator === 'metiers') {
+    return <Metiers onClose={() => setSelectedCalculator(null)} />
   }
 
   return (
@@ -41,7 +46,7 @@ export default function Calculateurs({ onBack }: CalculateursProps) {
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         {/* Calculateur PRIMES */}
         <button
           onClick={() => setSelectedCalculator('primes')}
@@ -103,6 +108,28 @@ export default function Calculateurs({ onBack }: CalculateursProps) {
               </p>
             </div>
             <div className="mt-4 px-4 py-2 bg-green-500/20 rounded-lg text-green-700 text-sm font-semibold">
+              Cliquez pour ouvrir
+            </div>
+          </div>
+        </button>
+
+        {/* Grilles Indiciaires */}
+        <button
+          onClick={() => setSelectedCalculator('metiers')}
+          className="group relative overflow-hidden bg-gradient-to-br from-amber-100/70 to-orange-100/70 border-2 border-amber-200 rounded-3xl p-8 transition-all duration-500 hover:bg-gradient-to-br hover:from-amber-100 hover:to-orange-100 hover:border-amber-400 hover:shadow-2xl hover:-translate-y-2"
+        >
+          <div className="relative z-10 flex flex-col items-center gap-6">
+            <div className="relative p-6 bg-gradient-to-br from-amber-500 to-orange-600 rounded-3xl shadow-xl group-hover:rotate-3 group-hover:scale-110 transition-transform">
+              <BookOpen className="w-12 h-12 text-white" />
+            </div>
+            <div>
+              <h3 className="text-2xl font-bold text-gray-800 group-hover:text-amber-700">Grilles Indiciaires</h3>
+              <p className="text-center text-gray-600 mt-2">
+                Filières et métiers<br />
+                <span className="text-sm">Consulter les grilles</span>
+              </p>
+            </div>
+            <div className="mt-4 px-4 py-2 bg-amber-500/20 rounded-lg text-amber-700 text-sm font-semibold">
               Cliquez pour ouvrir
             </div>
           </div>
