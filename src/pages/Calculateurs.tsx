@@ -48,21 +48,21 @@ export default function Calculateurs({ onBack }: CalculateursProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         <button
           onClick={() => setSelectedCalculator('primes')}
-          className="group relative overflow-hidden bg-gradient-to-br from-cyan-100/70 to-blue-100/70 border-2 border-cyan-200 rounded-3xl p-8 transition-all duration-500 hover:bg-gradient-to-br hover:from-cyan-100 hover:to-blue-100 hover:border-cyan-400 hover:shadow-2xl hover:-translate-y-2"
+          disabled
+          className="group relative overflow-hidden bg-gradient-to-br from-cyan-100/70 to-blue-100/70 border-2 border-cyan-200 rounded-3xl p-8 transition-all duration-500 opacity-60 cursor-not-allowed"
         >
           <div className="relative z-10 flex flex-col items-center gap-6">
             <div className="relative p-6 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-3xl shadow-xl group-hover:rotate-3 group-hover:scale-110 transition-transform">
               <TrendingUp className="w-12 h-12 text-white" />
             </div>
             <div>
-              <h3 className="text-2xl font-bold text-gray-800 group-hover:text-cyan-700">Calculateur PRIMES</h3>
+              <h3 className="text-2xl font-bold text-gray-800 group-hover:text-cyan-700">PRIMES</h3>
               <p className="text-center text-gray-600 mt-2">
-                IFSE 1, IFSE 2, IFSE 3<br />
-                <span className="text-sm">Calcul des primes mensuelles</span>
+                À VENIR
               </p>
             </div>
             <div className="mt-4 px-4 py-2 bg-cyan-500/20 rounded-lg text-cyan-700 text-sm font-semibold">
-              Cliquez pour ouvrir
+              Bientôt disponible
             </div>
           </div>
         </button>
