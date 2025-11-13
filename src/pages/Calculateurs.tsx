@@ -66,48 +66,47 @@ export default function Calculateurs({ onBack }: CalculateursProps) {
           </div>
         </button>
 
+        {/* Calculateur CIA - À VENIR */}
         <button
-          onClick={() => setSelectedCalculator('cia')}
-          className="group relative overflow-hidden bg-gradient-to-br from-purple-100/70 to-pink-100/70 border-2 border-purple-200 rounded-3xl p-8 transition-all duration-500 hover:bg-gradient-to-br hover:from-purple-100 hover:to-pink-100 hover:border-purple-400 hover:shadow-2xl hover:-translate-y-2"
+          disabled
+          title="Le calculateur CIA sera bientôt disponible"
+          className="group relative overflow-hidden bg-gradient-to-br from-purple-100/70 to-pink-100/70 border-2 border-purple-200 rounded-3xl p-8 transition-all duration-500 opacity-50 cursor-not-allowed"
         >
           <div className="relative z-10 flex flex-col items-center gap-6">
-            <div className="relative p-6 bg-gradient-to-br from-purple-500 to-pink-600 rounded-3xl shadow-xl group-hover:rotate-3 group-hover:scale-110 transition-transform">
+            <div className="relative p-6 bg-gradient-to-br from-purple-500 to-pink-600 rounded-3xl shadow-xl">
               <Calculator className="w-12 h-12 text-white" />
             </div>
-            <div>
-              <h3 className="text-2xl font-bold text-gray-800 group-hover:text-purple-700">Calculateur CIA</h3>
-              <p className="text-center text-gray-600 mt-2">
-                Cotisation Indemnité d'Ancienneté<br />
-                <span className="text-sm">Calcul de la CIA</span>
-              </p>
+            <div className="text-center">
+              <h3 className="text-2xl font-bold text-gray-800">Calculateur CIA</h3>
+              <p className="text-center text-gray-600 mt-2 font-semibold">À VENIR</p>
             </div>
             <div className="mt-4 px-4 py-2 bg-purple-500/20 rounded-lg text-purple-700 text-sm font-semibold">
-              Cliquez pour ouvrir
+              Bientôt disponible
             </div>
           </div>
         </button>
 
+        {/* Calculateur 13ème Mois - À VENIR */}
         <button
-          onClick={() => setSelectedCalculator('13eme')}
-          className="group relative overflow-hidden bg-gradient-to-br from-green-100/70 to-emerald-100/70 border-2 border-green-200 rounded-3xl p-8 transition-all duration-500 hover:bg-gradient-to-br hover:from-green-100 hover:to-emerald-100 hover:border-green-400 hover:shadow-2xl hover:-translate-y-2"
+          disabled
+          title="Le calculateur 13ème Mois sera bientôt disponible"
+          className="group relative overflow-hidden bg-gradient-to-br from-green-100/70 to-emerald-100/70 border-2 border-green-200 rounded-3xl p-8 transition-all duration-500 opacity-50 cursor-not-allowed"
         >
           <div className="relative z-10 flex flex-col items-center gap-6">
-            <div className="relative p-6 bg-gradient-to-br from-green-500 to-emerald-600 rounded-3xl shadow-xl group-hover:rotate-3 group-hover:scale-110 transition-transform">
+            <div className="relative p-6 bg-gradient-to-br from-green-500 to-emerald-600 rounded-3xl shadow-xl">
               <DollarSign className="w-12 h-12 text-white" />
             </div>
-            <div>
-              <h3 className="text-2xl font-bold text-gray-800 group-hover:text-green-700">Calculateur 13ème Mois</h3>
-              <p className="text-center text-gray-600 mt-2">
-                Gratification 13ème mois<br />
-                <span className="text-sm">Calcul du 13ème mois</span>
-              </p>
+            <div className="text-center">
+              <h3 className="text-2xl font-bold text-gray-800">Calculateur 13ème Mois</h3>
+              <p className="text-center text-gray-600 mt-2 font-semibold">À VENIR</p>
             </div>
             <div className="mt-4 px-4 py-2 bg-green-500/20 rounded-lg text-green-700 text-sm font-semibold">
-              Cliquez pour ouvrir
+              Bientôt disponible
             </div>
           </div>
         </button>
 
+        {/* Grilles Indiciaires - CLICABLE */}
         <button
           onClick={handleGrillesClick}
           className="group relative overflow-hidden bg-gradient-to-br from-orange-100/70 to-red-100/70 border-2 border-orange-200 rounded-3xl p-8 transition-all duration-500 hover:bg-gradient-to-br hover:from-orange-100 hover:to-red-100 hover:border-orange-400 hover:shadow-2xl hover:-translate-y-2"
