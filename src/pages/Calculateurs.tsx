@@ -35,8 +35,8 @@ export default function Calculateurs({ onBack }: CalculateursProps) {
           <p className="text-sm text-gray-600">Choisissez un calculateur ou consultez les grilles</p>
         </div>
         {onBack && (
-          <button 
-            onClick={onBack} 
+          <button
+            onClick={onBack}
             className="px-4 py-2 rounded-full bg-slate-100 border border-slate-200 hover:bg-slate-200 flex items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -45,6 +45,7 @@ export default function Calculateurs({ onBack }: CalculateursProps) {
         )}
       </div>
 
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         {/* Calculateur PRIMES - À VENIR */}
         <button
           disabled
@@ -52,7 +53,7 @@ export default function Calculateurs({ onBack }: CalculateursProps) {
           className="group relative overflow-hidden bg-gradient-to-br from-cyan-100/70 to-blue-100/70 border-2 border-cyan-200 rounded-3xl p-8 transition-all duration-500 opacity-50 cursor-not-allowed"
         >
           <div className="relative z-10 flex flex-col items-center gap-6">
-            <div className="relative p-6 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-3xl shadow-xl group-hover:rotate-3 group-hover:scale-110 transition-transform">
+            <div className="relative p-6 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-3xl shadow-xl">
               <TrendingUp className="w-12 h-12 text-white" />
             </div>
             <div className="text-center">
