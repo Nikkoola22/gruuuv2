@@ -43,6 +43,18 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
     return matches
   }, [selectedJob])
 
+  // Get jobs for selected direction only
+  const jobsForDirection = useMemo(() => {
+    if (!selectedDirection) return []
+    const jobs = new Set<string>();
+    ifse2Data.forEach(item => {
+      if (item.direction === selectedDirection && item.jobs) {
+        item.jobs.forEach(job => jobs.add(job));
+      }
+    });
+    return Array.from(jobs).sort((a, b) => a.localeCompare(b, 'fr'))
+  }, [selectedDirection])
+
   // Calculs
   const ifse1Amount = useMemo(() => {
     if (!selectedFunctionCode) return 0
@@ -131,7 +143,7 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
   )
 
   return (
-    <div className="space-y-6 flex-1">
+    <div className="space-y-6 flex-1 max-w-3xl mx-auto w-full">
       {/* PROGRESS TRACKER */}
       <div className="space-y-3">
         <div className="flex items-center justify-between mb-2">
@@ -249,55 +261,6 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
         </div>
       )}
 
-            {/* ÉTAPE 2B: MÉTIER (OPTIONNEL) */}
-      {selectedFunctionCode && (
-        <div className="bg-gradient-to-br from-slate-800/40 to-slate-800/30 rounded-xl p-5 border border-slate-700/40">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400/60 to-pink-400/60 flex items-center justify-center text-white text-xs font-bold">
-              ⚡
-            </div>
-            <div>
-              <h5 className="text-sm font-semibold text-slate-200">Sélectionner un métier (optionnel)</h5>
-              <p className="text-xs text-slate-500">Pré-remplit les IFSE 2 applicables à votre service</p>
-            </div>
-          </div>
-
-          <select
-            value={selectedJob}
-            onChange={(e) => handleJobChange(e.target.value)}
-            className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600/30 rounded-lg text-white text-sm focus:border-purple-400 focus:ring-2 focus:ring-purple-400/30 outline-none transition"
-          >
-            <option value="">Choisir un métier...</option>
-            {allJobs.map(job => (
-              <option key={job} value={job}>
-                {job}
-              </option>
-            ))}
-          </select>
-
-          {matchedJobDirections.length > 0 && selectedJob && (
-            <div className="mt-3 space-y-2">
-              <p className="text-xs text-slate-400">Directions correspondantes:</p>
-              <div className="space-y-1">
-                {matchedJobDirections.map(dir => (
-                  <button
-                    key={dir}
-                    onClick={() => handleDirectionSelect(dir)}
-                    className={`w-full p-2 rounded text-sm text-left transition-all ${
-                      selectedDirection === dir
-                        ? 'bg-purple-500/70 text-white font-medium'
-                        : 'bg-slate-700/30 text-slate-300 hover:bg-slate-700/50'
-                    }`}
-                  >
-                    {getDirectionFullName(dir)}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
       {/* ÉTAPE 3: PRIMES COMPLÉMENTAIRES (IFSE 2 & 3) */}
       {selectedFunctionCode && (
         <div className={`transition-all duration-300 ${currentStep === 3 ? 'ring-2 ring-teal-400/50' : ''} bg-gradient-to-br from-slate-800/60 to-slate-800/40 rounded-xl p-6 border border-slate-700/50 hover:border-slate-600/50`}>
@@ -336,6 +299,56 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
                 ))}
               </select>
             </div>
+
+            {selectedDirection && (
+              <div className="mt-4 p-3 bg-slate-700/30 border border-slate-600/30 rounded-lg">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400/60 to-pink-400/60 flex items-center justify-center text-white text-xs font-bold">
+                    ⚡
+                  </div>
+                  <div>
+                    <h5 className="text-sm font-semibold text-slate-200">Sélectionner un métier (optionnel)</h5>
+                    <p className="text-xs text-slate-500">Pré-remplit les IFSE 2 applicables à votre service</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {selectedDirection && (
+              <select
+                value={selectedJob}
+                onChange={(e) => handleJobChange(e.target.value)}
+                className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600/30 rounded-lg text-white text-sm focus:border-purple-400 focus:ring-2 focus:ring-purple-400/30 outline-none transition"
+              >
+                <option value="">Choisir un métier...</option>
+                {jobsForDirection.map(job => (
+                  <option key={job} value={job}>
+                    {job}
+                  </option>
+                ))}
+              </select>
+            )}
+
+            {matchedJobDirections.length > 0 && selectedJob && (
+              <div className="mt-3 space-y-2">
+                <p className="text-xs text-slate-400">Directions correspondantes:</p>
+                <div className="space-y-1">
+                  {matchedJobDirections.map(dir => (
+                    <button
+                      key={dir}
+                      onClick={() => handleDirectionSelect(dir)}
+                      className={`w-full p-2 rounded text-sm text-left transition-all ${
+                        selectedDirection === dir
+                          ? 'bg-purple-500/70 text-white font-medium'
+                          : 'bg-slate-700/30 text-slate-300 hover:bg-slate-700/50'
+                      }`}
+                    >
+                      {getDirectionFullName(dir)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {selectedDirection && (
               <div className="space-y-2 max-h-48 overflow-y-auto">
