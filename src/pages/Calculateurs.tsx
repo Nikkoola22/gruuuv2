@@ -45,10 +45,11 @@ export default function Calculateurs({ onBack }: CalculateursProps) {
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        {/* Calculateur PRIMES - À VENIR */}
         <button
           disabled
-          className="group relative overflow-hidden bg-gradient-to-br from-cyan-100/70 to-blue-100/70 border-2 border-cyan-200 rounded-3xl p-8 transition-all duration-500 opacity-60 cursor-not-allowed"
+          title="Le calculateur PRIMES sera bientôt disponible"
+          className="group relative overflow-hidden bg-gradient-to-br from-cyan-100/70 to-blue-100/70 border-2 border-cyan-200 rounded-3xl p-8 transition-all duration-500 opacity-50 cursor-not-allowed"
         >
           <div className="relative z-10 flex flex-col items-center gap-6">
             <div className="relative p-6 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-3xl shadow-xl group-hover:rotate-3 group-hover:scale-110 transition-transform">
