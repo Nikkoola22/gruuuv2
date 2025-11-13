@@ -35,6 +35,8 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
   //   return matches
   // }, [selectedJob])
 
+  // Get jobs for selected direction only
+
   // Calculs
   const ifse1Amount = useMemo(() => {
     if (!selectedFunctionCode) return 0
@@ -143,9 +145,6 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
             </button>
           )}
         </div>
-        <p className="text-slate-300 text-sm leading-relaxed">
-          Calculez vos primes IFSE (base, sujétion de service, week-end) pas à pas
-        </p>
       </div>
 
       <div className="space-y-6 flex-1 overflow-y-auto p-6 max-w-2xl mx-auto w-full">
@@ -348,6 +347,8 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
                 </div>
               </div>
             )}
+
+
 
             {selectedDirection && (
               <div className="space-y-2 max-h-48 overflow-y-auto">
