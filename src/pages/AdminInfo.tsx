@@ -6,6 +6,13 @@ interface InfoItem {
   content: string;
 }
 
+interface CalculatorStatus {
+  primes: boolean;
+  cia: boolean;
+  treizeme: boolean;
+  grilles: boolean;
+}
+
 const AdminInfo: React.FC = () => {
   const [infoItems, setInfoItems] = useState<InfoItem[]>([]);
   const [newInfo, setNewInfo] = useState({ title: "", content: "" });
@@ -15,11 +22,26 @@ const AdminInfo: React.FC = () => {
     return saved ? JSON.parse(saved) : false;
   });
 
+  const [calculatorsStatus, setCalculatorsStatus] = useState<CalculatorStatus>(() => {
+    const saved = localStorage.getItem('calculators-status');
+    return saved ? JSON.parse(saved) : { primes: true, cia: true, treizeme: true, grilles: true };
+  });
+
   const togglePrimesBlock = () => {
     const newValue = !isPrimesBlocked;
     setIsPrimesBlocked(newValue);
     localStorage.setItem('primes-blocked', JSON.stringify(newValue));
     window.dispatchEvent(new CustomEvent('primes-blocked-changed', { detail: newValue }));
+  };
+
+  const toggleCalculator = (calculator: keyof CalculatorStatus) => {
+    const updatedStatus = {
+      ...calculatorsStatus,
+      [calculator]: !calculatorsStatus[calculator]
+    };
+    setCalculatorsStatus(updatedStatus);
+    localStorage.setItem('calculators-status', JSON.stringify(updatedStatus));
+    window.dispatchEvent(new CustomEvent('calculators-status-changed', { detail: updatedStatus }));
   };
 
   useEffect(() => {
@@ -147,6 +169,154 @@ const AdminInfo: React.FC = () => {
         >
           {isPrimesBlocked ? "🔓 Débloquer PRIMES" : "🔒 Bloquer PRIMES"}
         </button>
+      </div>
+
+      {/* Section Contrôle des Calculateurs */}
+      <div style={{
+        marginBottom: "2rem",
+        padding: "1rem",
+        background: "#f0f7ff",
+        border: "2px solid #2196F3",
+        borderRadius: "8px"
+      }}>
+        <h3 style={{ marginTop: 0, marginBottom: "1rem" }}>📊 Contrôle des Calculateurs</h3>
+        <p style={{ marginBottom: "1rem", color: "#666" }}>
+          Activez ou désactivez l'accès à chaque calculateur
+        </p>
+        
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+          gap: "1rem"
+        }}>
+          {/* PRIMES */}
+          <div style={{
+            padding: "1rem",
+            background: "white",
+            border: `2px solid ${calculatorsStatus.primes ? "#4caf50" : "#f44336"}`,
+            borderRadius: "6px",
+            textAlign: "center"
+          }}>
+            <h4 style={{ margin: "0 0 0.5rem 0" }}>💎 PRIMES</h4>
+            <p style={{ margin: "0 0 0.75rem 0", color: "#666", fontSize: "0.9em" }}>
+              État: <strong>{calculatorsStatus.primes ? "✅ ACTIF" : "❌ INACTIF"}</strong>
+            </p>
+            <button
+              onClick={() => toggleCalculator('primes')}
+              style={{
+                padding: "0.5rem 1rem",
+                fontSize: "0.9rem",
+                fontWeight: "bold",
+                color: "white",
+                background: calculatorsStatus.primes ? "#4caf50" : "#f44336",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+                width: "100%"
+              }}
+              onMouseOver={(e) => e.currentTarget.style.opacity = "0.8"}
+              onMouseOut={(e) => e.currentTarget.style.opacity = "1"}
+            >
+              {calculatorsStatus.primes ? "Désactiver" : "Activer"}
+            </button>
+          </div>
+
+          {/* CIA */}
+          <div style={{
+            padding: "1rem",
+            background: "white",
+            border: `2px solid ${calculatorsStatus.cia ? "#4caf50" : "#f44336"}`,
+            borderRadius: "6px",
+            textAlign: "center"
+          }}>
+            <h4 style={{ margin: "0 0 0.5rem 0" }}>🧮 CIA</h4>
+            <p style={{ margin: "0 0 0.75rem 0", color: "#666", fontSize: "0.9em" }}>
+              État: <strong>{calculatorsStatus.cia ? "✅ ACTIF" : "❌ INACTIF"}</strong>
+            </p>
+            <button
+              onClick={() => toggleCalculator('cia')}
+              style={{
+                padding: "0.5rem 1rem",
+                fontSize: "0.9rem",
+                fontWeight: "bold",
+                color: "white",
+                background: calculatorsStatus.cia ? "#4caf50" : "#f44336",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+                width: "100%"
+              }}
+              onMouseOver={(e) => e.currentTarget.style.opacity = "0.8"}
+              onMouseOut={(e) => e.currentTarget.style.opacity = "1"}
+            >
+              {calculatorsStatus.cia ? "Désactiver" : "Activer"}
+            </button>
+          </div>
+
+          {/* 13ème Mois */}
+          <div style={{
+            padding: "1rem",
+            background: "white",
+            border: `2px solid ${calculatorsStatus.treizeme ? "#4caf50" : "#f44336"}`,
+            borderRadius: "6px",
+            textAlign: "center"
+          }}>
+            <h4 style={{ margin: "0 0 0.5rem 0" }}>💰 13ème Mois</h4>
+            <p style={{ margin: "0 0 0.75rem 0", color: "#666", fontSize: "0.9em" }}>
+              État: <strong>{calculatorsStatus.treizeme ? "✅ ACTIF" : "❌ INACTIF"}</strong>
+            </p>
+            <button
+              onClick={() => toggleCalculator('treizeme')}
+              style={{
+                padding: "0.5rem 1rem",
+                fontSize: "0.9rem",
+                fontWeight: "bold",
+                color: "white",
+                background: calculatorsStatus.treizeme ? "#4caf50" : "#f44336",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+                width: "100%"
+              }}
+              onMouseOver={(e) => e.currentTarget.style.opacity = "0.8"}
+              onMouseOut={(e) => e.currentTarget.style.opacity = "1"}
+            >
+              {calculatorsStatus.treizeme ? "Désactiver" : "Activer"}
+            </button>
+          </div>
+
+          {/* Grilles Indiciaires */}
+          <div style={{
+            padding: "1rem",
+            background: "white",
+            border: `2px solid ${calculatorsStatus.grilles ? "#4caf50" : "#f44336"}`,
+            borderRadius: "6px",
+            textAlign: "center"
+          }}>
+            <h4 style={{ margin: "0 0 0.5rem 0" }}>📚 Grilles</h4>
+            <p style={{ margin: "0 0 0.75rem 0", color: "#666", fontSize: "0.9em" }}>
+              État: <strong>{calculatorsStatus.grilles ? "✅ ACTIF" : "❌ INACTIF"}</strong>
+            </p>
+            <button
+              onClick={() => toggleCalculator('grilles')}
+              style={{
+                padding: "0.5rem 1rem",
+                fontSize: "0.9rem",
+                fontWeight: "bold",
+                color: "white",
+                background: calculatorsStatus.grilles ? "#4caf50" : "#f44336",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+                width: "100%"
+              }}
+              onMouseOver={(e) => e.currentTarget.style.opacity = "0.8"}
+              onMouseOut={(e) => e.currentTarget.style.opacity = "1"}
+            >
+              {calculatorsStatus.grilles ? "Désactiver" : "Activer"}
+            </button>
+          </div>
+        </div>
       </div>
 
       <p style={{ color: "#666", marginBottom: "2rem" }}>
