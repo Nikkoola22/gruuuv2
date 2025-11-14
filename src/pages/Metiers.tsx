@@ -8,7 +8,7 @@ interface MetierCardProps {
   filiere: string;
 }
 
-const MetierCard: React.FC<MetierCardProps & { onClose: () => void }> = ({ icon, title, description, filiere, onClose }) => {
+const MetierCard: React.FC<MetierCardProps & { onClose: () => void }> = ({ icon, title, description, filiere }) => {
   const handleNavigate = () => {
     const urls: Record<string, string> = {
       'culturelle': 'https://interco.cfdt.fr/vos-metiers/fonction-publique-territoriale/filiere-culturelle/',

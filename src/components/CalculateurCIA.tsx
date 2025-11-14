@@ -109,8 +109,6 @@ Calcul détaillé du CIA:
   };
   
   const resultat = calculerCIA();
-  const ciaMensuel = resultat.ciaFinal / 12;
-
   return (
     <div className="flex flex-col h-full">
       {/* Header avec bouton retour */}

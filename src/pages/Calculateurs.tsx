@@ -49,60 +49,57 @@ export default function Calculateurs({ onBack }: CalculateursProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         {/* Calculateur PRIMES */}
         <button
-          disabled
-          title="Le calculateur PRIMES sera bientôt disponible"
-          className="group relative overflow-hidden bg-gradient-to-br from-cyan-100/70 to-blue-100/70 border-2 border-cyan-200 rounded-3xl p-8 transition-all duration-500 opacity-50 cursor-not-allowed"
+          onClick={() => setSelectedCalculator('primes')}
+          className="group relative overflow-hidden bg-gradient-to-br from-cyan-100/70 to-blue-100/70 border-2 border-cyan-200 rounded-3xl p-8 transition-all duration-500 hover:bg-gradient-to-br hover:from-cyan-100 hover:to-blue-100 hover:border-cyan-400 hover:shadow-2xl hover:-translate-y-2"
         >
           <div className="relative z-10 flex flex-col items-center gap-6">
-            <div className="relative p-6 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-3xl shadow-xl">
+            <div className="relative p-6 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-3xl shadow-xl group-hover:rotate-3 group-hover:scale-110 transition-transform">
               <TrendingUp className="w-12 h-12 text-white" />
             </div>
             <div className="text-center">
-              <h3 className="text-2xl font-bold text-gray-800">PRIMES</h3>
-              <p className="text-center text-gray-600 mt-2 font-semibold">À VENIR</p>
+              <h3 className="text-2xl font-bold text-gray-800 group-hover:text-cyan-700">PRIMES</h3>
+              <p className="text-center text-gray-600 mt-2">Prime de base et sujétion<br /><span className="text-sm">Calculer vos primes</span></p>
             </div>
             <div className="mt-4 px-4 py-2 bg-cyan-500/20 rounded-lg text-cyan-700 text-sm font-semibold">
-              Bientôt disponible
+              Cliquez pour ouvrir
             </div>
           </div>
         </button>
 
-        {/* Calculateur CIA - À VENIR */}
+        {/* Calculateur CIA */}
         <button
-          disabled
-          title="Le calculateur CIA sera bientôt disponible"
-          className="group relative overflow-hidden bg-gradient-to-br from-purple-100/70 to-pink-100/70 border-2 border-purple-200 rounded-3xl p-8 transition-all duration-500 opacity-50 cursor-not-allowed"
+          onClick={() => setSelectedCalculator('cia')}
+          className="group relative overflow-hidden bg-gradient-to-br from-purple-100/70 to-pink-100/70 border-2 border-purple-200 rounded-3xl p-8 transition-all duration-500 hover:bg-gradient-to-br hover:from-purple-100 hover:to-pink-100 hover:border-purple-400 hover:shadow-2xl hover:-translate-y-2"
         >
           <div className="relative z-10 flex flex-col items-center gap-6">
-            <div className="relative p-6 bg-gradient-to-br from-purple-500 to-pink-600 rounded-3xl shadow-xl">
+            <div className="relative p-6 bg-gradient-to-br from-purple-500 to-pink-600 rounded-3xl shadow-xl group-hover:rotate-3 group-hover:scale-110 transition-transform">
               <Calculator className="w-12 h-12 text-white" />
             </div>
             <div className="text-center">
-              <h3 className="text-2xl font-bold text-gray-800">Calculateur CIA</h3>
-              <p className="text-center text-gray-600 mt-2 font-semibold">À VENIR</p>
+              <h3 className="text-2xl font-bold text-gray-800 group-hover:text-purple-700">Calculateur CIA</h3>
+              <p className="text-center text-gray-600 mt-2">Complément individuel d'activité<br /><span className="text-sm">Calculer votre CIA</span></p>
             </div>
             <div className="mt-4 px-4 py-2 bg-purple-500/20 rounded-lg text-purple-700 text-sm font-semibold">
-              Bientôt disponible
+              Cliquez pour ouvrir
             </div>
           </div>
         </button>
 
-        {/* Calculateur 13ème Mois - À VENIR */}
+        {/* Calculateur 13ème Mois */}
         <button
-          disabled
-          title="Le calculateur 13ème Mois sera bientôt disponible"
-          className="group relative overflow-hidden bg-gradient-to-br from-green-100/70 to-emerald-100/70 border-2 border-green-200 rounded-3xl p-8 transition-all duration-500 opacity-50 cursor-not-allowed"
+          onClick={() => setSelectedCalculator('13eme')}
+          className="group relative overflow-hidden bg-gradient-to-br from-green-100/70 to-emerald-100/70 border-2 border-green-200 rounded-3xl p-8 transition-all duration-500 hover:bg-gradient-to-br hover:from-green-100 hover:to-emerald-100 hover:border-green-400 hover:shadow-2xl hover:-translate-y-2"
         >
           <div className="relative z-10 flex flex-col items-center gap-6">
-            <div className="relative p-6 bg-gradient-to-br from-green-500 to-emerald-600 rounded-3xl shadow-xl">
+            <div className="relative p-6 bg-gradient-to-br from-green-500 to-emerald-600 rounded-3xl shadow-xl group-hover:rotate-3 group-hover:scale-110 transition-transform">
               <DollarSign className="w-12 h-12 text-white" />
             </div>
             <div className="text-center">
-              <h3 className="text-2xl font-bold text-gray-800">Calculateur 13ème Mois</h3>
-              <p className="text-center text-gray-600 mt-2 font-semibold">À VENIR</p>
+              <h3 className="text-2xl font-bold text-gray-800 group-hover:text-green-700">13ème Mois</h3>
+              <p className="text-center text-gray-600 mt-2">Prime de 13ème mois<br /><span className="text-sm">Calculer votre 13ème mois</span></p>
             </div>
             <div className="mt-4 px-4 py-2 bg-green-500/20 rounded-lg text-green-700 text-sm font-semibold">
-              Bientôt disponible
+              Cliquez pour ouvrir
             </div>
           </div>
         </button>
