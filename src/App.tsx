@@ -808,7 +808,7 @@ ${contexte}
               </div>
 
               {/* PRIMES Window on the left */}
-              <div className="absolute left-24 md:left-32 top-40 md:top-1/2 transform md:-translate-y-1/2 z-30">
+              <div className="absolute left-24 md:left-32 top-8 md:top-1/2 transform md:-translate-y-1/2 z-30">
                 <div className="relative z-10 p-4 rounded-2xl overflow-hidden w-auto max-w-[200px]">
                   <div className="absolute inset-0 bg-gradient-to-br from-cyan-500 via-blue-600 to-blue-700 opacity-70" />
                   <div className="flex flex-col items-center gap-4 relative z-20 text-white">
