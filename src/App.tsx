@@ -807,25 +807,29 @@ ${contexte}
                 <div className="w-24 h-24 sm:w-32 md:w-44 sm:h-32 md:h-44 rounded-full bg-white shadow-lg" />
               </div>
 
-              {/* PRIMES Button on the left */}
-              <div className="absolute left-12 md:left-20 top-12 md:top-1/2 transform md:-translate-y-1/2 z-30">
-                <button 
-                  onClick={() => {
-                    if (!isPrimesBlocked) {
-                      setShowCalculator(true);
-                    }
-                  }}
-                  disabled={isPrimesBlocked}
-                  aria-label="Ouvrir Calculateur PRIMES"
-                  className={`group focus:outline-none ${isPrimesBlocked ? 'opacity-50 cursor-not-allowed' : ''}`}
-                  title={isPrimesBlocked ? "Le bouton PRIMES est désactivé" : "Ouvrir Calculateur PRIMES"}
-                >
-                  <div className={`relative p-6 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-3xl shadow-xl group-hover:rotate-3 group-hover:scale-110 transition-transform w-32 h-32 sm:w-36 sm:h-36 md:w-44 md:h-44 flex items-center justify-center ${isPrimesBlocked ? 'opacity-60' : ''}`}>
-                    <TrendingUp className="w-16 h-16 sm:w-18 sm:h-18 md:w-24 md:h-24 text-white" />
+              {/* PRIMES Window on the left */}
+              <div className="absolute left-24 md:left-32 top-40 md:top-1/2 transform md:-translate-y-1/2 z-30">
+                <div className="relative z-10 p-4 rounded-2xl overflow-hidden w-auto max-w-[200px]">
+                  <div className="absolute inset-0 bg-gradient-to-br from-cyan-500 via-blue-600 to-blue-700 opacity-70" />
+                  <div className="flex flex-col items-center gap-4 relative z-20 text-white">
+                    <div className={`relative p-5 bg-cyan-500 rounded-3xl shadow-lg ring-2 ring-cyan-300 ${isPrimesBlocked ? 'opacity-60' : ''}`}>
+                      <TrendingUp className="w-10 h-10 text-white" />
+                    </div>
+                    <button 
+                      onClick={() => {
+                        if (!isPrimesBlocked) {
+                          setShowCalculator(true);
+                        }
+                      }}
+                      disabled={isPrimesBlocked}
+                      aria-label="Ouvrir Calculateur PRIMES"
+                      title={isPrimesBlocked ? "Le bouton PRIMES est désactivé" : "Ouvrir Calculateur PRIMES"}
+                      className={`px-5 py-2 bg-cyan-500 hover:bg-cyan-600 rounded-full text-xl font-bold text-white shadow-md focus:outline-none ${isPrimesBlocked ? 'opacity-50 cursor-not-allowed hover:bg-cyan-500' : ''}`}
+                    >
+                      PRIMES
+                    </button>
                   </div>
-                  <p className="text-center text-white font-bold text-sm sm:text-base md:text-lg mt-2">PRIMES</p>
-                  <p className="text-center text-orange-400 font-bold text-xs sm:text-sm mt-1 animate-pulse">À VENIR</p>
-                </button>
+                </div>
               </div>
 
               {/* Center the QUIZZ star horizontally above the FAQ card (absolute to match background circle) */}
