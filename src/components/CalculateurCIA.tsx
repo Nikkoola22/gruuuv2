@@ -7,18 +7,23 @@ interface CalculateurCIAProps {
 
 export default function CalculateurCIA({ onClose }: CalculateurCIAProps) {
   const [ifseMensuel, setIfseMensuel] = useState<number>(0);
+  const [weekendServices, setWeekendServices] = useState<number>(0);
+  const [weekendRate, setWeekendRate] = useState<number>(40);
   const [tauxEvaluation, setTauxEvaluation] = useState<number>(100);
   const [joursAbsenceN1, setJoursAbsenceN1] = useState<number>(0);
   const [etapeActive, setEtapeActive] = useState<number>(1); // Suivi de l'étape active
   const [absencesTouched, setAbsencesTouched] = useState<boolean>(false); // Track if user touched absences field
   const [evaluationTouched, setEvaluationTouched] = useState<boolean>(false); // Track if user touched evaluation
+
+  const weekendOptions = Array.from({ length: 53 }, (_, i) => i);
+  const ifseMensuelTotal = ifseMensuel + weekendServices * weekendRate;
   
   // Auto-advance to next step when IFSE is filled (only advance to step 2, not beyond)
   useEffect(() => {
-    if (etapeActive === 1 && ifseMensuel > 0) {
+    if (etapeActive === 1 && ifseMensuelTotal > 0) {
       setTimeout(() => setEtapeActive(2), 300);
     }
-  }, [ifseMensuel, etapeActive]);
+  }, [ifseMensuelTotal, etapeActive]);
 
   // Auto-advance to next step when Évaluation is selected
   useEffect(() => {
@@ -36,7 +41,7 @@ export default function CalculateurCIA({ onClose }: CalculateurCIAProps) {
   
   // Calcul du CIA
   const calculerCIA = () => {
-    if (ifseMensuel <= 0) {
+    if (ifseMensuelTotal <= 0) {
       return {
         ifseAnnuel: 0,
         base10Pourcent: 0,
@@ -50,7 +55,7 @@ export default function CalculateurCIA({ onClose }: CalculateurCIAProps) {
     
     // ÉTAPE 1: Calcul de la base CIA
     // CIA = (IFSE mensuel × 10% × 12)
-    const ifseAnnuel = ifseMensuel * 12;
+    const ifseAnnuel = ifseMensuelTotal * 12;
     const base10Pourcent = ifseAnnuel * 0.10; // 10% de l'IFSE annuel
     
     // ÉTAPE 2: Calcul de la première moitié (Taux d'évaluation)
@@ -76,19 +81,21 @@ export default function CalculateurCIA({ onClose }: CalculateurCIAProps) {
     // Détail du calcul
     const detailCalcul = `
 Calcul détaillé du CIA:
-1️⃣ IFSE annuel = ${ifseMensuel}€ × 12 = ${ifseAnnuel}€
-2️⃣ Base CIA (10% de l'IFSE annuel) = ${ifseAnnuel}€ × 10% = ${base10Pourcent.toFixed(2)}€
+1️⃣ IFSE déclaré = ${ifseMensuel.toFixed(2)}€ | Week-ends (${weekendServices} × ${weekendRate}€) = ${(weekendServices * weekendRate).toFixed(2)}€
+  ➜ IFSE mensuel retenu = ${ifseMensuelTotal.toFixed(2)}€
+  ➜ IFSE annuel = ${ifseMensuelTotal.toFixed(2)}€ × 12 = ${ifseAnnuel.toFixed(2)}€
+2️⃣ Base CIA (10% de l'IFSE annuel) = ${ifseAnnuel.toFixed(2)}€ × 10% = ${base10Pourcent.toFixed(2)}€
 
 📊 Répartition sur 2 moitiés (chaque moitié = 50%):
 
 1️⃣ PREMIÈRE MOITIÉ (Évaluation annuelle):
    • Montant de la moitié = ${base10Pourcent.toFixed(2)}€ ÷ 2 = ${(base10Pourcent / 2).toFixed(2)}€
    • Taux d'évaluation = ${tauxEvaluation}%
-   • CIA Évaluation = ${(base10Pourcent / 2).toFixed(2)}€ × ${tauxEvaluation}% = ${ciaEvaluation.toFixed(2)}€
+  • CIA Évaluation = ${(base10Pourcent / 2).toFixed(2)}€ × ${tauxEvaluation}% = ${ciaEvaluation.toFixed(2)}€
 
 2️⃣ DEUXIÈME MOITIÉ (Jours d'absence N-1):
    • Montant de la moitié = ${base10Pourcent.toFixed(2)}€ ÷ 2 = ${(base10Pourcent / 2).toFixed(2)}€
-   • Jours d'absence en N-1 = ${joursAbsenceN1} jours
+  • Jours d'absence en N-1 = ${joursAbsenceN1} jours
    • Taux appliqué = ${tauxAbsence}%
      (< 5 jours = 100% | 5-10 jours = 50% | > 10 jours = 0%)
    • CIA Absence = ${(base10Pourcent / 2).toFixed(2)}€ × ${tauxAbsence}% = ${ciaAbsence.toFixed(2)}€
@@ -198,15 +205,51 @@ Calcul détaillé du CIA:
                 />
               </div>
               
-              {ifseMensuel > 0 && (
+              {ifseMensuelTotal > 0 && (
                 <div className="mt-4 p-3 bg-green-100 border border-green-400 rounded-lg">
                   <p className="text-green-800 font-semibold flex items-center gap-2">
                     <CheckCircle className="w-5 h-5" />
-                    IFSE annuel: {(ifseMensuel * 12).toFixed(2)}€
+                    IFSE annuel pris en compte: {(ifseMensuelTotal * 12).toFixed(2)}€
                   </p>
-                  <p className="text-xs text-green-700 mt-1">({ifseMensuel}€ × 12 mois)</p>
+                  <p className="text-xs text-green-700 mt-1">(IFSE mensuel + week-ends valorisés) × 12</p>
                 </div>
               )}
+
+              <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Week-ends (samedi/dimanche) réalisés en N-1
+                  </label>
+                  <select
+                    value={weekendServices}
+                    onChange={(e) => setWeekendServices(Number(e.target.value))}
+                    className="w-full px-3 py-2 border-2 border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    {weekendOptions.map((value) => (
+                      <option key={value} value={value}>{value} week-end{value > 1 ? 's' : ''}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Taux appliqué par week-end
+                  </label>
+                  <select
+                    value={weekendRate}
+                    onChange={(e) => setWeekendRate(Number(e.target.value))}
+                    className="w-full px-3 py-2 border-2 border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    {[40, 60, 80].map(rate => (
+                      <option key={rate} value={rate}>{rate} €</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="mt-4 p-3 bg-blue-100 border border-blue-300 rounded-lg text-sm text-blue-900">
+                <p className="font-semibold">IFSE total retenu : {ifseMensuel.toFixed(2)}€ + ({weekendServices} × {weekendRate}€) = {ifseMensuelTotal.toFixed(2)}€</p>
+                <p className="text-xs mt-1">Ce montant sert de base pour les étapes suivantes.</p>
+              </div>
 
               <div className="mt-3 p-3 bg-slate-100 rounded-lg text-xs text-slate-700">
                 <strong>💡 Conseil:</strong> Trouvez ce montant sur votre bulletin de paie ou demandez à la RH
@@ -216,7 +259,7 @@ Calcul détaillé du CIA:
         </div>
 
         {/* ÉTAPE 2: Taux d'Évaluation */}
-        {ifseMensuel > 0 && (
+        {ifseMensuelTotal > 0 && (
           <div className={`rounded-xl shadow-md overflow-hidden transition-all ${etapeActive >= 2 ? 'ring-2 ring-purple-400' : ''}`}>
             <div className="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-4">
               <div className="flex items-center gap-3">
@@ -273,9 +316,9 @@ Calcul détaillé du CIA:
                 <div className="p-3 bg-purple-100 border border-purple-400 rounded-lg">
                   <p className="text-purple-800 font-semibold flex items-center gap-2">
                     <CheckCircle className="w-5 h-5" />
-                    CIA Évaluation: {((ifseMensuel * 12 * 0.10) / 2 * (tauxEvaluation / 100)).toFixed(2)}€/an
+                    CIA Évaluation: {((ifseMensuelTotal * 12 * 0.10) / 2 * (tauxEvaluation / 100)).toFixed(2)}€/an
                   </p>
-                  <p className="text-xs text-purple-700 mt-1">Base (50%): {((ifseMensuel * 12 * 0.10) / 2).toFixed(2)}€ × {tauxEvaluation}%</p>
+                  <p className="text-xs text-purple-700 mt-1">Base (50%): {((ifseMensuelTotal * 12 * 0.10) / 2).toFixed(2)}€ × {tauxEvaluation}%</p>
                 </div>
               )}
             </div>
@@ -283,7 +326,7 @@ Calcul détaillé du CIA:
         )}
 
         {/* ÉTAPE 3: Jours d'Absence N-1 */}
-        {ifseMensuel > 0 && tauxEvaluation >= 0 && (
+        {ifseMensuelTotal > 0 && tauxEvaluation >= 0 && (
           <div className={`rounded-xl shadow-md overflow-hidden transition-all ${etapeActive >= 3 ? 'ring-2 ring-red-400' : ''}`}>
             <div className="bg-gradient-to-r from-red-500 to-red-600 text-white p-4">
               <div className="flex items-center gap-3">
@@ -343,10 +386,10 @@ Calcul détaillé du CIA:
                   <div className="p-3 bg-red-100 border border-red-400 rounded-lg">
                     <p className="text-red-800 font-semibold flex items-center gap-2">
                       <CheckCircle className="w-5 h-5" />
-                      CIA Absence: {joursAbsenceN1 < 5 ? ((ifseMensuel * 12 * 0.10) / 2).toFixed(2) : joursAbsenceN1 <= 10 ? ((ifseMensuel * 12 * 0.10) / 2 * 0.5).toFixed(2) : '0.00'}€/an
+                      CIA Absence: {joursAbsenceN1 < 5 ? ((ifseMensuelTotal * 12 * 0.10) / 2).toFixed(2) : joursAbsenceN1 <= 10 ? ((ifseMensuelTotal * 12 * 0.10) / 2 * 0.5).toFixed(2) : '0.00'}€/an
                     </p>
                     <p className="text-xs text-red-700 mt-1">
-                      Base (50%): {((ifseMensuel * 12 * 0.10) / 2).toFixed(2)}€ × {joursAbsenceN1 < 5 ? '100%' : joursAbsenceN1 <= 10 ? '50%' : '0%'}
+                      Base (50%): {((ifseMensuelTotal * 12 * 0.10) / 2).toFixed(2)}€ × {joursAbsenceN1 < 5 ? '100%' : joursAbsenceN1 <= 10 ? '50%' : '0%'}
                     </p>
                   </div>
                 )}
@@ -356,7 +399,7 @@ Calcul détaillé du CIA:
         )}
 
         {/* ÉTAPE 4: RÉSULTAT FINAL */}
-        {ifseMensuel > 0 && (
+        {ifseMensuelTotal > 0 && (
           <div className={`rounded-xl shadow-xl overflow-hidden transition-all ${etapeActive >= 4 ? 'ring-3 ring-orange-400' : ''}`}>
             <div className="bg-gradient-to-r from-orange-500 via-orange-500 to-red-600 text-white p-4">
               <div className="flex items-center gap-3">
@@ -404,12 +447,20 @@ Calcul détaillé du CIA:
                 
                 <div className="space-y-2 text-sm font-mono text-gray-700 bg-slate-50 p-4 rounded-lg">
                   <div className="flex justify-between">
-                    <span>IFSE Mensuel</span>
+                    <span>IFSE de base</span>
                     <span className="font-bold">{ifseMensuel}€</span>
                   </div>
+                  <div className="flex justify-between">
+                    <span>Week-ends valorisés ({weekendServices} × {weekendRate}€)</span>
+                    <span className="font-bold text-blue-600">{(weekendServices * weekendRate).toFixed(2)}€</span>
+                  </div>
                   <div className="border-t pt-2 flex justify-between">
+                    <span>IFSE Mensuel retenu</span>
+                    <span className="font-bold">{ifseMensuelTotal.toFixed(2)}€</span>
+                  </div>
+                  <div className="flex justify-between">
                     <span>IFSE Annuel (× 12 mois)</span>
-                    <span className="font-bold text-blue-600">{resultat.ifseAnnuel}€</span>
+                    <span className="font-bold text-blue-600">{resultat.ifseAnnuel.toFixed(2)}€</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Base CIA (10% × IFSE Annuel)</span>
@@ -450,6 +501,8 @@ Calcul détaillé du CIA:
                 <button
                   onClick={() => {
                     setIfseMensuel(0);
+                    setWeekendServices(0);
+                    setWeekendRate(40);
                     setTauxEvaluation(100);
                     setJoursAbsenceN1(0);
                     setEtapeActive(1);

@@ -1,114 +1,303 @@
-import { useState, useEffect } from 'react'
-import { ChevronRight, CheckCircle2, ArrowLeft, DollarSign } from 'lucide-react'
+import { useState, useMemo } from 'react'
+import { ArrowLeft, DollarSign, Shield, Clock, Calculator } from 'lucide-react'
 
 interface Calculateur13emeProps {
   onClose?: () => void
 }
 
+type AgentType = 'indiciaire' | 'horaire'
+type IndiciaireProfile = 'permanent' | 'medecin' | 'assistante'
+type HoraireBase = 'indice' | 'taux'
+type HorairePeriode = 'juin' | 'novembre'
+
+const INDICIAIRE_SCHEDULE: Record<IndiciaireProfile, { month: string; part: number; note?: string }[]> = {
+  permanent: [
+    { month: 'Juin', part: 6, note: 'Versement principal (6/12)' },
+    { month: 'Novembre', part: 5, note: 'Complément (5/12)' },
+    { month: 'Décembre', part: 1, note: 'Solde (1/12)' },
+  ],
+  medecin: [
+    { month: 'Juin', part: 6, note: 'Versement principal (6/12)' },
+    { month: 'Novembre', part: 6, note: 'Versement complémentaire (6/12)' },
+  ],
+  assistante: [
+    { month: 'Juin', part: 6, note: 'Calendrier spécifique assistantes' },
+    { month: 'Novembre', part: 6 },
+  ],
+}
+
+const HOURS_CAP = 910
+const HOURS_MIN = 455
+const SMIC_MENSUEL = 1801.8
+const DEFAULT_SMIC_REFERENCE = SMIC_MENSUEL
+const INDICE_POINT_VALUE = 4.92278
+const IR_RATE = 0.03
+const HOURS_REFERENCE_TEXT = '910 h = équivalent 6 mois temps complet'
+
+const formatEUR = (value: number) =>
+  value.toLocaleString('fr-FR', {
+    style: 'currency',
+    currency: 'EUR',
+    minimumFractionDigits: 2,
+  })
+
+const sanitizeNumber = (value: string | number) => {
+  if (typeof value === 'number') return value
+  if (!value) return 0
+  return Number(value.replace(',', '.')) || 0
+}
+
+const indiceToEuro = (indice: string) => sanitizeNumber(indice) * INDICE_POINT_VALUE
+
 export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
-  const [currentStep, setCurrentStep] = useState(1)
-  const [contractType, setContractType] = useState('fonc')
-  const [profession, setProfession] = useState('standard')
-  const [salary, setSalary] = useState('')
+  const [agentType, setAgentType] = useState<AgentType>('indiciaire')
+  const [indiciaireProfile, setIndiciaireProfile] = useState<IndiciaireProfile>('permanent')
+  const [im, setIm] = useState('')
+  const [nbi, setNbi] = useState('')
+  const [tempsEmploi, setTempsEmploi] = useState(100)
   const [monthsWorked, setMonthsWorked] = useState(12)
-  const [weeklyHours, setWeeklyHours] = useState('')
-  const [annualHours, setAnnualHours] = useState('')
+  const [anciennete, setAnciennete] = useState(12)
+  const [smicReference, setSmicReference] = useState(DEFAULT_SMIC_REFERENCE)
+  const [rubrique7587, setRubrique7587] = useState('')
+
+  const [horaireBaseType, setHoraireBaseType] = useState<HoraireBase>('indice')
+  const [horaireIM, setHoraireIM] = useState('')
+  const [horaireTaux, setHoraireTaux] = useState('')
+  const [horaireConges, setHoraireConges] = useState(10)
+  const [horaireHours, setHoraireHours] = useState(HOURS_MIN)
+  const [horairePeriode, setHorairePeriode] = useState<HorairePeriode>('juin')
+  const [horaireAnciennete, setHoraireAnciennete] = useState(12)
+
   const [result, setResult] = useState<any>(null)
+  const [showAdvancedParams, setShowAdvancedParams] = useState(false)
+  const [wizardStep, setWizardStep] = useState(1)
 
-  const stepDescriptions = [
-    { num: 1, label: 'Type de contrat', desc: 'Fonctionnaire ou contractuel' },
-    { num: 2, label: 'Infos personnelles', desc: 'Profession et heures travaillées' },
-    { num: 3, label: 'Salaire & mois', desc: 'Salaire mensuel et mois travaillés' },
-    { num: 4, label: 'Résultat', desc: 'Simulation du 13ème mois' },
-  ]
+  const indiciaireTI = indiceToEuro(im)
+  const indiciaireNBIValue = indiceToEuro(nbi)
+  const indiciaireIRValue = indiciaireTI * IR_RATE
+  const horaireTI = indiceToEuro(horaireIM)
+  const horaireIRValue = horaireTI * IR_RATE
 
-  const isStepComplete = (step: number) => {
-    if (step === 1) return contractType !== ''
-    if (step === 2) return profession !== '' && ((contractType === 'fonc' && weeklyHours) || (contractType === 'contractuel' && annualHours))
-    if (step === 3) return salary !== '' && monthsWorked > 0
-    if (step === 4) return result !== null
-    return false
+  const indiciaireEligibility = useMemo(() => {
+    const reasons = [] as string[]
+    if (monthsWorked < 3) reasons.push('Ancienneté insuffisante (< 3 mois)')
+    if (tempsEmploi < 50) reasons.push('Temps de travail < 50%')
+    if (indiciaireProfile === 'assistante' && !rubrique7587) reasons.push('La rubrique 7587 est requise')
+    const base = indiciaireProfile === 'assistante'
+      ? sanitizeNumber(rubrique7587)
+      : indiciaireTI + indiciaireNBIValue
+    if (base <= 0) reasons.push('Saisir un indice majoré et/ou une NBI pour lancer le calcul')
+    return {
+      eligible: reasons.length === 0,
+      reasons,
+    }
+  }, [monthsWorked, tempsEmploi, indiciaireProfile, indiciaireTI, indiciaireNBIValue, rubrique7587])
+
+  const horaireEligibility = useMemo(() => {
+    const reasons = [] as string[]
+    if (horaireAnciennete < 3) reasons.push('Ancienneté insuffisante (< 3 mois)')
+    if (horaireHours < HOURS_MIN) reasons.push(`Nombre d'heures insuffisant (< ${HOURS_MIN}h) sur la période de référence`)
+    if (horaireBaseType === 'indice' && horaireTI <= 0) {
+      reasons.push('Saisir un indice majoré pour un calcul indiciaire')
+    }
+    if (horaireBaseType === 'taux' && sanitizeNumber(horaireTaux) === 0) {
+      reasons.push('Saisir le taux horaire pour le calcul au taux')
+    }
+    return {
+      eligible: reasons.length === 0,
+      reasons,
+    }
+  }, [horaireAnciennete, horaireHours, horaireBaseType, horaireTI, horaireTaux])
+
+  const handleReset = () => {
+    setIndiciaireProfile('permanent')
+    setIm('')
+    setNbi('')
+    setTempsEmploi(100)
+    setMonthsWorked(12)
+    setAnciennete(12)
+    setSmicReference(DEFAULT_SMIC_REFERENCE)
+    setRubrique7587('')
+    setHoraireBaseType('indice')
+    setHoraireIM('')
+    setHoraireTaux('')
+    setHoraireConges(10)
+    setHoraireHours(HOURS_MIN)
+    setHorairePeriode('juin')
+    setHoraireAnciennete(12)
+    setResult(null)
+    setWizardStep(1)
   }
 
-  const progressPercent = Math.round(
-    (Object.values({
-      contract: contractType ? 1 : 0,
-      profession: profession ? 1 : 0,
-      salary: salary ? 1 : 0,
-      result: result ? 1 : 0,
-    }).reduce((a, b) => a + b, 0) / 4) * 100
-  )
+  const handleSelectAgentType = (type: AgentType) => {
+    setAgentType(type)
+    setResult(null)
+    setWizardStep(prev => {
+      if (agentType !== type) return 2
+      return Math.max(prev, 2)
+    })
+  }
 
-  // Auto-advance to next step
-  useEffect(() => {
-    if (currentStep === 1 && contractType) {
-      setTimeout(() => setCurrentStep(2), 300)
-    }
-  }, [contractType, currentStep])
+  const handleSelectIndiciaireProfile = (profile: IndiciaireProfile) => {
+    setIndiciaireProfile(profile)
+    setResult(null)
+    setWizardStep(prev => Math.max(prev, 3))
+  }
 
-  useEffect(() => {
-    if (currentStep === 2 && profession && ((contractType === 'fonc' && weeklyHours) || (contractType === 'contractuel' && annualHours))) {
-      setTimeout(() => setCurrentStep(3), 300)
-    }
-  }, [profession, weeklyHours, annualHours, contractType, currentStep])
+  const handleSelectHoraireBaseType = (base: HoraireBase) => {
+    setHoraireBaseType(base)
+    setResult(null)
+    setWizardStep(prev => Math.max(prev, 3))
+  }
 
-  useEffect(() => {
-    if (currentStep === 3 && salary && monthsWorked > 0) {
-      setTimeout(() => setCurrentStep(4), 300)
-    }
-  }, [salary, monthsWorked, currentStep])
-
-  const calculateThirteen = () => {
-    const sal = parseFloat(salary.toString().replace(',', '.')) || 0
-    const months = Math.max(0, Math.min(12, Number(monthsWorked || 0)))
-    const weekly = parseFloat(weeklyHours || '0')
-    const annualH = parseFloat(annualHours || '0')
-
-    const isContractuel = contractType === 'contractuel'
-    const eligible = isContractuel ? (annualH >= 550) : (weekly > 17.5)
-
+  const computeIndiciaire = () => {
+    const { eligible, reasons } = indiciaireEligibility
     if (!eligible) {
-      setResult({ eligible: false })
+      setResult({ eligible: false, reasons })
       return
     }
 
-    const base = sal
-    let schedule: { month: string; pct: number }[] = []
-    if (profession === 'medecin') {
-      schedule = [
-        { month: 'Juin', pct: 0.5 },
-        { month: 'Novembre', pct: 0.5 },
-        { month: 'Décembre', pct: 0 },
-      ]
-    } else {
-      schedule = [
-        { month: 'Juin', pct: 0.5 },
-        { month: 'Novembre', pct: 0.4 },
-        { month: 'Décembre', pct: 0.1 },
-      ]
+    const tiValue = indiciaireTI
+    const nbiValue = indiciaireNBIValue
+    const irValue = indiciaireIRValue
+    const baseRub = sanitizeNumber(rubrique7587)
+
+    const remunerationBase = indiciaireProfile === 'assistante'
+      ? (baseRub / 2)
+      : (tiValue + nbiValue + irValue)
+
+    const tempsRatio = Math.max(0, Math.min(1, tempsEmploi / 100))
+    const prorataAnnee = Math.max(0, Math.min(1, monthsWorked / 12))
+    const ancienneteRatio = Math.max(0, Math.min(1, anciennete / 12))
+    const prorataGlobal = tempsRatio * prorataAnnee * ancienneteRatio
+
+    const fixedPart = prorataGlobal * (smicReference / 2)
+    const smicVerse = prorataGlobal * smicReference
+    const remunerationProratisee = prorataGlobal * remunerationBase
+    const variableBase = remunerationProratisee - smicVerse
+    const variablePart = variableBase > 0 ? variableBase : 0
+    const total = fixedPart + variablePart
+
+    const schedule = INDICIAIRE_SCHEDULE[indiciaireProfile]
+    const parts = schedule.reduce((sum, item) => sum + item.part, 0)
+    const breakdown = schedule.map(item => ({
+      month: item.month,
+      ratio: item.part / parts,
+      note: item.note,
+      amount: (total * (item.part / parts)),
+    }))
+
+    setResult({
+      eligible: true,
+      family: 'indiciaire',
+      total,
+      compRem: fixedPart,
+      primeSem: variablePart,
+      breakdown,
+      context: {
+        baseMensuelle: remunerationBase,
+        tempsRatio,
+        prorataAnnee,
+        ancienneteRatio,
+        prorataGlobal,
+        tiValue,
+        nbiValue,
+        irValue,
+        fixedPart,
+        variablePart,
+        smicVerse,
+        remunerationProratisee,
+        variableBase,
+      },
+    })
+  }
+
+  const computeHoraire = () => {
+    const { eligible, reasons } = horaireEligibility
+    if (!eligible) {
+      setResult({ eligible: false, reasons })
+      return
     }
 
-    const prorata = months / 12
-    const breakdown = schedule.map(s => ({
-      month: s.month,
-      pct: s.pct,
-      amount: +(base * s.pct * prorata).toFixed(2),
-    }))
-    const total = breakdown.reduce((sum, b) => sum + b.amount, 0)
+    const heuresRetenues = Math.min(horaireHours, HOURS_CAP)
+    const ratioHeures = heuresRetenues / HOURS_CAP
+    const tiHoraire = horaireTI
+    const autoIRHoraire = horaireIRValue
+    const tauxHoraire = sanitizeNumber(horaireTaux)
 
-    setResult({ eligible: true, breakdown, total, prorata })
+    let baseReference = 0
+    let total = 0
+    let compRem = 0
+    let primeSem = 0
+    let baseSixMois = 0
+    let basePS = 0
+    const crBase = smicReference / 2
+    const crHoraireUnit = crBase / HOURS_CAP
+
+    if (horaireBaseType === 'indice') {
+      baseReference = tiHoraire + autoIRHoraire
+      baseSixMois = baseReference / 2
+      basePS = Math.max(baseSixMois - crBase, 0)
+      compRem = ratioHeures * crBase
+      primeSem = ratioHeures * basePS
+      total = compRem + primeSem
+    } else {
+      const tauxMajore = tauxHoraire * (1 + horaireConges / 100)
+      baseReference = tauxMajore
+      const mensualise = tauxMajore * 151.67
+      baseSixMois = mensualise / 2
+      basePS = Math.max(baseSixMois - crBase, 0)
+      compRem = ratioHeures * crBase
+      primeSem = ratioHeures * basePS
+      total = compRem + primeSem
+    }
+
+    setResult({
+      eligible: true,
+      family: 'horaire',
+      total,
+      compRem,
+      primeSem,
+      breakdown: [
+        {
+          month: horairePeriode === 'juin' ? 'Versement de Juin (Réf. Nov → Avril)' : 'Versement de Novembre (Réf. Mai → Octobre)',
+          ratio: ratioHeures,
+          amount: total,
+          note: `${horaireHours} h déclarées sur la période / ${HOURS_CAP} h max`,
+        },
+      ],
+      context: {
+        ratioHeures,
+        baseReference,
+        heuresRetenues,
+        tiHoraire,
+        autoIRHoraire,
+        baseType: horaireBaseType,
+        baseSixMois,
+        basePS,
+        crBase,
+        crHoraireUnit: horaireBaseType === 'indice' ? crHoraireUnit : undefined,
+        tauxHoraireMajore: horaireBaseType === 'taux' ? tauxHoraire * (1 + horaireConges / 100) : undefined,
+      },
+    })
   }
 
-  const reset = () => {
-    setCurrentStep(1)
-    setContractType('fonc')
-    setProfession('standard')
-    setSalary('')
-    setMonthsWorked(12)
-    setWeeklyHours('')
-    setAnnualHours('')
-    setResult(null)
+  const handleCompute = () => {
+    if (agentType === 'indiciaire') {
+      computeIndiciaire()
+    } else {
+      computeHoraire()
+    }
   }
+
+  const eligibility = agentType === 'indiciaire' ? indiciaireEligibility : horaireEligibility
+  const stepLabels = [
+    '1. Choisir mon mode de rémunération',
+    agentType === 'indiciaire'
+      ? '2. Sélectionner mon profil indiciaire'
+      : '2. Sélectionner mon mode horaire',
+    '3. Saisir mes montants et obtenir le résultat',
+  ]
 
   return (
     <div className="flex flex-col h-full">
@@ -136,262 +325,562 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
         </div>
       </div>
 
-      <div className="space-y-6 flex-1 overflow-y-auto p-6 max-w-2xl mx-auto w-full">
-      {/* Progress Bar */}
-      <div className="bg-slate-700/30 border border-slate-600/30 rounded-lg p-4">
-        <div className="flex justify-between mb-3">
-          {stepDescriptions.map(step => (
-            <div key={step.num} className={`text-center flex-1 text-xs ${isStepComplete(step.num) ? 'text-green-400' : currentStep === step.num ? 'text-green-500' : 'text-slate-500'}`}>
-              <div className="font-semibold">{step.label}</div>
-            </div>
-          ))}
+      <div className="space-y-6 flex-1 overflow-y-auto p-6 max-w-3xl mx-auto w-full">
+        <div className="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-4">
+          <div>
+            <p className="text-xs uppercase tracking-wide text-green-100">Mode d'emploi express</p>
+            <h4 className="text-white font-semibold text-lg">Suivez les étapes, l'outil s'occupe du reste</h4>
+            <p className="text-sm text-slate-200 mt-1">Chaque carte se déverrouille après votre choix précédent. Aucun calcul manuel, seulement des questions simples.</p>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            {stepLabels.map((label, index) => {
+              const status = wizardStep === index + 1 ? 'current' : wizardStep > index + 1 ? 'done' : 'todo'
+              const baseClasses = 'flex-1 min-w-[180px] rounded-xl border p-3 text-xs transition-colors'
+              const statusClasses = {
+                current: 'border-emerald-400 bg-emerald-500/20 text-white',
+                done: 'border-emerald-700 bg-emerald-800/40 text-emerald-100',
+                todo: 'border-slate-700 bg-slate-900/40 text-slate-300',
+              }[status]
+              return (
+                <div key={label} className={`${baseClasses} ${statusClasses}`}>
+                  <p className="font-semibold mb-1">Étape {index + 1}</p>
+                  <p>{label}</p>
+                </div>
+              )
+            })}
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+            {[{
+              title: '1 • Identifiez-vous',
+              desc: 'Choisissez "indiciaire" ou "horaire" selon votre paie. Un texte court rappelle la différence.',
+            }, {
+              title: agentType === 'indiciaire' ? '2 • Choisissez votre profil' : '2 • Choisissez votre mode horaire',
+              desc: agentType === 'indiciaire'
+                ? 'Agents permanents, médecins ou assistantes : une carte = un calendrier de versement.'
+                : 'Êtes-vous payé via un indice ou un taux horaire (SMIC, animateurs, etc.) ?'
+            }, {
+              title: '3 • Remplissez & vérifiez',
+              desc: 'On vous affiche seulement les champs utiles puis une synthèse (CR + Prime semestrielle).',
+            }].map((step) => (
+              <div key={step.title} className="bg-slate-900/60 border border-white/10 rounded-xl p-4">
+                <p className="text-sm font-semibold text-white">{step.title}</p>
+                <p className="text-xs text-slate-300 mt-2 leading-relaxed">{step.desc}</p>
+              </div>
+            ))}
+          </div>
         </div>
-        <div className="w-full bg-slate-800/50 rounded-full h-2 overflow-hidden border border-slate-600/30">
-          <div
-            className="h-full bg-gradient-to-r from-green-500 to-emerald-500 transition-all duration-300"
-            style={{ width: `${progressPercent}%` }}
-          />
-        </div>
-        <span className="text-xs font-medium text-slate-400 mt-2 block">{progressPercent}%</span>
-      </div>
 
-      {/* ÉTAPE 1: TYPE DE CONTRAT */}
-      <div className={`transition-all duration-300 ${currentStep === 1 ? 'ring-2 ring-blue-400/50' : ''} bg-gradient-to-br from-slate-800/60 to-slate-800/40 rounded-xl p-6 border border-slate-700/50 hover:border-slate-600/50`}>
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-sm">
-              1
-            </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <button
+            onClick={() => handleSelectAgentType('indiciaire')}
+            className={`flex items-center gap-3 rounded-xl border p-4 text-left transition-all ${agentType === 'indiciaire' ? 'bg-emerald-600/20 border-emerald-400 text-white' : 'bg-slate-800/50 border-slate-600 text-slate-200'}`}
+          >
+            <Shield className="w-10 h-10" />
             <div>
-              <h4 className="text-lg font-semibold text-white">Type de contrat</h4>
-              <p className="text-xs text-slate-400">Choisissez votre statut professionnel</p>
+              <p className="font-semibold">Agents permanents indiciaires</p>
+              <p className="text-xs opacity-70">IM + NBI + IR • Assistantes maternelles • Médecins</p>
             </div>
-          </div>
-          {contractType && <CheckCircle2 className="w-5 h-5 text-green-400" />}
-        </div>
-
-        <div className="space-y-2">
-          {[
-            { value: 'fonc', label: 'Fonctionnaire / Titulaire', desc: 'Vous travaillez à temps plein' },
-            { value: 'contractuel', label: 'Contractuel', desc: 'Vous êtes en contrat de travail' },
-          ].map(option => (
-            <button
-              key={option.value}
-              onClick={() => setContractType(option.value)}
-              className={`w-full p-4 rounded-lg text-left transition-all border ${
-                contractType === option.value
-                  ? 'bg-blue-500/80 border-blue-400 shadow-lg ring-2 ring-blue-300'
-                  : 'bg-slate-700/40 border-slate-600/30 hover:bg-slate-700/60 hover:border-slate-500/50'
-              }`}
-            >
-              <p className={`font-semibold text-base ${contractType === option.value ? 'text-white' : 'text-slate-200'}`}>
-                {option.label}
-              </p>
-              <p className={`text-xs mt-1 ${contractType === option.value ? 'text-blue-100' : 'text-slate-400'}`}>
-                {option.desc}
-              </p>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* ÉTAPE 2: INFOS PERSONNELLES */}
-      {contractType && (
-        <div className={`transition-all duration-300 ${currentStep === 2 ? 'ring-2 ring-cyan-400/50' : ''} bg-gradient-to-br from-slate-800/60 to-slate-800/40 rounded-xl p-6 border border-slate-700/50 hover:border-slate-600/50`}>
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-teal-500 flex items-center justify-center text-white font-bold text-sm">
-                2
-              </div>
-              <div>
-                <h4 className="text-lg font-semibold text-white">Infos personnelles</h4>
-                <p className="text-xs text-slate-400">Profession et heures travaillées</p>
-              </div>
-            </div>
-            {profession && ((contractType === 'fonc' && weeklyHours) || (contractType === 'contractuel' && annualHours)) && <CheckCircle2 className="w-5 h-5 text-green-400" />}
-          </div>
-
-          <div className="space-y-4">
+          </button>
+          <button
+            onClick={() => handleSelectAgentType('horaire')}
+            className={`flex items-center gap-3 rounded-xl border p-4 text-left transition-all ${agentType === 'horaire' ? 'bg-cyan-600/20 border-cyan-400 text-white' : 'bg-slate-800/50 border-slate-600 text-slate-200'}`}
+          >
+            <Clock className="w-10 h-10" />
             <div>
-              <label className="text-sm text-slate-300 mb-2 block font-medium">Profession</label>
-              <select
-                value={profession}
-                onChange={(e) => setProfession(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600/30 rounded-lg text-white text-sm focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 outline-none"
-              >
-                <option value="standard">Standard</option>
-                <option value="medecin">Médecin</option>
-              </select>
+              <p className="font-semibold">Agents rémunérés à l'heure</p>
+              <p className="text-xs opacity-70">Référence 455h / période • Limite 910h</p>
             </div>
-
-            {contractType === 'fonc' ? (
-              <div>
-                <label className="text-sm text-slate-300 mb-2 block font-medium">Heures travaillées par semaine</label>
-                <input
-                  type="number"
-                  step="0.25"
-                  value={weeklyHours}
-                  onChange={(e) => setWeeklyHours(e.target.value)}
-                  placeholder="ex: 35"
-                  className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600/30 rounded-lg text-white text-sm focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 outline-none"
-                />
-                <p className="text-xs text-slate-400 mt-1">⚠️ Doit être {'>'} 17.5h pour être éligible</p>
-              </div>
-            ) : (
-              <div>
-                <label className="text-sm text-slate-300 mb-2 block font-medium">Heures annuelles de travail</label>
-                <input
-                  type="number"
-                  step="1"
-                  value={annualHours}
-                  onChange={(e) => setAnnualHours(e.target.value)}
-                  placeholder="ex: 600"
-                  className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600/30 rounded-lg text-white text-sm focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 outline-none"
-                />
-                <p className="text-xs text-slate-400 mt-1">⚠️ Doit être ≥ 550h pour être éligible</p>
-              </div>
-            )}
-          </div>
+          </button>
         </div>
-      )}
 
-      {/* ÉTAPE 3: SALAIRE & MOIS */}
-      {contractType && profession && ((contractType === 'fonc' && weeklyHours) || (contractType === 'contractuel' && annualHours)) && (
-        <div className={`transition-all duration-300 ${currentStep === 3 ? 'ring-2 ring-teal-400/50' : ''} bg-gradient-to-br from-slate-800/60 to-slate-800/40 rounded-xl p-6 border border-slate-700/50 hover:border-slate-600/50`}>
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-teal-500 to-green-500 flex items-center justify-center text-white font-bold text-sm">
-                3
+        {wizardStep >= 2 && (
+          agentType === 'indiciaire' ? (
+            <div className="bg-slate-900/60 border border-slate-700 rounded-2xl p-6 space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-emerald-200">Étape 2</p>
+                  <p className="text-sm text-white font-semibold">Sélectionnez votre profil indiciaire</p>
+                </div>
+                {wizardStep < 3 && <p className="text-xs text-slate-400">Choisissez un profil pour afficher la suite</p>}
               </div>
-              <div>
-                <h4 className="text-lg font-semibold text-white">Salaire & mois travaillés</h4>
-                <p className="text-xs text-slate-400">Informations financières</p>
+              <div className="flex flex-wrap gap-3">
+                {([
+                  { value: 'permanent', label: 'Agent permanent indiciaire', desc: 'Versement 6/12 + 5/12 + 1/12' },
+                  { value: 'medecin', label: 'Médecin indiciaire', desc: 'Deux versements 6/12' },
+                  { value: 'assistante', label: 'Assistante maternelle', desc: 'Montant basé sur rubrique 7587' },
+                ] as const).map(option => (
+                  <button
+                    key={option.value}
+                    onClick={() => handleSelectIndiciaireProfile(option.value)}
+                    className={`flex-1 min-w-[220px] border rounded-xl p-4 text-left transition-all ${indiciaireProfile === option.value ? 'bg-emerald-600/20 border-emerald-400 text-white' : 'bg-slate-900/40 border-slate-700 text-slate-200'}`}
+                  >
+                    <p className="text-sm font-semibold">{option.label}</p>
+                    <p className="text-xs opacity-70">{option.desc}</p>
+                  </button>
+                ))}
               </div>
             </div>
-            {salary && monthsWorked > 0 && <CheckCircle2 className="w-5 h-5 text-green-400" />}
+          ) : (
+            <div className="bg-slate-900/60 border border-slate-700 rounded-2xl p-6 space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-cyan-200">Étape 2</p>
+                  <p className="text-sm text-white font-semibold">Choisissez votre mode de rémunération horaire</p>
+                </div>
+                {wizardStep < 3 && <p className="text-xs text-slate-400">Sélectionnez un mode pour accéder aux champs</p>}
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {[{
+                  value: 'indice',
+                  title: 'Base IM + IR',
+                  desc: 'Indice converti en euros puis proratisé sur 910 h',
+                }, {
+                  value: 'taux',
+                  title: 'Base taux horaire',
+                  desc: 'Taux + congés → mensualisé → base 6 mois (SMIC/2 + PS)',
+                }].map(option => (
+                  <button
+                    key={option.value}
+                    onClick={() => handleSelectHoraireBaseType(option.value as HoraireBase)}
+                    className={`text-left border rounded-xl p-4 transition-all ${horaireBaseType === option.value ? 'bg-cyan-600/10 border-cyan-400 text-white' : 'bg-slate-900/40 border-slate-700 text-slate-200'}`}
+                  >
+                    <p className="text-sm font-semibold">{option.title}</p>
+                    <p className="text-xs opacity-70 mt-1">{option.desc}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )
+        )}
+
+        {wizardStep === 2 && (
+          <div className="bg-amber-900/20 border border-amber-600/30 rounded-xl p-4 text-xs text-amber-100">
+            Sélectionnez un profil dans l'étape 2 pour faire apparaître les champs détaillés.
           </div>
+        )}
 
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm text-slate-300 mb-2 block font-medium">Salaire brut mensuel (€)</label>
-              <input
-                type="text"
-                inputMode="decimal"
-                value={salary}
-                onChange={(e) => setSalary(e.target.value)}
-                placeholder="ex: 2500"
-                className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600/30 rounded-lg text-white text-sm focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="text-sm text-slate-300 mb-2 block font-medium">Mois travaillés en 2024 (0-12)</label>
-              <div className="flex gap-2">
-                <input
-                  type="number"
-                  min="0"
-                  max="12"
-                  value={monthsWorked}
-                  onChange={(e) => setMonthsWorked(Math.max(0, Math.min(12, Number(e.target.value || 0))))}
-                  className="flex-1 px-3 py-2 bg-slate-700/50 border border-slate-600/30 rounded-lg text-white text-sm focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 outline-none"
-                />
-                <span className="px-3 py-2 bg-slate-700/30 border border-slate-600/30 rounded-lg text-slate-300 text-sm">
-                  {monthsWorked}/12
-                </span>
+        {wizardStep >= 3 && (
+          agentType === 'indiciaire' ? (
+            <div className="bg-gradient-to-br from-slate-900/60 to-slate-800/60 border border-slate-700 rounded-2xl p-6 space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-emerald-200">Étape 3</p>
+                  <p className="text-sm text-slate-200">Saisissez vos données indiciaires</p>
+                </div>
+                <p className="text-xs text-slate-400">Profil : <span className="text-white font-semibold capitalize">{indiciaireProfile}</span></p>
               </div>
-            </div>
-          </div>
-        </div>
-      )}
 
-      {/* ÉTAPE 4: RÉSULTAT */}
-      {contractType && profession && salary && monthsWorked > 0 && (
-        <div className={`transition-all duration-300 ${currentStep === 4 ? 'ring-2 ring-green-400/50' : ''} bg-gradient-to-br from-green-900/40 via-emerald-900/40 to-teal-900/40 rounded-xl p-6 border border-green-500/40 shadow-lg`}>
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center text-white font-bold text-sm">
-                4
-              </div>
-              <div>
-                <h4 className="text-lg font-semibold text-white">Résultat estimé</h4>
-                <p className="text-xs text-slate-300">Simulation du 13ème mois</p>
-              </div>
-            </div>
-            <ChevronRight className="w-6 h-6 text-green-400" />
-          </div>
-
-          <div className="space-y-4">
-            <button
-              onClick={calculateThirteen}
-              disabled={result !== null}
-              className={`w-full px-4 py-3 rounded-lg font-medium transition-all ${
-                result === null
-                  ? 'bg-green-600/70 hover:bg-green-700 text-white shadow-lg'
-                  : 'bg-green-700/40 text-green-200'
-              }`}
-            >
-              {result === null ? '🧮 Calculer le 13ème mois' : '✓ Calcul effectué'}
-            </button>
-
-            {result && result.eligible === false && (
-              <div className="p-4 bg-amber-900/30 border border-amber-500/40 rounded-lg">
-                <p className="text-sm text-amber-200 font-medium mb-1">❌ Non éligible</p>
-                <p className="text-xs text-amber-200">
-                  {contractType === 'fonc'
-                    ? 'Vous devez travailler plus de 17h30 par semaine pour être éligible.'
-                    : 'Vous devez travailler au minimum 550 heures annuelles pour être éligible.'}
-                </p>
-              </div>
-            )}
-
-            {result && result.eligible === true && (
-              <div className="space-y-4">
-                <div className="bg-slate-800/40 border border-green-500/30 rounded-lg p-4">
-                  <p className="text-xs text-green-300 mb-3">📊 Ventilation du 13ème mois</p>
-                  <div className="space-y-2">
-                    {result.breakdown.map((item: any, idx: number) => (
-                      <div key={idx} className="flex justify-between items-center">
-                        <div>
-                          <p className="text-sm text-slate-200">{item.month}</p>
-                          <p className="text-xs text-slate-400">{(item.pct * 100).toFixed(0)}% du salaire</p>
-                        </div>
-                        <p className="text-lg font-bold text-green-300">{item.amount.toFixed(2)}€</p>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="border-t border-green-500/20 mt-3 pt-3">
-                    <div className="flex justify-between items-center">
-                      <p className="text-sm font-semibold text-slate-200">Total 13ème mois</p>
-                      <p className="text-2xl font-bold text-green-300">{result.total.toFixed(2)}€</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {indiciaireProfile !== 'assistante' ? (
+                  <>
+                    <div>
+                      <label className="text-xs uppercase tracking-wide text-slate-400">Indice Majoré (IM)</label>
+                      <input
+                        value={im}
+                        onChange={(e) => setIm(e.target.value)}
+                        inputMode="decimal"
+                        className="w-full mt-1 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white"
+                        placeholder="ex : 1800"
+                      />
+                      <p className="text-xs text-slate-400 mt-1">Conversion automatique : indice × 4,92278.</p>
                     </div>
-                    <p className="text-xs text-green-200 mt-1">
-                      Prorata appliqué: {(result.prorata * 100).toFixed(0)}%
-                    </p>
+                    <div>
+                      <label className="text-xs uppercase tracking-wide text-slate-400">Nouvelle Bonification Indiciaire (NBI)</label>
+                      <input
+                        value={nbi}
+                        onChange={(e) => setNbi(e.target.value)}
+                        inputMode="decimal"
+                        className="w-full mt-1 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white"
+                        placeholder="ex : 150"
+                      />
+                      <p className="text-xs text-slate-400 mt-1">Saisir l'indice NBI (conversion × 4,92278 utilisée dans le calcul).</p>
+                    </div>
+                    <div className="md:col-span-2 bg-white/5 border border-white/10 rounded-lg p-3 text-xs text-slate-200">
+                      <p className="font-semibold text-white">Traitement indiciaire (TI) converti : <span className="text-emerald-300">{formatEUR(indiciaireTI)}</span></p>
+                      <p className="mt-1">Indemnité de résidence (3% du TI) : <span className="text-emerald-300">{formatEUR(indiciaireIRValue)}</span></p>
+                      <p className="text-slate-400 mt-1">Le calcul applique automatiquement 3% du TI conformément à la procédure.</p>
+                    </div>
+                  </>
+                ) : (
+                  <div className="md:col-span-2">
+                    <label className="text-xs uppercase tracking-wide text-slate-400">Montant rubrique 7587 en paie</label>
+                    <input
+                      value={rubrique7587}
+                      onChange={(e) => setRubrique7587(e.target.value)}
+                      inputMode="decimal"
+                      className="w-full mt-1 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white"
+                      placeholder="Montant brut rubrique 7587"
+                    />
+                    <p className="text-xs text-slate-400 mt-1">Le 13ème mois = rubrique 7587 / 2 (proratisé)</p>
                   </div>
-                </div>
+                )}
 
-                <div className="bg-gradient-to-r from-emerald-500/30 via-teal-500/30 to-green-500/30 border border-emerald-500/50 rounded-lg p-4">
-                  <p className="text-xs text-emerald-200 mb-2">💡 À titre informatif</p>
-                  <p className="text-sm text-slate-200">
-                    Ce montant est une estimation basée sur les informations saisies. Pour une confirmation officielle, consultez votre RH.
-                  </p>
+              <div>
+                <label className="text-xs uppercase tracking-wide text-slate-400">Temps de travail (%)</label>
+                <input
+                  type="range"
+                  min={50}
+                  max={100}
+                  value={tempsEmploi}
+                  onChange={(e) => setTempsEmploi(Number(e.target.value))}
+                  className="w-full"
+                />
+                <p className="text-xs text-slate-200 font-semibold">{tempsEmploi}%</p>
+              </div>
+              <div>
+                <label className="text-xs uppercase tracking-wide text-slate-400">Mois travaillés sur l'année</label>
+                <input
+                  type="number"
+                  min={0}
+                  max={12}
+                  value={monthsWorked}
+                  onChange={(e) => setMonthsWorked(Math.max(0, Math.min(12, Number(e.target.value) || 0)))}
+                  className="w-full mt-1 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white"
+                />
+                <p className="text-xs text-slate-400 mt-1">{monthsWorked}/12 mois</p>
+              </div>
+              <div>
+                <label className="text-xs uppercase tracking-wide text-slate-400">Ancienneté dans le grade (mois)</label>
+                <input
+                  type="number"
+                  min={0}
+                  max={12}
+                  value={anciennete}
+                  onChange={(e) => setAnciennete(Math.max(0, Math.min(12, Number(e.target.value) || 0)))}
+                  className="w-full mt-1 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white"
+                />
+              </div>
+              <div>
+                <label className="text-xs uppercase tracking-wide text-slate-400">Référence SMIC (CR)</label>
+                <input
+                  type="number"
+                  min={0}
+                  value={smicReference}
+                  onChange={(e) => setSmicReference(Number(e.target.value) || 0)}
+                  className="w-full mt-1 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white"
+                />
+                <p className="text-xs text-slate-400 mt-1">SMIC mensuel actuel (1 801,80 €) utilisé pour le "Complément de rémunération" – modifiable en cas de revalorisation.</p>
+              </div>
+            </div>
+          </div>
+          ) : (
+            <div className="bg-gradient-to-br from-slate-900/60 to-slate-800/60 border border-slate-700 rounded-2xl p-6 space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-cyan-200">Étape 3</p>
+                  <p className="text-sm text-slate-200">Renseignez vos heures et montants</p>
+                </div>
+                <p className="text-xs text-slate-400">Mode retenu : <span className="text-white font-semibold">{horaireBaseType === 'indice' ? 'Indice + IR' : 'Taux horaire'}</span></p>
+              </div>
+
+              <div className="bg-white/5 border border-white/10 rounded-lg p-4 text-xs text-slate-200 space-y-2">
+                <p className="text-sm font-semibold text-white">Cas gérés pour les agents horaires</p>
+                <ul className="list-disc pl-4 space-y-1">
+                  <li>Rémunération sur IM : montant = (IM + IR) converti en euros × (heures retenues / 910 h).</li>
+                  <li>Rémunération au taux SMIC : taux horaire majoré congés → mensualisé (× 151,67) → base 6 mois (÷ 2).</li>
+                </ul>
+                <p>Pour le taux SMIC : part CR = SMIC/2 (ex : 900,9 €) proratisée, part PS = (base 6 mois - SMIC/2) proratisée.</p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs uppercase tracking-wide text-slate-400">Période de versement</label>
+                  <select
+                    value={horairePeriode}
+                    onChange={(e) => setHorairePeriode(e.target.value as HorairePeriode)}
+                    className="w-full mt-1 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white"
+                  >
+                    <option value="juin">Juin (heures Nov → Avril)</option>
+                    <option value="novembre">Novembre (heures Mai → Octobre)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs uppercase tracking-wide text-slate-400">Ancienneté sur la période (mois)</label>
+                  <input
+                    type="number"
+                    min={0}
+                    max={12}
+                    value={horaireAnciennete}
+                    onChange={(e) => setHoraireAnciennete(Math.max(0, Math.min(12, Number(e.target.value) || 0)))}
+                    className="w-full mt-1 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white"
+                  />
                 </div>
               </div>
-            )}
 
-            <button
-              onClick={reset}
-              className="w-full px-4 py-2 bg-slate-700/50 hover:bg-slate-700/70 text-slate-300 rounded-lg transition-all font-light text-sm"
-            >
-              ↻ Nouvelle simulation
-            </button>
-          </div>
-        </div>
-      )}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="md:col-span-2">
+                  <label className="text-xs uppercase tracking-wide text-slate-400">Heures rémunérées dans la période (min {HOURS_MIN}h)</label>
+                  <input
+                    type="number"
+                    min={0}
+                    value={horaireHours}
+                    onChange={(e) => setHoraireHours(Math.max(0, Number(e.target.value) || 0))}
+                    className="w-full mt-1 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white"
+                  />
+                  <p className="text-xs text-slate-400 mt-1">{HOURS_REFERENCE_TEXT}</p>
+                </div>
 
-      {/* Bouton Retour - removed as header button is sufficient */}
+                {horaireBaseType === 'indice' ? (
+                  <>
+                    <div>
+                      <label className="text-xs uppercase tracking-wide text-slate-400">Indice majoré (IM)</label>
+                      <input
+                        value={horaireIM}
+                        onChange={(e) => setHoraireIM(e.target.value)}
+                        inputMode="decimal"
+                        className="w-full mt-1 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white"
+                      />
+                      <p className="text-xs text-slate-400 mt-1">Indice converti en euros via 4,92278 pour le calcul.</p>
+                    </div>
+                    <div className="md:col-span-2 bg-white/5 border border-white/10 rounded-lg p-3 text-xs text-slate-200">
+                      <p className="font-semibold text-white">TI converti à partir de l'indice : <span className="text-emerald-300">{formatEUR(horaireTI)}</span></p>
+                      <p className="mt-1">IR appliquée automatiquement (3% du TI) : <span className="text-emerald-300">{formatEUR(horaireIRValue)}</span></p>
+                      <p className="text-slate-400 mt-1">Les montants IM et IR sont déduits de l'indice saisi conformément à la procédure.</p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div>
+                      <label className="text-xs uppercase tracking-wide text-slate-400">Taux horaire brut (€)</label>
+                      <input
+                        value={horaireTaux}
+                        onChange={(e) => setHoraireTaux(e.target.value)}
+                        inputMode="decimal"
+                        className="w-full mt-1 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs uppercase tracking-wide text-slate-400">Majoration congés (%)</label>
+                      <input
+                        type="number"
+                        value={horaireConges}
+                        onChange={(e) => setHoraireConges(Number(e.target.value) || 0)}
+                        className="w-full mt-1 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white"
+                      />
+                      <p className="text-xs text-slate-400 mt-1">Méthode : (taux × (1 + congés%)) × 151,67 ÷ 2 → base 6 mois, puis CR = SMIC/2, PS = base 6 mois - CR.</p>
+                    </div>
+                  </>
+                )}
+                <div>
+                  <label className="text-xs uppercase tracking-wide text-slate-400">Référence SMIC (CR)</label>
+                  <input
+                    type="number"
+                    value={smicReference}
+                    onChange={(e) => setSmicReference(Number(e.target.value) || 0)}
+                    className="w-full mt-1 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white"
+                  />
+                  <p className="text-xs text-slate-400 mt-1">SMIC mensuel (1 801,80 €) servant de base au "Complément de rémunération".</p>
+                </div>
+              </div>
+            </div>
+          )
+        )}
 
+        {wizardStep >= 3 && (
+          <>
+            <div className="bg-slate-900/60 border border-slate-700 rounded-2xl p-5 space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-slate-400">Paramètres avancés RH</p>
+                  <p className="text-sm text-white">Ancienneté verrouillée & Référence SMIC</p>
+                </div>
+                <button
+                  onClick={() => setShowAdvancedParams((prev) => !prev)}
+                  className="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-600 text-slate-100 hover:bg-slate-800"
+                >
+                  {showAdvancedParams ? 'Masquer les paramètres' : 'Afficher les paramètres'}
+                </button>
+              </div>
+              {!showAdvancedParams && (
+                <p className="text-xs text-slate-400">
+                  Ancienneté dans le grade fixée à {anciennete} mois • SMIC de référence : {formatEUR(smicReference)} (ajustable par les RH en cas de revalorisation).
+                </p>
+              )}
+              {showAdvancedParams && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {agentType === 'indiciaire' && (
+                    <div>
+                      <label className="text-xs uppercase tracking-wide text-slate-400">Ancienneté dans le grade (mois)</label>
+                      <input
+                        type="number"
+                        min={0}
+                        max={12}
+                        value={anciennete}
+                        onChange={(e) => setAnciennete(Math.max(0, Math.min(12, Number(e.target.value) || 0)))}
+                        className="w-full mt-1 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white"
+                      />
+                    </div>
+                  )}
+                  <div className={agentType === 'indiciaire' ? '' : 'md:col-span-2'}>
+                    <label className="text-xs uppercase tracking-wide text-slate-400">Référence SMIC (CR)</label>
+                    <input
+                      type="number"
+                      min={0}
+                      value={smicReference}
+                      onChange={(e) => setSmicReference(Number(e.target.value) || 0)}
+                      className="w-full mt-1 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white"
+                    />
+                    <p className="text-xs text-slate-400 mt-1">SMIC mensuel actuel (1 801,80 €) utilisé pour le "Complément de rémunération" – modifiable en cas de revalorisation.</p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="bg-gradient-to-br from-green-900/40 via-emerald-900/40 to-teal-900/40 border border-emerald-600/40 rounded-2xl p-6 space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-emerald-200 uppercase tracking-wide">Étape finale</p>
+                  <h4 className="text-xl font-semibold text-white">Calcul du 13ème mois</h4>
+                </div>
+                <Calculator className="w-10 h-10 text-emerald-300" />
+              </div>
+
+              {eligibility.reasons.length > 0 && (
+                <div className="bg-amber-900/30 border border-amber-500/30 rounded-lg p-4 text-sm text-amber-100">
+                  <p className="font-semibold mb-2">Conditions à respecter :</p>
+                  <ul className="space-y-1 text-xs">
+                    {eligibility.reasons.map(reason => (
+                      <li key={reason}>• {reason}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              <button
+                onClick={handleCompute}
+                className={`w-full px-4 py-3 rounded-lg font-semibold transition-all ${eligibility.eligible ? 'bg-emerald-500 hover:bg-emerald-600 text-white' : 'bg-slate-600/50 text-slate-300 cursor-not-allowed'}`}
+                disabled={!eligibility.eligible}
+              >
+                {eligibility.eligible ? '🧮 Lancer le calcul conforme à la procédure' : 'Complétez les conditions pour calculer'}
+              </button>
+
+              {result && (
+                <div className="space-y-4">
+                  {!result.eligible && (
+                    <div className="bg-rose-900/40 border border-rose-500/40 rounded-xl p-4 text-sm text-rose-100">
+                      <p className="font-semibold">Situations bloquantes</p>
+                      <ul className="mt-2 space-y-1">
+                        {result.reasons?.map((reason: string) => (
+                          <li key={reason}>• {reason}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {result.eligible && (
+                    <div className="space-y-4">
+                      <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                        <p className="text-xs uppercase tracking-wide text-green-200">Total estimé du 13ème mois</p>
+                        <p className="text-4xl font-bold text-white mt-2">{formatEUR(result.total)}</p>
+                        <div className="grid grid-cols-2 gap-3 mt-4 text-sm text-slate-200">
+                          <div>
+                            <p className="text-xs text-slate-400">Complément de rémunération (CR)</p>
+                            <p className="font-semibold text-green-200">{formatEUR(result.compRem)}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-slate-400">Prime semestrielle (PS)</p>
+                            <p className="font-semibold text-green-200">{formatEUR(result.primeSem)}</p>
+                          </div>
+                        </div>
+                        {agentType === 'indiciaire' ? (
+                          <p className="text-xs text-slate-400 mt-3">
+                            Part fixe = (SMIC brut ÷ 2) proratisé ; Part variable = dépassement du total IM + NBI + IR sur le SMIC versé, proratisé.
+                          </p>
+                        ) : (
+                          <p className="text-xs text-slate-400 mt-3">
+                            Pour les agents horaires, l'intégralité du montant est basée sur IM+IR ou sur le taux horaire majoré congés et proratisée selon les heures rémunérées.
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="bg-slate-900/60 border border-slate-700 rounded-xl p-4 space-y-3">
+                        <p className="text-xs uppercase tracking-wide text-slate-400">Ventilation par échéance</p>
+                        <div className="space-y-2">
+                          {result.breakdown?.map((item: any) => (
+                            <div key={item.month} className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/10">
+                              <div>
+                                <p className="text-sm text-white font-semibold">{item.month}</p>
+                                <p className="text-xs text-slate-300">{(item.ratio * 100).toFixed(1)}% • {item.note || 'Part réglementaire'}</p>
+                              </div>
+                              <p className="text-lg font-bold text-emerald-300">{formatEUR(item.amount)}</p>
+                            </div>
+                          ))}
+                        </div>
+                        {result.context && (
+                          <div className="text-xs text-slate-400 border-t border-slate-700 pt-3">
+                            {agentType === 'indiciaire' ? (
+                              <p>
+                                Prorata année : {(result.context.prorataAnnee * 100).toFixed(0)}% • Temps de travail : {(result.context.tempsRatio * 100).toFixed(0)}%
+                                {typeof result.context.tiValue === 'number' && (
+                                  <>
+                                    {' '}• TI converti : {formatEUR(result.context.tiValue)} • NBI convertie : {formatEUR(result.context.nbiValue || 0)} • IR 3% : {formatEUR(result.context.irValue || 0)}
+                                  </>
+                                )}
+                              </p>
+                            ) : (
+                              <p>
+                                Heures retenues : {(result.context.ratioHeures * 100).toFixed(0)}% de la référence ({HOURS_CAP}h)
+                                {result.context.baseType === 'indice' && (
+                                  <>
+                                    {' '}• Base IM + IR : {formatEUR(result.context.baseReference || 0)}
+                                    {' '}• Base 6 mois : {formatEUR(result.context.baseSixMois || 0)}
+                                    {' '}• CR horaire : {formatEUR(result.context.crHoraireUnit || 0)} /h
+                                    {' '}• Base PS : {formatEUR(result.context.basePS || 0)}
+                                  </>
+                                )}
+                                {result.context.baseType === 'taux' && (
+                                  <>
+                                    {' '}• Base taux horaire + congés : {formatEUR(result.context.baseReference || 0)} /h
+                                  </>
+                                )}
+                              </p>
+                            )}
+                            {agentType === 'indiciaire' && typeof result.context.fixedPart === 'number' && (
+                              <p className="mt-1">
+                                Part fixe (SMIC/2 proratisé) : {formatEUR(result.context.fixedPart)} • Part variable : {formatEUR(result.context.variablePart || 0)} • SMIC versé : {formatEUR(result.context.smicVerse || 0)} • IM+NBI+IR proratisés : {formatEUR(result.context.remunerationProratisee || 0)}
+                              </p>
+                            )}
+                            {agentType === 'horaire' && (
+                              <div className="mt-1 space-y-1">
+                                {result.context.baseType === 'indice' ? (
+                                  <p>
+                                    Cas calculé : IM + IR • Montant converti : {formatEUR(result.context.baseReference || 0)} • Heures retenues : {result.context.heuresRetenues}
+                                  </p>
+                                ) : (
+                                  <>
+                                    <p>
+                                      Cas calculé : Taux horaire + congés • Taux majoré : {formatEUR(result.context.tauxHoraireMajore || 0)} /h • Heures retenues : {result.context.heuresRetenues}
+                                    </p>
+                                    <p>
+                                      Base 6 mois : {formatEUR(result.context.baseSixMois || 0)} • Base CR (SMIC/2) : {formatEUR(result.context.crBase || 0)} • Base PS : {formatEUR(result.context.basePS || 0)}
+                                    </p>
+                                  </>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="bg-gradient-to-r from-emerald-600/30 via-teal-600/30 to-green-600/30 border border-emerald-500/40 rounded-xl p-4 text-sm text-white">
+                        <p className="font-semibold">⚠️ À communiquer à votre gestionnaire RH</p>
+                        <p className="text-xs mt-2 text-emerald-50">
+                          Ce simulateur reprend la procédure « Gestion du 13ème mois – indiciaires & horaires » (MAJ 01/06/2025). Pour validation officielle, merci de transmettre les éléments justificatifs (tableau heures, rubrique 7587, etc.).
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  <button
+                    onClick={handleReset}
+                    className="w-full px-4 py-2 rounded-lg border border-slate-600 text-slate-200 text-sm hover:bg-slate-800"
+                  >
+                    ↻ Nouvelle simulation
+                  </button>
+                </div>
+              )}
+            </div>
+          </>
+        )}
       </div>
     </div>
   )
