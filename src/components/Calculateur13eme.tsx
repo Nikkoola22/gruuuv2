@@ -320,14 +320,15 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
         </div>
       </div>
 
-      <div className="space-y-6 flex-1 overflow-y-auto p-6 max-w-3xl mx-auto w-full">
-        <div className="grid grid-cols-1 gap-4">
-          <div>
-            <label className="text-xs uppercase tracking-wide text-slate-400">Quel est votre mode de rémunération ?</label>
+      <div className="space-y-6 flex-1 overflow-y-auto p-6 max-w-md mx-auto w-full">
+        <div className="grid grid-cols-1 gap-6 mb-6">
+          <div className="text-center">
+            <h4 className="text-base font-semibold text-white mb-3">Étape 1 - Mode de rémunération</h4>
+            <label className="text-sm uppercase tracking-wide text-slate-300">Quel est votre mode ?</label>
             <select
               value={agentType}
               onChange={(e) => handleSelectAgentType(e.target.value as AgentType)}
-              className="w-full mt-2 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white"
+              className="w-full mt-3 px-4 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white text-center"
             >
               <option value="">Choisir...</option>
               <option value="indiciaire">Indiciaires</option>
@@ -337,17 +338,18 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
         </div>
 
         {agentType && (
-          <div className="grid grid-cols-1 gap-4">
-            <div>
-              <label className="text-xs uppercase tracking-wide text-slate-400">
-                {agentType === 'indiciaire' ? 'Quel est votre profil ?' : 'Mode de rémunération horaire'}
+          <div className="grid grid-cols-1 gap-6">
+            <div className="text-center">
+              <h4 className="text-base font-semibold text-white mb-3">Étape 2 - {agentType === 'indiciaire' ? 'Profil' : 'Mode horaire'}</h4>
+              <label className="text-sm uppercase tracking-wide text-slate-300">
+                {agentType === 'indiciaire' ? 'Quel est votre profil ?' : 'Choisissez votre mode'}
               </label>
               <select
                 value={agentType === 'indiciaire' ? indiciaireProfile : horaireBaseType}
                 onChange={(e) => agentType === 'indiciaire' 
                   ? handleSelectIndiciaireProfile(e.target.value as IndiciaireProfile)
                   : handleSelectHoraireBaseType(e.target.value as HoraireBase)}
-                className="w-full mt-2 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white"
+                className="w-full mt-3 px-4 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white text-center"
               >
                 <option value="">Choisir...</option>
                 {agentType === 'indiciaire' ? (
