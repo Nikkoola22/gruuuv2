@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { ArrowLeft, DollarSign, Shield, Clock, Calculator } from 'lucide-react'
+import { ArrowLeft, DollarSign, Calculator } from 'lucide-react'
 
 interface Calculateur13emeProps {
   onClose?: () => void
@@ -371,87 +371,48 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <button
-            onClick={() => handleSelectAgentType('indiciaire')}
-            className={`flex items-center gap-3 rounded-xl border p-4 text-left transition-all ${agentType === 'indiciaire' ? 'bg-emerald-600/20 border-emerald-400 text-white' : 'bg-slate-800/50 border-slate-600 text-slate-200'}`}
-          >
-            <Shield className="w-10 h-10" />
+          <div>
+            <label className="text-xs uppercase tracking-wide text-slate-400">Quel est votre mode de rémunération ?</label>
+            <select
+              value={agentType}
+              onChange={(e) => handleSelectAgentType(e.target.value as AgentType)}
+              className="w-full mt-2 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white"
+            >
+              <option value="">Choisir...</option>
+              <option value="indiciaire">Indiciaires</option>
+              <option value="horaire">Horaires</option>
+            </select>
+          </div>
+          {agentType === 'indiciaire' && (
             <div>
-              <p className="font-semibold">Agents permanents indiciaires</p>
-              <p className="text-xs opacity-70">IM + NBI + IR • Assistantes maternelles • Médecins</p>
+              <label className="text-xs uppercase tracking-wide text-slate-400">Quel est votre profil ?</label>
+              <select
+                value={indiciaireProfile}
+                onChange={(e) => handleSelectIndiciaireProfile(e.target.value as IndiciaireProfile)}
+                className="w-full mt-2 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white"
+              >
+                <option value="">Choisir...</option>
+                <option value="permanent">Agent permanent</option>
+                <option value="medecin">Médecin</option>
+                <option value="assistante">Assistante maternelle</option>
+              </select>
             </div>
-          </button>
-          <button
-            onClick={() => handleSelectAgentType('horaire')}
-            className={`flex items-center gap-3 rounded-xl border p-4 text-left transition-all ${agentType === 'horaire' ? 'bg-cyan-600/20 border-cyan-400 text-white' : 'bg-slate-800/50 border-slate-600 text-slate-200'}`}
-          >
-            <Clock className="w-10 h-10" />
+          )}
+          {agentType === 'horaire' && (
             <div>
-              <p className="font-semibold">Agents rémunérés à l'heure</p>
-              <p className="text-xs opacity-70">Référence 455h / période • Limite 910h</p>
+              <label className="text-xs uppercase tracking-wide text-slate-400">Mode de rémunération horaire</label>
+              <select
+                value={horaireBaseType}
+                onChange={(e) => handleSelectHoraireBaseType(e.target.value as HoraireBase)}
+                className="w-full mt-2 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white"
+              >
+                <option value="">Choisir...</option>
+                <option value="indice">Base IM + IR</option>
+                <option value="taux">Base taux horaire</option>
+              </select>
             </div>
-          </button>
+          )}
         </div>
-
-        {wizardStep >= 2 && (
-          agentType === 'indiciaire' ? (
-            <div className="bg-slate-900/60 border border-slate-700 rounded-2xl p-6 space-y-4">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <p className="text-xs uppercase tracking-wide text-emerald-200">Étape 2</p>
-                  <p className="text-sm text-white font-semibold">Sélectionnez votre profil indiciaire</p>
-                </div>
-                {wizardStep < 3 && <p className="text-xs text-slate-400">Choisissez un profil pour afficher la suite</p>}
-              </div>
-              <div className="flex flex-wrap gap-3">
-                {([
-                  { value: 'permanent', label: 'Agent permanent indiciaire', desc: 'Versement 6/12 + 5/12 + 1/12' },
-                  { value: 'medecin', label: 'Médecin indiciaire', desc: 'Deux versements 6/12' },
-                  { value: 'assistante', label: 'Assistante maternelle', desc: 'Montant basé sur rubrique 7587' },
-                ] as const).map(option => (
-                  <button
-                    key={option.value}
-                    onClick={() => handleSelectIndiciaireProfile(option.value)}
-                    className={`flex-1 min-w-[220px] border rounded-xl p-4 text-left transition-all ${indiciaireProfile === option.value ? 'bg-emerald-600/20 border-emerald-400 text-white' : 'bg-slate-900/40 border-slate-700 text-slate-200'}`}
-                  >
-                    <p className="text-sm font-semibold">{option.label}</p>
-                    <p className="text-xs opacity-70">{option.desc}</p>
-                  </button>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <div className="bg-slate-900/60 border border-slate-700 rounded-2xl p-6 space-y-4">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <p className="text-xs uppercase tracking-wide text-cyan-200">Étape 2</p>
-                  <p className="text-sm text-white font-semibold">Choisissez votre mode de rémunération horaire</p>
-                </div>
-                {wizardStep < 3 && <p className="text-xs text-slate-400">Sélectionnez un mode pour accéder aux champs</p>}
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {[{
-                  value: 'indice',
-                  title: 'Base IM + IR',
-                  desc: 'Indice converti en euros puis proratisé sur 910 h',
-                }, {
-                  value: 'taux',
-                  title: 'Base taux horaire',
-                  desc: 'Taux + congés → mensualisé → base 6 mois (SMIC/2 + PS)',
-                }].map(option => (
-                  <button
-                    key={option.value}
-                    onClick={() => handleSelectHoraireBaseType(option.value as HoraireBase)}
-                    className={`text-left border rounded-xl p-4 transition-all ${horaireBaseType === option.value ? 'bg-cyan-600/10 border-cyan-400 text-white' : 'bg-slate-900/40 border-slate-700 text-slate-200'}`}
-                  >
-                    <p className="text-sm font-semibold">{option.title}</p>
-                    <p className="text-xs opacity-70 mt-1">{option.desc}</p>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )
-        )}
 
         {wizardStep === 2 && (
           <div className="bg-amber-900/20 border border-amber-600/30 rounded-xl p-4 text-xs text-amber-100">
