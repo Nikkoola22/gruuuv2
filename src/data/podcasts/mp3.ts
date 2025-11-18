@@ -23,11 +23,11 @@ export const podcastEpisodes: PodcastEpisode[] = [
   },
   { 
     id: 2, 
-    title: "Podcast Naudrh - Arrêt maladie Baisse à 90%", 
-    url: "https://audio.ausha.co/yk4aasqX1w8m.mp3",
-    duration: "6:45", 
-    description: "Baisse de rémunération en cas de congés pour maladie ordinaire (CMO) !",
-    date: "19/08/2025"
+    title: "La minute statutaire", 
+    url: "https://vod.api.video/vod/vi0zHzmWQnIIrtlBfAM4JAB/mp4/source.mp4",
+    duration: "00:00", 
+    description: "La minute statutaire",
+    date: "05/2025"
   },
   { 
     id: 3, 
@@ -39,19 +39,19 @@ export const podcastEpisodes: PodcastEpisode[] = [
   },
   { 
     id: 4, 
-    title: "Podcast Radio France - Perte d'Attractivité", 
-    url: "https://media.radiofrance-podcast.net/2025/6/3/NET_MFO_f2992cf3-ede2-46ba-a173-110376f3b3f3.mp3",
-    duration: "25:10", 
-    description: "Les opportunités de formation",
-    date: "17/08/2025"
+    title: "Le contrat à durée indeterminée (CDI)", 
+    url: "https://vod.api.video/vod/vi5pOcokezXtOcExeMpobXey/mp4/source.mp4",
+    duration: "00:00", 
+    description: "Le contrat à durée indeterminée (CDI)",
+    date: "18/11/2025"
   },
-  { 
+  {
     id: 5,  
-    title: "Podcast Citoyen - Les types de prisons", 
-    url: "https://open.acast.com/public/streams/63f887026c3fc00011d022e2/episodes/6621010d4df82b0013c839a0.mp3",
-    duration: "20:15", 
-    description: "Les types de prisons",
-    date: "16/08/2025"
+    title: "Conditions de recrutement", 
+    url: "https://vod.api.video/vod/vi3fMf8grPVgzkbpTdOd74R0/mp4/source.mp4",
+    duration: "00:00", 
+    description: "Conditions de recrutement",
+    date: "09/2025"
   },
   {
     id: 6,
@@ -60,5 +60,13 @@ export const podcastEpisodes: PodcastEpisode[] = [
     duration: "00:00",
     description: "Fichier audio local RQTH.mp3 importé depuis src/data/podcasts",
     date: "08/09/2025"
+  },
+  {
+    id: 7,
+    title: "SVP statut",
+    url: "https://vod.api.video/vod/vi1UUFqrsaLf2j09cEuG6QEk/mp4/source.mp4",
+    duration: "00:00",
+    description: "SVP statut",
+    date: "18/11/2025"
   }
 ];

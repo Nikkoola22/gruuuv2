@@ -351,7 +351,7 @@ const INITIAL_QUESTIONS: Question[] = faqData.slice(0, 10).map((f, idx) => {
         "Les jours d'ARTT (Aménagement et Réduction du Temps de Travail) sont des journées de repos attribuées pour compenser le fait de travailler week-end",
         "Les jours d'ARTT (Aménagement et Réduction du Temps de Travail) sont des journées de repos attribuées pour compenser le fait de travailler trop tard",
         "Les jours d'ARTT (Aménagement et Réduction du Temps de Travail) sont des journées de repos attribuées pour compenser la fatigue",
-        "Les jours d'ARTT (Aménagement et Réduction du Temps de Travail) sont des journées de repos attribuées pour compenser le fait de l annualisation",
+        "Les jours d'ARTT (Aménagement et Réduction du Temps de Travail) sont des journées de repos attribuées pour compenser le fait de depasser les 35h",
         "Les jours d'ARTT (Aménagement et Réduction du Temps de Travail) sont des heures de repos attribuées pour compenser le fait de travailler 5 jours / semaine"
       ];
       correctIndex = 3; // fourth option (annualisation) is correct
@@ -433,7 +433,7 @@ export default function Quiz({ onBack }: QuizProps) {
           "Les jours d'ARTT (Aménagement et Réduction du Temps de Travail) sont des journées de repos attribuées pour compenser le fait de travailler week-end",
           "Les jours d'ARTT (Aménagement et Réduction du Temps de Travail) sont des journées de repos attribuées pour compenser le fait de travailler trop tard",
           "Les jours d'ARTT (Aménagement et Réduction du Temps de Travail) sont des journées de repos attribuées pour compenser la fatigue",
-          "Les jours d'ARTT (Aménagement et Réduction du Temps de Travail) sont des journées de repos attribuées pour compenser le fait de l annualisation",
+          "Les jours d'ARTT (Aménagement et Réduction du Temps de Travail) sont des journées de repos attribuées pour compenser le fait de depasser les 35h",
           "Les jours d'ARTT (Aménagement et Réduction du Temps de Travail) sont des heures de repos attribuées pour compenser le fait de travailler 5 jours / semaine"
         ];
         const correctIndex = 3; // annualisation
