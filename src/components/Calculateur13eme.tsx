@@ -74,9 +74,9 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
 
   const indiciaireTI = indiceToEuro(im)
   const indiciaireNBIValue = indiceToEuro(nbi)
-  const indiciaireIRValue = indiciaireTI * IR_RATE
+  const indiciaireIRValue = (indiciaireTI + indiciaireNBIValue) * IR_RATE
   const horaireTI = indiceToEuro(horaireIM)
-  const horaireIRValue = horaireTI * IR_RATE
+  const horaireIRValue = (horaireTI + 0) * IR_RATE
 
   const indiciaireEligibility = useMemo(() => {
     const reasons = [] as string[]
