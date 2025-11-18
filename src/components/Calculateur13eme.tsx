@@ -50,8 +50,8 @@ const sanitizeNumber = (value: string | number) => {
 const indiceToEuro = (indice: string) => sanitizeNumber(indice) * INDICE_POINT_VALUE
 
 export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
-  const [agentType, setAgentType] = useState<AgentType>('indiciaire')
-  const [indiciaireProfile, setIndiciaireProfile] = useState<IndiciaireProfile>('permanent')
+  const [agentType, setAgentType] = useState<AgentType>('')
+  const [indiciaireProfile, setIndiciaireProfile] = useState<IndiciaireProfile>('')
   const [im, setIm] = useState('')
   const [nbi, setNbi] = useState('')
   const [tempsEmploi, setTempsEmploi] = useState(100)
@@ -60,7 +60,7 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
   const [smicReference, setSmicReference] = useState(DEFAULT_SMIC_REFERENCE)
   const [rubrique7587, setRubrique7587] = useState('')
 
-  const [horaireBaseType, setHoraireBaseType] = useState<HoraireBase>('indice')
+  const [horaireBaseType, setHoraireBaseType] = useState<HoraireBase>('')
   const [horaireIM, setHoraireIM] = useState('')
   const [horaireTaux, setHoraireTaux] = useState('')
   const [horaireConges, setHoraireConges] = useState(10)
@@ -118,7 +118,9 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
     setAnciennete(12)
     setSmicReference(DEFAULT_SMIC_REFERENCE)
     setRubrique7587('')
-    setHoraireBaseType('indice')
+    setAgentType('')
+    setIndiciaireProfile('')
+    setHoraireBaseType('')
     setHoraireIM('')
     setHoraireTaux('')
     setHoraireConges(10)
