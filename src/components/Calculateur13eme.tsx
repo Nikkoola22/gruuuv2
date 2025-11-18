@@ -484,9 +484,9 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
                   <input
                     type="number"
                     min={0}
-                    max={12}
+                    max={6}
                     value={horaireAnciennete}
-                    onChange={(e) => setHoraireAnciennete(Math.max(0, Math.min(12, Number(e.target.value) || 0)))}
+                    onChange={(e) => setHoraireAnciennete(Math.max(0, Math.min(6, Number(e.target.value) || 0)))}
                     className="w-full mt-1 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white"
                   />
                 </div>
