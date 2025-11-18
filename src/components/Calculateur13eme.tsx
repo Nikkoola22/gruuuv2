@@ -539,28 +539,6 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
                 />
                 <p className="text-xs text-slate-400 mt-1">{monthsWorked}/12 mois</p>
               </div>
-              <div>
-                <label className="text-xs uppercase tracking-wide text-slate-400">Ancienneté dans le grade (mois)</label>
-                <input
-                  type="number"
-                  min={0}
-                  max={12}
-                  value={anciennete}
-                  onChange={(e) => setAnciennete(Math.max(0, Math.min(12, Number(e.target.value) || 0)))}
-                  className="w-full mt-1 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white"
-                />
-              </div>
-              <div>
-                <label className="text-xs uppercase tracking-wide text-slate-400">Référence SMIC (CR)</label>
-                <input
-                  type="number"
-                  min={0}
-                  value={smicReference}
-                  onChange={(e) => setSmicReference(Number(e.target.value) || 0)}
-                  className="w-full mt-1 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white"
-                />
-                <p className="text-xs text-slate-400 mt-1">SMIC mensuel actuel (1 801,80 €) utilisé pour le "Complément de rémunération" – modifiable en cas de revalorisation.</p>
-              </div>
             </div>
           </div>
           ) : (
