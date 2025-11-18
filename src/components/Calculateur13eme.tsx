@@ -388,7 +388,7 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
                         onChange={(e) => setIm(e.target.value)}
                         inputMode="decimal"
                         className="w-full mt-1 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white"
-                        placeholder="ex : 1800"
+                        placeholder="ex : 366"
                       />
                       <p className="text-xs text-slate-400 mt-1">Conversion automatique : indice × 4,92278.</p>
                     </div>
@@ -399,7 +399,7 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
                         onChange={(e) => setNbi(e.target.value)}
                         inputMode="decimal"
                         className="w-full mt-1 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white"
-                        placeholder="ex : 150"
+                        placeholder="ex : 10"
                       />
                       <p className="text-xs text-slate-400 mt-1">Saisir l'indice NBI (conversion × 4,92278 utilisée dans le calcul).</p>
                     </div>
