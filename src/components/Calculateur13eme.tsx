@@ -66,7 +66,7 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
   const [horaireConges, setHoraireConges] = useState(10)
   const [horaireHours, setHoraireHours] = useState(HOURS_MIN)
   const [horairePeriode, setHorairePeriode] = useState<HorairePeriode>('juin')
-  const [horaireAnciennete, setHoraireAnciennete] = useState(12)
+  const [horaireAnciennete, setHoraireAnciennete] = useState(6)
 
   const [result, setResult] = useState<any>(null)
   const [showAdvancedParams, setShowAdvancedParams] = useState(false)
@@ -126,7 +126,7 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
     setHoraireConges(10)
     setHoraireHours(HOURS_MIN)
     setHorairePeriode('juin')
-    setHoraireAnciennete(12)
+    setHoraireAnciennete(6)
     setResult(null)
     setWizardStep(1)
   }
