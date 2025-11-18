@@ -536,28 +536,8 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
                         className="w-full mt-1 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white"
                       />
                     </div>
-                    <div>
-                      <label className="text-xs uppercase tracking-wide text-slate-400">Majoration congés (%)</label>
-                      <input
-                        type="number"
-                        value={horaireConges}
-                        onChange={(e) => setHoraireConges(Number(e.target.value) || 0)}
-                        className="w-full mt-1 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white"
-                      />
-                      <p className="text-xs text-slate-400 mt-1">Méthode : (taux × (1 + congés%)) × 151,67 ÷ 2 → base 6 mois, puis CR = SMIC/2, PS = base 6 mois - CR.</p>
-                    </div>
                   </>
                 )}
-                <div>
-                  <label className="text-xs uppercase tracking-wide text-slate-400">Référence SMIC (CR)</label>
-                  <input
-                    type="number"
-                    value={smicReference}
-                    onChange={(e) => setSmicReference(Number(e.target.value) || 0)}
-                    className="w-full mt-1 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white"
-                  />
-                  <p className="text-xs text-slate-400 mt-1">SMIC mensuel (1 801,80 €) servant de base au "Complément de rémunération".</p>
-                </div>
               </div>
             </div>
           )
