@@ -1,0 +1,662 @@
+import { useState, useMemo, useEffect } from 'react'
+import { ChevronRight, CheckCircle2, AlertCircle, TrendingUp, ArrowLeft } from 'lucide-react'
+import { ifse1Data, getDirectionFullName } from '../data/rifseep-data'
+import ifse2PrimesJson from './ifse2_primes.json'
+
+// Interface pour les données du JSON
+interface IFSE2PrimeJson {
+  Motif: string
+  Montant: string
+  Metiers_concernes: string
+  Direction: string
+  Service: string
+}
+
+// Interface pour les données transformées
+interface IFSE2Data {
+  motif: string
+  amount: number
+  jobs: string[]
+  direction: string
+  service: string
+}
+
+// Convertir les données JSON au format attendu
+const transformIfse2Data = (jsonData: IFSE2PrimeJson[]): IFSE2Data[] => {
+  // Grouper par motif, direction et service pour combiner les métiers
+  const grouped = new Map<string, IFSE2Data>()
+  
+  jsonData.forEach(item => {
+    const key = `${item.Motif}|${item.Direction}|${item.Service}`
+    // Gérer les montants avec virgule (format français) ou point (format anglais)
+    const amountStr = item.Montant.replace(' €', '').trim().replace(',', '.')
+    const amount = parseFloat(amountStr) || 0
+    
+    if (grouped.has(key)) {
+      const existing = grouped.get(key)!
+      if (!existing.jobs.includes(item.Metiers_concernes)) {
+        existing.jobs.push(item.Metiers_concernes)
+      }
+    } else {
+      grouped.set(key, {
+        motif: item.Motif,
+        amount: amount,
+        jobs: [item.Metiers_concernes],
+        direction: item.Direction,
+        service: item.Service
+      })
+    }
+  })
+  
+  return Array.from(grouped.values())
+}
+
+// Données IFSE2 transformées
+const ifse2Data = transformIfse2Data(ifse2PrimesJson as IFSE2PrimeJson[])
+
+// Fonction pour obtenir toutes les directions
+const getAllDirections = (): string[] => {
+  const directions = ifse2Data.map(item => item.direction)
+  const uniqueDirections = [...new Set(directions)].sort()
+  return uniqueDirections
+}
+
+// Fonction pour obtenir les IFSE2 par direction
+const getIFSE2ByDirection = (direction: string): IFSE2Data[] => {
+  // Récupère les IFSE 2 spécifiques à la direction
+  const directionSpecific = ifse2Data.filter(item => item.direction === direction)
+  
+  // Récupère les IFSE 2 communes à toutes les directions
+  const commonIFSE2 = ifse2Data.filter(item => item.direction === 'Toutes dir°' || item.direction === 'Toutes directions')
+  
+  return [...directionSpecific, ...commonIFSE2]
+}
+
+// Fonction pour obtenir les services uniques d'une direction
+const getServicesByDirection = (direction: string): string[] => {
+  const services = ifse2Data
+    .filter(item => item.direction === direction)
+    .map(item => item.service)
+    .filter(service => service && service.trim() !== '')
+  const uniqueServices = [...new Set(services)].sort()
+  return uniqueServices
+}
+
+interface CalculateurPrimesProps {
+  onClose?: () => void
+}
+
+export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
+  const [currentStep, setCurrentStep] = useState(1)
+  const [selectedCategory, setSelectedCategory] = useState('')
+  const [selectedFunctionCode, setSelectedFunctionCode] = useState('')
+  // const [selectedJob, setSelectedJob] = useState('') // Kept for future advanced filtering
+  const [selectedDirection, setSelectedDirection] = useState('')
+  const [selectedService, setSelectedService] = useState('')
+  const [selectedJob, setSelectedJob] = useState('')
+  const [selectedIFSE2, setSelectedIFSE2] = useState<Set<number>>(new Set())
+  const [weekendSaturdays, setWeekendSaturdays] = useState(0)
+  const [weekendSundays, setWeekendSundays] = useState(0)
+  const [weekendRateSat, setWeekendRateSat] = useState(40)
+  const [weekendRateSun, setWeekendRateSun] = useState(40)
+
+  // Get all unique jobs from IFSE2 data, sorted
+  // Note: allJobs kept for future use in advanced filtering
+
+  // Note: matchedJobDirections kept for future use in advanced filtering
+  // const matchedJobDirections = useMemo(() => {
+  //   if (!selectedJob) return []
+  //   const matches: string[] = []
+  //   ifse2Data.forEach(item => {
+  //     if (item.jobs?.some(j => j.toLowerCase().includes(selectedJob.toLowerCase()))) {
+  //       if (!matches.includes(item.direction)) {
+  //         matches.push(item.direction)
+  //       }
+  //     }
+  //   })
+  //   return matches
+  // }, [selectedJob])
+
+  // Get jobs for selected direction only
+
+  // Calculs
+  const ifse1Amount = useMemo(() => {
+    if (!selectedFunctionCode) return 0
+    const item = ifse1Data.find(i => i.functionCode === selectedFunctionCode && i.category === selectedCategory)
+    return item?.monthlyAmount || 0
+  }, [selectedFunctionCode, selectedCategory])
+
+  const ifse2Amount = useMemo(() => {
+    if (!selectedDirection || selectedIFSE2.size === 0) return 0
+    const ifse2List = getIFSE2ByDirection(selectedDirection)
+    return Array.from(selectedIFSE2).reduce((sum, idx) => {
+      return sum + (ifse2List[idx]?.amount || 0)
+    }, 0)
+  }, [selectedDirection, selectedIFSE2])
+
+  const ifse3SatTotal = weekendSaturdays * weekendRateSat
+  const ifse3SunTotal = weekendSundays * weekendRateSun
+  const ifse3Total = ifse3SatTotal + ifse3SunTotal
+
+  const totalMonthly = Math.round((ifse1Amount + ifse2Amount + ifse3Total) * 100) / 100
+
+  // Note: Commented out for future enhancement of UI
+  // const stepDescriptions = [
+  //   { num: 1, label: 'Catégorie', desc: 'Votre grille indiciaire' },
+  //   { num: 2, label: 'Fonction', desc: 'IFSE 1 - Prime de base' },
+  //   { num: 3, label: 'Primes sujétion', desc: 'IFSE 2 - Services' },
+  //   { num: 4, label: 'Primes week-end', desc: 'IFSE 3 - Samedis/Dimanches' },
+  //   { num: 5, label: 'Résultat', desc: 'Total mensuel' },
+  // ]
+
+  // Note: Commented out for future enhancement
+  // const isStepComplete = (step: number) => {
+  //   if (step === 1) return selectedCategory !== ''
+  //   if (step === 2) return selectedFunctionCode !== ''
+  //   if (step === 3) return selectedDirection !== ''
+  //   if (step === 4) return true
+  //   if (step === 5) return true
+  //   return false
+  // }
+
+    // Note: Commented out for future enhancement
+  // const handleJobChange = (value: string) => {
+  //   setSelectedJob(value)
+  // }
+
+  const handleDirectionSelect = (dir: string) => {
+    setSelectedDirection(dir)
+    setSelectedIFSE2(new Set())
+    setSelectedJob('')
+    setSelectedService('')
+  }
+
+  const handleServiceSelect = (service: string) => {
+    setSelectedService(service)
+    // Réinitialiser les primes sélectionnées lors du changement de service
+    setSelectedIFSE2(new Set())
+    setSelectedJob('')
+  }
+
+  const handleJobSelect = (job: string) => {
+    setSelectedJob(job)
+    if (!job) return
+    
+    // Récupérer tous les primes associés à ce métier dans cette direction
+    const directionPrimes = getIFSE2ByDirection(selectedDirection)
+    const jobPrimes = directionPrimes.filter(p => p.jobs?.includes(job))
+    
+    // Pré-sélectionner les primes associées
+    const newSelectedIFSE2 = new Set(selectedIFSE2)
+    jobPrimes.forEach(jobPrime => {
+      const primeIdx = directionPrimes.findIndex(p => p === jobPrime)
+      if (primeIdx >= 0) {
+        newSelectedIFSE2.add(primeIdx)
+      }
+    })
+    setSelectedIFSE2(newSelectedIFSE2)
+  }
+
+  const handleToggleIFSE2 = (idx: number) => {
+    const newSet = new Set(selectedIFSE2)
+    if (newSet.has(idx)) {
+      newSet.delete(idx)
+    } else {
+      newSet.add(idx)
+    }
+    setSelectedIFSE2(newSet)
+  }
+
+  // Auto-advance to next step when current step is complete
+  useEffect(() => {
+    if (currentStep === 1 && selectedCategory) {
+      setTimeout(() => setCurrentStep(2), 300)
+    }
+  }, [selectedCategory, currentStep])
+
+  useEffect(() => {
+    if (currentStep === 2 && selectedFunctionCode) {
+      setTimeout(() => setCurrentStep(3), 300)
+    }
+  }, [selectedFunctionCode, currentStep])
+
+  useEffect(() => {
+    if (currentStep === 3 && selectedDirection) {
+      setTimeout(() => setCurrentStep(4), 300)
+    }
+  }, [selectedDirection, currentStep])
+
+  const progressPercent = Math.round(
+    (Object.values({
+      category: selectedCategory ? 1 : 0,
+      function: selectedFunctionCode ? 1 : 0,
+      direction: selectedDirection ? 1 : 0,
+      weekend: ifse3Total > 0 ? 1 : 0,
+      result: selectedFunctionCode ? 1 : 0,
+    }).reduce((a, b) => a + b, 0) / 5) * 100
+  )
+
+  return (
+    <div className="flex flex-col h-full">
+      {/* Header avec bouton retour */}
+      <div className="bg-slate-800/50 py-6 text-left border-b border-slate-700 px-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-3xl font-bold text-white flex items-center gap-2">
+            <TrendingUp className="w-8 h-8 text-cyan-400" />
+            Calculateur PRIMES
+          </h2>
+          {onClose && (
+            <button
+              onClick={onClose}
+              className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-full font-semibold transition-all text-sm"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Retour
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div className="space-y-6 flex-1 overflow-y-auto p-6 max-w-2xl mx-auto w-full">
+        {/* PROGRESS TRACKER */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-sm font-semibold text-slate-300">Progression du calcul</h3>
+            <span className="text-xs font-medium text-slate-400">{progressPercent}%</span>
+          </div>
+          <div className="w-full h-2 bg-slate-700/50 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-gradient-to-r from-blue-500 via-cyan-500 to-teal-500 transition-all duration-500"
+              style={{ width: `${progressPercent}%` }}
+            ></div>
+          </div>
+        </div>
+
+        {/* ÉTAPE 1: CATÉGORIE */}
+        <div className={`transition-all duration-300 ${currentStep === 1 ? 'ring-2 ring-blue-400/50' : ''} bg-gradient-to-br from-slate-800/60 to-slate-800/40 rounded-xl p-6 border border-slate-700/50 hover:border-slate-600/50`}>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-sm">
+              1
+            </div>
+            <div>
+              <h4 className="text-xl font-bold text-white">Catégorie d'emploi</h4>
+              <p className="text-xs text-slate-400">Sélectionnez votre grille indiciaire (A, B ou C)</p>
+            </div>
+          </div>
+          {selectedCategory && <CheckCircle2 className="w-5 h-5 text-green-400" />}
+        </div>
+
+        <div className="max-w-md mx-auto">
+          <label className="text-xs text-slate-400 mb-2 block font-medium">Choisir une catégorie:</label>
+          <select
+            value={selectedCategory}
+            onChange={(e) => {
+              setSelectedCategory(e.target.value)
+              if (e.target.value) {
+                setCurrentStep(2)
+              }
+            }}
+            className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/30 rounded-lg text-white text-base focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 outline-none transition"
+          >
+            <option value="">-- Sélectionnez une catégorie --</option>
+            {['A', 'B', 'C'].map(cat => (
+              <option key={cat} value={cat}>
+                Catégorie {cat}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {/* ÉTAPE 2: FONCTION (IFSE 1) */}
+      {selectedCategory && (
+        <div className={`transition-all duration-300 ${currentStep === 2 ? 'ring-2 ring-cyan-400/50' : ''} bg-gradient-to-br from-slate-800/60 to-slate-800/40 rounded-xl p-6 border border-slate-700/50 hover:border-slate-600/50`}>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-teal-500 flex items-center justify-center text-white font-bold text-sm">
+                2
+              </div>
+              <div>
+                <h4 className="text-xl font-bold text-white">Fonction & IFSE 1</h4>
+                <p className="text-xs text-slate-400">Prime de base selon votre poste</p>
+              </div>
+            </div>
+            {selectedFunctionCode && <CheckCircle2 className="w-5 h-5 text-green-400" />}
+          </div>
+
+          <div className="max-w-md mx-auto">
+            <label className="text-xs text-slate-400 mb-2 block font-medium">Choisir une fonction:</label>
+            <select
+              value={selectedFunctionCode}
+              onChange={(e) => {
+                setSelectedFunctionCode(e.target.value)
+                if (e.target.value) {
+                  setCurrentStep(3)
+                }
+              }}
+              className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/30 rounded-lg text-white text-base focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 outline-none transition"
+            >
+              <option value="">-- Sélectionnez une fonction --</option>
+              {ifse1Data
+                .filter(item => item.category === selectedCategory)
+                .map((item, idx) => (
+                  <option key={`${selectedCategory}-${idx}-${item.functionCode}`} value={item.functionCode}>
+                    {item.function} - {item.monthlyAmount}€/mois
+                  </option>
+                ))}
+            </select>
+          </div>
+        </div>
+      )}
+
+      {/* ÉTAPE 3: PRIMES COMPLÉMENTAIRES (IFSE 2 & 3) */}
+      {selectedFunctionCode && (
+        <div className={`transition-all duration-300 ${currentStep === 3 ? 'ring-2 ring-teal-400/50' : ''} bg-gradient-to-br from-slate-800/60 to-slate-800/40 rounded-xl p-6 border border-slate-700/50 hover:border-slate-600/50`}>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-teal-500 to-green-500 flex items-center justify-center text-white font-bold text-sm">
+                3
+              </div>
+              <div>
+                                <h4 className="text-xl font-bold text-white">Primes complémentaires</h4>
+                <p className="text-xs text-slate-400">IFSE 2 - Services et sujétions</p>
+              </div>
+            </div>
+            {(selectedDirection || ifse3Total > 0) && <CheckCircle2 className="w-5 h-5 text-green-400" />}
+          </div>
+
+          {/* IFSE 2 */}
+          <div className="mb-6">
+            <h5 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 text-teal-400" />
+              IFSE 2 — Primes de sujétion
+            </h5>
+
+            <div className="mb-3">
+              <label className="text-xs text-slate-400 mb-2 block font-medium">Sélectionnez votre direction:</label>
+              <select
+                value={selectedDirection}
+                onChange={(e) => handleDirectionSelect(e.target.value)}
+                className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/30 rounded-lg text-white text-base focus:border-teal-400 focus:ring-2 focus:ring-teal-400/30 outline-none transition"
+              >
+                <option value="">-- Choisir une direction --</option>
+                {getAllDirections().map(dir => (
+                  <option key={dir} value={dir}>
+                    {getDirectionFullName(dir)} ({dir})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Section Sélectionner un service */}
+            {selectedDirection && (
+              <div className="mb-3">
+                <label className="text-xs text-slate-400 mb-2 block font-medium">Sélectionnez votre service:</label>
+                <select
+                  value={selectedService}
+                  onChange={(e) => handleServiceSelect(e.target.value)}
+                  className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/30 rounded-lg text-white text-base focus:border-teal-400 focus:ring-2 focus:ring-teal-400/30 outline-none transition"
+                >
+                  <option value="">-- Tous les services --</option>
+                  {getServicesByDirection(selectedDirection).map(service => (
+                    <option key={service} value={service}>
+                      {service}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {/* Section Sélectionner un métier */}
+            {selectedDirection && (
+              <div className="mb-4 p-4 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/30 rounded-lg">
+                <h6 className="text-sm font-semibold text-blue-300 mb-3 flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 bg-blue-400 rounded-full" />
+                  Sélectionner un métier (optionnel)
+                </h6>
+                <p className="text-xs text-slate-300 mb-3 italic">
+                  Pré-remplit les IFSE 2 applicables à votre service
+                </p>
+                
+                <label className="text-xs text-slate-400 mb-2 block font-medium">Choisir un métier:</label>
+                <select
+                  value={selectedJob}
+                  onChange={(e) => handleJobSelect(e.target.value)}
+                  className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/30 rounded-lg text-white text-base focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 outline-none transition"
+                >
+                  <option value="">-- Sélectionnez un métier (optionnel) --</option>
+                  {getIFSE2ByDirection(selectedDirection)
+                    .filter(p => !selectedService || p.service === selectedService || p.service === 'Tous services' || p.direction === 'Toutes dir°' || p.direction === 'Toutes directions')
+                    .flatMap(p => p.jobs || [])
+                    .filter((job, idx, arr) => arr.indexOf(job) === idx)
+                    .sort()
+                    .map((job, idx) => (
+                      <option key={idx} value={job}>
+                        {job}
+                      </option>
+                    ))}
+                </select>
+              </div>
+            )}
+
+
+
+            {selectedDirection && (
+              <div className="space-y-2 max-h-48 overflow-y-auto">
+                {getIFSE2ByDirection(selectedDirection)
+                  .filter(prime => !selectedService || prime.service === selectedService || prime.service === 'Tous services' || prime.direction === 'Toutes dir°' || prime.direction === 'Toutes directions')
+                  .map((prime, idx) => {
+                    // Calculer l'index réel dans la liste complète pour la sélection
+                    const allPrimes = getIFSE2ByDirection(selectedDirection)
+                    const realIdx = allPrimes.findIndex(p => p === prime)
+                    return (
+                      <button
+                        key={idx}
+                        onClick={() => handleToggleIFSE2(realIdx)}
+                        className={`w-full p-3 rounded-lg text-left transition-all border ${
+                          selectedIFSE2.has(realIdx)
+                            ? 'bg-teal-500/30 border-teal-400/60 shadow-md'
+                            : 'bg-slate-700/30 border-slate-600/20 hover:bg-slate-700/50'
+                        }`}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className={`w-5 h-5 rounded border-2 mt-0.5 flex items-center justify-center transition ${
+                            selectedIFSE2.has(realIdx)
+                              ? 'bg-green-500 border-green-400'
+                              : 'border-slate-500'
+                          }`}>
+                            {selectedIFSE2.has(realIdx) && <span className="text-white text-xs">✓</span>}
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-sm font-medium text-slate-200">{prime.motif}</p>
+                            <p className="text-xs text-slate-400 mt-0.5">Service: {prime.service || 'Tous'}</p>
+                            {prime.jobs && prime.jobs.length > 0 && (
+                              <p className="text-xs text-slate-400">Métier(s): {prime.jobs.slice(0, 2).join(', ')}</p>
+                            )}
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm font-bold text-green-400">{prime.amount}€</p>
+                            <p className="text-xs text-slate-500">/mois</p>
+                          </div>
+                        </div>
+                      </button>
+                    )
+                  })}
+              </div>
+            )}
+
+            {ifse2Amount > 0 && (
+              <div className="mt-3 p-2 bg-teal-500/10 border border-teal-500/30 rounded text-sm text-teal-200">
+                Primes sélectionnées: <span className="font-bold">{ifse2Amount}€/mois</span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ÉTAPE 4: PRIMES WEEK-END (IFSE 3) */}
+      {selectedFunctionCode && (
+        <div className={`transition-all duration-300 ${currentStep === 4 ? 'ring-2 ring-purple-400/50' : ''} bg-gradient-to-br from-slate-800/60 to-slate-800/40 rounded-xl p-6 border border-slate-700/50 hover:border-slate-600/50`}>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-sm">
+                4
+              </div>
+              <div>
+                <h4 className="text-xl font-bold text-white">Primes week-end</h4>
+                <p className="text-xs text-slate-400">IFSE 3 - Samedis et dimanches travaillés</p>
+              </div>
+            </div>
+            {(weekendSaturdays > 0 || weekendSundays > 0) && <CheckCircle2 className="w-5 h-5 text-green-400" />}
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <div>
+              <label className="text-xs text-slate-400 mb-2 block font-medium">Samedis travaillés par mois</label>
+              <select
+                value={weekendSaturdays}
+                onChange={(e) => setWeekendSaturdays(Number(e.target.value))}
+                className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/30 rounded-lg text-white text-base focus:border-purple-400 focus:ring-2 focus:ring-purple-400/30 outline-none transition"
+              >
+                {[0, 1, 2, 3, 4, 5].map(n => (
+                  <option key={n} value={n}>
+                    {n} samedi{n !== 1 ? 's' : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="text-xs text-slate-400 mb-2 block font-medium">Dimanches travaillés par mois</label>
+              <select
+                value={weekendSundays}
+                onChange={(e) => setWeekendSundays(Number(e.target.value))}
+                className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/30 rounded-lg text-white text-base focus:border-purple-400 focus:ring-2 focus:ring-purple-400/30 outline-none transition"
+              >
+                {[0, 1, 2, 3, 4, 5].map(n => (
+                  <option key={n} value={n}>
+                    {n} dimanche{n !== 1 ? 's' : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {(weekendSaturdays > 0 || weekendSundays > 0) && (
+            <>
+              <div className="mb-6 pb-6 border-b border-slate-600/30">
+                <h5 className="text-sm font-semibold text-slate-200 mb-4">Sélectionnez les taux horaires</h5>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs text-slate-400 mb-2 block font-medium">Taux pour les samedis</label>
+                    <select
+                      value={weekendRateSat}
+                      onChange={(e) => setWeekendRateSat(Number(e.target.value))}
+                      className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/30 rounded-lg text-white text-base focus:border-purple-400 focus:ring-2 focus:ring-purple-400/30 outline-none transition"
+                    >
+                      <option value={40}>40€ par samedi - Jusqu'à 3h13 de travail</option>
+                      <option value={60}>60€ par samedi - Entre 3h16 et 7h12 de travail</option>
+                      <option value={80}>80€ par samedi - Plus de 7h12 de travail</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="text-xs text-slate-400 mb-2 block font-medium">Taux pour les dimanches</label>
+                    <select
+                      value={weekendRateSun}
+                      onChange={(e) => setWeekendRateSun(Number(e.target.value))}
+                      className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/30 rounded-lg text-white text-base focus:border-purple-400 focus:ring-2 focus:ring-purple-400/30 outline-none transition"
+                    >
+                      <option value={40}>40€ par dimanche - Jusqu'à 3h13 de travail</option>
+                      <option value={60}>60€ par dimanche - Entre 3h16 et 7h12 de travail</option>
+                      <option value={80}>80€ par dimanche - Plus de 7h12 de travail</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {ifse3Total > 0 && (
+                <div className="p-4 bg-gradient-to-r from-purple-500/30 via-pink-500/30 to-purple-500/30 border border-purple-500/50 rounded-lg">
+                  <p className="text-xs text-purple-200 mb-2">💰 Calcul IFSE 3</p>
+                  <div className="space-y-1 text-sm">
+                    {weekendSaturdays > 0 && (
+                      <p className="text-slate-200">{weekendSaturdays} samedi(s) × {weekendRateSat}€ = <span className="font-bold text-purple-300">{ifse3SatTotal}€</span></p>
+                    )}
+                    {weekendSundays > 0 && (
+                      <p className="text-slate-200">{weekendSundays} dimanche(s) × {weekendRateSun}€ = <span className="font-bold text-purple-300">{ifse3SunTotal}€</span></p>
+                    )}
+                    <div className="border-t border-purple-400/30 mt-2 pt-2">
+                      <p className="text-purple-200 font-semibold">Total IFSE 3: <span className="text-lg">{ifse3Total}€/mois</span></p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+
+          {weekendSaturdays === 0 && weekendSundays === 0 && (
+            <div className="p-3 bg-slate-700/50 border border-slate-600/30 rounded-lg text-center">
+              <p className="text-xs text-slate-400">Pas de primes week-end sélectionnées</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ÉTAPE 5: RÉSULTAT FINAL */}
+      {selectedFunctionCode && (
+        <div className={`transition-all duration-300 ${currentStep === 5 ? 'ring-2 ring-green-400/50' : ''} bg-gradient-to-br from-green-900/40 via-emerald-900/40 to-teal-900/40 rounded-xl p-6 border border-green-500/40 shadow-lg`}>
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center text-white font-bold text-sm">
+                5
+              </div>
+              <div>
+                <h4 className="text-xl font-bold text-white">Résumé total</h4>
+                <p className="text-xs text-slate-300">Somme de toutes vos primes</p>
+              </div>
+            </div>
+            <ChevronRight className="w-6 h-6 text-green-400" />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+            <div className="bg-blue-500/20 border border-blue-500/40 rounded-lg p-4">
+              <p className="text-xs text-slate-400 mb-1">IFSE 1</p>
+              <p className="text-2xl font-bold text-blue-300">{ifse1Amount}€</p>
+              <p className="text-xs text-slate-400 mt-1">Prime de fonction</p>
+            </div>
+
+            <div className="bg-teal-500/20 border border-teal-500/40 rounded-lg p-4">
+              <p className="text-xs text-slate-400 mb-1">IFSE 2</p>
+              <p className="text-2xl font-bold text-teal-300">{ifse2Amount}€</p>
+              <p className="text-xs text-slate-400 mt-1">Primes sélectionnées</p>
+            </div>
+
+            <div className="bg-purple-500/20 border border-purple-500/40 rounded-lg p-4">
+              <p className="text-xs text-slate-400 mb-1">IFSE 3</p>
+              <p className="text-2xl font-bold text-purple-300">{ifse3Total}€</p>
+              <p className="text-xs text-slate-400 mt-1">Primes week-end</p>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-r from-green-500/30 via-emerald-500/30 to-teal-500/30 border border-green-500/60 rounded-lg p-6 shadow-lg">
+            <p className="text-sm text-slate-300 mb-2 font-medium">Revenu mensuel additionnel</p>
+            <p className="text-5xl font-bold text-green-300">{totalMonthly.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€</p>
+            <p className="text-sm text-slate-300 mt-3 font-light">
+              Soit <span className="font-bold text-green-200">{(totalMonthly * 12).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€</span> par an
+            </p>
+          </div>
+
+          <div className="mt-4 p-3 bg-slate-700/50 border border-slate-600/30 rounded-lg flex items-start gap-2">
+            <AlertCircle className="w-4 h-4 text-slate-400 mt-0.5 flex-shrink-0" />
+            <p className="text-xs text-slate-400">
+              ℹ️ Ces montants sont calculés selon vos sélections. Consultez la RH pour confirmation avant demande de régularisation.
+            </p>
+          </div>
+        </div>
+      )}
+      </div>
+    </div>
+  )
+}
