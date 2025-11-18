@@ -291,13 +291,6 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
   }
 
   const eligibility = agentType === 'indiciaire' ? indiciaireEligibility : horaireEligibility
-  const stepLabels = [
-    '1. Choisir mon mode de rémunération',
-    agentType === 'indiciaire'
-      ? '2. Sélectionner mon profil indiciaire'
-      : '2. Sélectionner mon mode horaire',
-    '3. Saisir mes montants et obtenir le résultat',
-  ]
 
   return (
     <div className="flex flex-col h-full">
@@ -326,50 +319,6 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
       </div>
 
       <div className="space-y-6 flex-1 overflow-y-auto p-6 max-w-3xl mx-auto w-full">
-        <div className="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-4">
-          <div>
-            <p className="text-xs uppercase tracking-wide text-green-100">Mode d'emploi express</p>
-            <h4 className="text-white font-semibold text-lg">Suivez les étapes, l'outil s'occupe du reste</h4>
-            <p className="text-sm text-slate-200 mt-1">Chaque carte se déverrouille après votre choix précédent. Aucun calcul manuel, seulement des questions simples.</p>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            {stepLabels.map((label, index) => {
-              const status = wizardStep === index + 1 ? 'current' : wizardStep > index + 1 ? 'done' : 'todo'
-              const baseClasses = 'flex-1 min-w-[180px] rounded-xl border p-3 text-xs transition-colors'
-              const statusClasses = {
-                current: 'border-emerald-400 bg-emerald-500/20 text-white',
-                done: 'border-emerald-700 bg-emerald-800/40 text-emerald-100',
-                todo: 'border-slate-700 bg-slate-900/40 text-slate-300',
-              }[status]
-              return (
-                <div key={label} className={`${baseClasses} ${statusClasses}`}>
-                  <p className="font-semibold mb-1">Étape {index + 1}</p>
-                  <p>{label}</p>
-                </div>
-              )
-            })}
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-            {[{
-              title: '1 • Identifiez-vous',
-              desc: 'Choisissez "indiciaire" ou "horaire" selon votre paie. Un texte court rappelle la différence.',
-            }, {
-              title: agentType === 'indiciaire' ? '2 • Choisissez votre profil' : '2 • Choisissez votre mode horaire',
-              desc: agentType === 'indiciaire'
-                ? 'Agents permanents, médecins ou assistantes : une carte = un calendrier de versement.'
-                : 'Êtes-vous payé via un indice ou un taux horaire (SMIC, animateurs, etc.) ?'
-            }, {
-              title: '3 • Remplissez & vérifiez',
-              desc: 'On vous affiche seulement les champs utiles puis une synthèse (CR + Prime semestrielle).',
-            }].map((step) => (
-              <div key={step.title} className="bg-slate-900/60 border border-white/10 rounded-xl p-4">
-                <p className="text-sm font-semibold text-white">{step.title}</p>
-                <p className="text-xs text-slate-300 mt-2 leading-relaxed">{step.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div>
             <label className="text-xs uppercase tracking-wide text-slate-400">Quel est votre mode de rémunération ?</label>
