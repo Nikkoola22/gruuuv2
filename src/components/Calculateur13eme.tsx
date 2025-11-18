@@ -319,7 +319,7 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
       </div>
 
       <div className="space-y-6 flex-1 overflow-y-auto p-6 max-w-3xl mx-auto w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4">
           <div>
             <label className="text-xs uppercase tracking-wide text-slate-400">Quel est votre mode de rémunération ?</label>
             <select
@@ -335,7 +335,7 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
         </div>
 
         {agentType && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4">
             <div>
               <label className="text-xs uppercase tracking-wide text-slate-400">
                 {agentType === 'indiciaire' ? 'Quel est votre profil ?' : 'Mode de rémunération horaire'}
