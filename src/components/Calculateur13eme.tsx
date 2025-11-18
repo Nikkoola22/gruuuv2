@@ -383,40 +383,36 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
               <option value="horaire">Horaires</option>
             </select>
           </div>
-          {agentType === 'indiciaire' && (
-            <div>
-              <label className="text-xs uppercase tracking-wide text-slate-400">Quel est votre profil ?</label>
-              <select
-                value={indiciaireProfile}
-                onChange={(e) => handleSelectIndiciaireProfile(e.target.value as IndiciaireProfile)}
-                className="w-full mt-2 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white"
-              >
-                <option value="">Choisir...</option>
-                <option value="permanent">Agent permanent</option>
-                <option value="medecin">Médecin</option>
-                <option value="assistante">Assistante maternelle</option>
-              </select>
-            </div>
-          )}
-          {agentType === 'horaire' && (
-            <div>
-              <label className="text-xs uppercase tracking-wide text-slate-400">Mode de rémunération horaire</label>
-              <select
-                value={horaireBaseType}
-                onChange={(e) => handleSelectHoraireBaseType(e.target.value as HoraireBase)}
-                className="w-full mt-2 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white"
-              >
-                <option value="">Choisir...</option>
-                <option value="indice">Base IM + IR</option>
-                <option value="taux">Base taux horaire</option>
-              </select>
-            </div>
-          )}
         </div>
 
-        {wizardStep === 2 && (
-          <div className="bg-amber-900/20 border border-amber-600/30 rounded-xl p-4 text-xs text-amber-100">
-            Sélectionnez un profil dans l'étape 2 pour faire apparaître les champs détaillés.
+        {agentType && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div>
+              <label className="text-xs uppercase tracking-wide text-slate-400">
+                {agentType === 'indiciaire' ? 'Quel est votre profil ?' : 'Mode de rémunération horaire'}
+              </label>
+              <select
+                value={agentType === 'indiciaire' ? indiciaireProfile : horaireBaseType}
+                onChange={(e) => agentType === 'indiciaire' 
+                  ? handleSelectIndiciaireProfile(e.target.value as IndiciaireProfile)
+                  : handleSelectHoraireBaseType(e.target.value as HoraireBase)}
+                className="w-full mt-2 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white"
+              >
+                <option value="">Choisir...</option>
+                {agentType === 'indiciaire' ? (
+                  <>
+                    <option value="permanent">Agent permanent</option>
+                    <option value="medecin">Médecin</option>
+                    <option value="assistante">Assistante maternelle</option>
+                  </>
+                ) : (
+                  <>
+                    <option value="indice">Base IM + IR</option>
+                    <option value="taux">Base taux horaire</option>
+                  </>
+                )}
+              </select>
+            </div>
           </div>
         )}
 
