@@ -563,54 +563,6 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
 
         {wizardStep >= 3 && (
           <>
-            <div className="bg-slate-900/60 border border-slate-700 rounded-2xl p-5 space-y-3">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <p className="text-xs uppercase tracking-wide text-slate-400">Paramètres avancés RH</p>
-                  <p className="text-sm text-white">Ancienneté verrouillée & Référence SMIC</p>
-                </div>
-                <button
-                  onClick={() => setShowAdvancedParams((prev) => !prev)}
-                  className="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-600 text-slate-100 hover:bg-slate-800"
-                >
-                  {showAdvancedParams ? 'Masquer les paramètres' : 'Afficher les paramètres'}
-                </button>
-              </div>
-              {!showAdvancedParams && (
-                <p className="text-xs text-slate-400">
-                  Ancienneté dans le grade fixée à {anciennete} mois • SMIC de référence : {formatEUR(smicReference)} (ajustable par les RH en cas de revalorisation).
-                </p>
-              )}
-              {showAdvancedParams && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {agentType === 'indiciaire' && (
-                    <div>
-                      <label className="text-xs uppercase tracking-wide text-slate-400">Ancienneté dans le grade (mois)</label>
-                      <input
-                        type="number"
-                        min={0}
-                        max={12}
-                        value={anciennete}
-                        onChange={(e) => setAnciennete(Math.max(0, Math.min(12, Number(e.target.value) || 0)))}
-                        className="w-full mt-1 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white"
-                      />
-                    </div>
-                  )}
-                  <div className={agentType === 'indiciaire' ? '' : 'md:col-span-2'}>
-                    <label className="text-xs uppercase tracking-wide text-slate-400">Référence SMIC (CR)</label>
-                    <input
-                      type="number"
-                      min={0}
-                      value={smicReference}
-                      onChange={(e) => setSmicReference(Number(e.target.value) || 0)}
-                      className="w-full mt-1 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white"
-                    />
-                    <p className="text-xs text-slate-400 mt-1">SMIC mensuel actuel (1 801,80 €) utilisé pour le "Complément de rémunération" – modifiable en cas de revalorisation.</p>
-                  </div>
-                </div>
-              )}
-            </div>
-
             <div className="bg-gradient-to-br from-green-900/40 via-emerald-900/40 to-teal-900/40 border border-emerald-600/40 rounded-2xl p-6 space-y-4">
               <div className="flex items-center justify-between">
                 <div>
