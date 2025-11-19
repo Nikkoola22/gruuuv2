@@ -321,14 +321,22 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
       </div>
 
       <div className="space-y-6 flex-1 overflow-y-auto p-6 max-w-md mx-auto w-full">
-        <div className="grid grid-cols-1 gap-6 mb-6">
-          <div className="text-center">
-            <h4 className="text-base font-semibold text-white mb-3">Étape 1 - Mode de rémunération</h4>
-            <label className="text-sm uppercase tracking-wide text-slate-300">Quel est votre mode ?</label>
+        {/* ÉTAPE 1 - Mode de rémunération */}
+        <div className="bg-gradient-to-br from-blue-950/40 via-slate-900/50 to-blue-900/40 border-2 border-blue-500/40 rounded-2xl p-8 space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm uppercase tracking-widest font-bold text-blue-300">◆ Étape 1</p>
+              <p className="text-lg font-semibold text-white mt-1">Mode de rémunération</p>
+            </div>
+          </div>
+          <div className="h-px bg-gradient-to-r from-blue-500/0 via-blue-500/40 to-blue-500/0"></div>
+          
+          <div>
+            <label className="block text-xs uppercase tracking-wide text-blue-300 font-semibold mb-3">Quel est votre mode ?</label>
             <select
               value={agentType}
               onChange={(e) => handleSelectAgentType(e.target.value as AgentType)}
-              className="w-full mt-3 px-4 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white text-center"
+              className="w-full px-4 py-3 rounded-lg bg-blue-900/20 border-2 border-blue-500/40 text-white font-semibold focus:border-blue-400 focus:outline-none"
             >
               <option value="">Choisir...</option>
               <option value="indiciaire">Indiciaire (sur un emploi permanent)</option>
@@ -338,10 +346,18 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
         </div>
 
         {agentType && (
-          <div className="grid grid-cols-1 gap-6">
-            <div className="text-center">
-              <h4 className="text-base font-semibold text-white mb-3">Étape 2 - {agentType === 'indiciaire' ? 'Profil' : 'Mode horaire'}</h4>
-              <label className="text-sm uppercase tracking-wide text-slate-300">
+          /* ÉTAPE 2 - Profil ou Mode horaire */
+          <div className="bg-gradient-to-br from-cyan-950/40 via-slate-900/50 to-cyan-900/40 border-2 border-cyan-500/40 rounded-2xl p-8 space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm uppercase tracking-widest font-bold text-cyan-300">◆ Étape 2</p>
+                <p className="text-lg font-semibold text-white mt-1">{agentType === 'indiciaire' ? 'Profil' : 'Mode horaire'}</p>
+              </div>
+            </div>
+            <div className="h-px bg-gradient-to-r from-cyan-500/0 via-cyan-500/40 to-cyan-500/0"></div>
+            
+            <div>
+              <label className="block text-xs uppercase tracking-wide text-cyan-300 font-semibold mb-3">
                 {agentType === 'indiciaire' ? 'Quel est votre profil ?' : 'Choisissez votre mode'}
               </label>
               <select
@@ -349,7 +365,7 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
                 onChange={(e) => agentType === 'indiciaire' 
                   ? handleSelectIndiciaireProfile(e.target.value as IndiciaireProfile)
                   : handleSelectHoraireBaseType(e.target.value as HoraireBase)}
-                className="w-full mt-3 px-4 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white text-center"
+                className="w-full px-4 py-3 rounded-lg bg-cyan-900/20 border-2 border-cyan-500/40 text-white font-semibold focus:border-cyan-400 focus:outline-none"
               >
                 <option value="">Choisir...</option>
                 {agentType === 'indiciaire' ? (
@@ -371,86 +387,115 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
 
         {wizardStep >= 3 && (
           agentType === 'indiciaire' ? (
-            <div className="bg-gradient-to-br from-slate-900/60 to-slate-800/60 border border-slate-700 rounded-2xl p-6 space-y-6">
-              <div className="flex items-center justify-between">
+            <div className="bg-gradient-to-br from-emerald-950/40 via-slate-900/50 to-emerald-900/40 border-2 border-emerald-500/40 rounded-2xl p-8 space-y-8">
+              <div className="flex items-center justify-between mb-2">
                 <div>
-                  <p className="text-xs uppercase tracking-wide text-emerald-200">Étape 3</p>
-                  <p className="text-sm text-slate-200">Saisissez vos données indiciaires</p>
+                  <p className="text-sm uppercase tracking-widest font-bold text-emerald-300">◆ Étape 3</p>
+                  <p className="text-lg font-semibold text-white mt-1">Saisissez vos données indiciaires</p>
                 </div>
-                <p className="text-xs text-slate-400">Profil : <span className="text-white font-semibold capitalize">{indiciaireProfile}</span></p>
+                <div className="bg-emerald-900/40 border border-emerald-500/50 rounded-lg px-4 py-2">
+                  <p className="text-xs text-slate-300">Profil : <span className="text-emerald-300 font-bold capitalize">{indiciaireProfile}</span></p>
+                </div>
               </div>
 
-              <div className="grid grid-cols-1 gap-4 max-w-sm mx-auto w-full">
+              <div className="h-px bg-gradient-to-r from-emerald-500/0 via-emerald-500/40 to-emerald-500/0"></div>
+
+              <div className="space-y-6">
                 {indiciaireProfile !== 'assistante' ? (
                   <>
-                    <div>
-                      <label className="text-xs uppercase tracking-wide text-slate-400">Indice Majoré (IM)</label>
-                      <input
-                        value={im}
-                        onChange={(e) => setIm(e.target.value)}
-                        inputMode="decimal"
-                        className="w-full mt-1 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white"
-                        placeholder="ex : 366"
-                      />
-                      <p className="text-xs text-slate-400 mt-1">Conversion automatique : indice × 4,92278.</p>
+                    <div className="bg-white/5 border border-emerald-500/20 rounded-xl p-5 space-y-4">
+                      <div className="flex items-start justify-between">
+                        <h4 className="text-sm font-semibold text-emerald-200 uppercase tracking-wide">📊 Données d'indice</h4>
+                        <p className="text-xs text-emerald-400 italic bg-emerald-900/30 px-3 py-1 rounded-lg">Veuillez regarder sur votre fiche de paie</p>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-xs uppercase tracking-wide text-emerald-300 font-semibold mb-2">Indice Majoré (IM)</label>
+                        <input
+                          value={im}
+                          onChange={(e) => setIm(e.target.value)}
+                          inputMode="decimal"
+                          className="w-full px-4 py-3 rounded-lg bg-emerald-900/20 border-2 border-emerald-500/40 text-white font-semibold placeholder-slate-500 focus:border-emerald-400 focus:outline-none"
+                          placeholder="ex : 366"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs uppercase tracking-wide text-emerald-300 font-semibold mb-2">Nouvelle Bonification Indiciaire (NBI)</label>
+                        <input
+                          value={nbi}
+                          onChange={(e) => setNbi(e.target.value)}
+                          inputMode="decimal"
+                          className="w-full px-4 py-3 rounded-lg bg-emerald-900/20 border-2 border-emerald-500/40 text-white font-semibold placeholder-slate-500 focus:border-emerald-400 focus:outline-none"
+                          placeholder="ex : 10"
+                        />
+                        <p className="text-xs text-slate-400 mt-2">Conversion appliquée : indice × 4,92278</p>
+                      </div>
                     </div>
-                    <div>
-                      <label className="text-xs uppercase tracking-wide text-slate-400">Nouvelle Bonification Indiciaire (NBI)</label>
-                      <input
-                        value={nbi}
-                        onChange={(e) => setNbi(e.target.value)}
-                        inputMode="decimal"
-                        className="w-full mt-1 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white"
-                        placeholder="ex : 10"
-                      />
-                      <p className="text-xs text-slate-400 mt-1">Saisir l'indice NBI (conversion × 4,92278 utilisée dans le calcul).</p>
-                    </div>
-                    <div className="bg-white/5 border border-white/10 rounded-lg p-3 text-xs text-slate-200">
-                      <p className="font-semibold text-white">Traitement indiciaire (TI) converti : <span className="text-emerald-300">{formatEUR(indiciaireTI)}</span></p>
-                      <p className="mt-1">Indemnité de résidence (3% du TI) : <span className="text-emerald-300">{formatEUR(indiciaireIRValue)}</span></p>
-                      <p className="text-slate-400 mt-1">Le calcul applique automatiquement 3% du TI conformément à la procédure.</p>
+
+                    <div className="bg-emerald-950/30 border-2 border-emerald-500/60 rounded-xl p-5 space-y-3">
+                      <h4 className="text-sm font-semibold text-emerald-200 uppercase tracking-wide">💰 Montants convertis</h4>
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-center py-2 px-3 bg-emerald-900/20 rounded-lg">
+                          <span className="text-sm text-slate-300">Traitement indiciaire (TI) :</span>
+                          <span className="text-base font-bold text-emerald-300">{formatEUR(indiciaireTI)}</span>
+                        </div>
+                        <div className="flex justify-between items-center py-2 px-3 bg-emerald-900/20 rounded-lg">
+                          <span className="text-sm text-slate-300">Indemnité de résidence (3% du TI) :</span>
+                          <span className="text-base font-bold text-emerald-300">{formatEUR(indiciaireIRValue)}</span>
+                        </div>
+                      </div>
                     </div>
                   </>
                 ) : (
-                  <div>
-                    <label className="text-xs uppercase tracking-wide text-slate-400">Montant rubrique 7587 en paie</label>
+                  <div className="bg-white/5 border border-emerald-500/20 rounded-xl p-5">
+                    <label className="block text-xs uppercase tracking-wide text-emerald-300 font-semibold mb-2">Montant rubrique 7587 en paie</label>
                     <input
                       value={rubrique7587}
                       onChange={(e) => setRubrique7587(e.target.value)}
                       inputMode="decimal"
-                      className="w-full mt-1 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white"
+                      className="w-full px-4 py-3 rounded-lg bg-emerald-900/20 border-2 border-emerald-500/40 text-white font-semibold placeholder-slate-500 focus:border-emerald-400 focus:outline-none"
                       placeholder="Montant brut rubrique 7587"
                     />
-                    <p className="text-xs text-slate-400 mt-1">Le 13ème mois = rubrique 7587 / 2 (proratisé)</p>
+                    <p className="text-xs text-slate-400 mt-2">Le 13ème mois = rubrique 7587 / 2 (proratisé)</p>
                   </div>
                 )}
 
-              <div>
-                <label className="text-xs uppercase tracking-wide text-slate-400">Temps de travail (%)</label>
-                <input
-                  type="range"
-                  min={50}
-                  max={100}
-                  value={tempsEmploi}
-                  onChange={(e) => setTempsEmploi(Number(e.target.value))}
-                  className="w-full"
-                />
-                <p className="text-xs text-slate-200 font-semibold">{tempsEmploi}%</p>
-              </div>
-              <div>
-                <label className="text-xs uppercase tracking-wide text-slate-400">Mois travaillés sur l'année</label>
-                <input
-                  type="number"
-                  min={0}
-                  max={12}
-                  value={monthsWorked}
-                  onChange={(e) => setMonthsWorked(Math.max(0, Math.min(12, Number(e.target.value) || 0)))}
-                  className="w-full mt-1 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white"
-                />
-                <p className="text-xs text-slate-400 mt-1">{monthsWorked}/12 mois</p>
+                <div className="bg-white/5 border border-emerald-500/20 rounded-xl p-5 space-y-4">
+                  <h4 className="text-sm font-semibold text-emerald-200 uppercase tracking-wide">⏱️ Paramètres de calcul</h4>
+                  
+                  <div>
+                    <label className="block text-xs uppercase tracking-wide text-emerald-300 font-semibold mb-3">Temps de travail</label>
+                    <input
+                      type="range"
+                      min={50}
+                      max={100}
+                      value={tempsEmploi}
+                      onChange={(e) => setTempsEmploi(Number(e.target.value))}
+                      className="w-full accent-emerald-500"
+                    />
+                    <div className="flex justify-between items-center mt-2">
+                      <span className="text-xs text-slate-400">50%</span>
+                      <span className="text-lg font-bold text-emerald-300 bg-emerald-900/30 px-4 py-2 rounded-lg">{tempsEmploi}%</span>
+                      <span className="text-xs text-slate-400">100%</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs uppercase tracking-wide text-emerald-300 font-semibold mb-2">Mois travaillés sur l'année</label>
+                    <input
+                      type="number"
+                      min={0}
+                      max={12}
+                      value={monthsWorked}
+                      onChange={(e) => setMonthsWorked(Math.max(0, Math.min(12, Number(e.target.value) || 0)))}
+                      className="w-full px-4 py-3 rounded-lg bg-emerald-900/20 border-2 border-emerald-500/40 text-white font-semibold placeholder-slate-500 focus:border-emerald-400 focus:outline-none"
+                    />
+                    <p className="text-xs text-slate-400 mt-2"><strong>{monthsWorked}/12</strong> mois travaillés</p>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
           ) : (
             <div className="bg-gradient-to-br from-slate-900/60 to-slate-800/60 border border-slate-700 rounded-2xl p-6 space-y-6">
               <div className="flex items-center justify-between">

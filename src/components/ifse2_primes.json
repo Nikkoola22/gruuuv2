@@ -534,13 +534,6 @@
   {
     "Motif": "Prime accueil 1",
     "Montant": "50 €",
-    "Metiers_concernes": "ATSEM",
-    "Direction": "DESS",
-    "Service": "SERA"
-  },
-  {
-    "Motif": "Prime accueil 1",
-    "Montant": "50 €",
     "Metiers_concernes": "Responsable d'office",
     "Direction": "DESS",
     "Service": "SERA"
@@ -1832,5 +1825,222 @@
     "Metiers_concernes": "Secrétaire",
     "Direction": "DSA",
     "Service": "Coordination gérontologique"
+  },
+  {
+    "Motif": "Prime accueil 1",
+    "Montant": "50 €",
+    "Metiers_concernes": "Secrétaire médicale",
+    "Direction": "DMSP",
+    "Service": "Promotion santé"
+  },
+  {
+    "Motif": "Prime accueil 1",
+    "Montant": "50 €",
+    "Metiers_concernes": "Responsable de service",
+    "Direction": "DMRU",
+    "Service": "Affaires civiles"
+  },
+  {
+    "Motif": "Prime accueil 1",
+    "Montant": "50 €",
+    "Metiers_concernes": "Agent d'accueil",
+    "Direction": "DMRU",
+    "Service": "Accueil démarches prestations"
+  },
+  {
+    "Motif": "Prime accueil 1",
+    "Montant": "50 €",
+    "Metiers_concernes": "Assistante polyvalente",
+    "Direction": "DMRU",
+    "Service": "Accueil démarches prestations"
+  },
+  {
+    "Motif": "Prime accueil 1",
+    "Montant": "50 €",
+    "Metiers_concernes": "Adjoint au responsable de service",
+    "Direction": "DMRU",
+    "Service": "Accueil démarches prestations"
+  },
+  {
+    "Motif": "Prime accueil 1",
+    "Montant": "50 €",
+    "Metiers_concernes": "Assistante de direction",
+    "Direction": "DMRU",
+    "Service": "Direction Administrative"
+  },
+  {
+    "Motif": "Prime accueil 1",
+    "Montant": "50 €",
+    "Metiers_concernes": "Animateur santé",
+    "Direction": "DMSP",
+    "Service": "Espace santé jeunes"
+  },
+  {
+    "Motif": "Prime accueil 1",
+    "Montant": "50 €",
+    "Metiers_concernes": "Auxiliaire de puériculture",
+    "Direction": "DMSP",
+    "Service": "PMI Timbaud & PMI Timbaud"
+  },
+  {
+    "Motif": "Prime accueil 1",
+    "Montant": "50 €",
+    "Metiers_concernes": "Responsable de service",
+    "Direction": "DMSP",
+    "Service": "PMI Timbaud"
+  },
+  {
+    "Motif": "Prime accueil 1",
+    "Montant": "50 €",
+    "Metiers_concernes": "Agent d'accueil",
+    "Direction": "DMSP",
+    "Service": "Dentaire"
+  },
+  {
+    "Motif": "Prime accueil 1",
+    "Montant": "50 €",
+    "Metiers_concernes": "Agent chargé des repas et télétransmission",
+    "Direction": "DSA",
+    "Service": "ASA"
+  },
+  {
+    "Motif": "Prime accueil 1",
+    "Montant": "50 €",
+    "Metiers_concernes": "Assistante administrative",
+    "Direction": "DSA",
+    "Service": "ASA"
+  },
+  {
+    "Motif": "Prime accueil 1",
+    "Montant": "50 €",
+    "Metiers_concernes": "Agent d'accueil",
+    "Direction": "DSA",
+    "Service": "Coordination gérontologique"
+  },
+  {
+    "Motif": "Prime accueil 1",
+    "Montant": "50 €",
+    "Metiers_concernes": "Secrétaire",
+    "Direction": "DSA",
+    "Service": "Coordination gérontologique"
+  },
+  {
+    "Motif": "Prime accueil 1",
+    "Montant": "50 €",
+    "Metiers_concernes": "Conseiller en insertion",
+    "Direction": "DSA",
+    "Service": "Espace insertion"
+  },
+  {
+    "Motif": "Prime accueil 1",
+    "Montant": "50 €",
+    "Metiers_concernes": "Assistante",
+    "Direction": "DSA",
+    "Service": "Espace insertion"
+  },
+  {
+    "Motif": "Prime accueil 1",
+    "Montant": "50 €",
+    "Metiers_concernes": "Agent d'accueil",
+    "Direction": "DSA",
+    "Service": "Espace insertion"
+  },
+  {
+    "Motif": "Prime accueil 1",
+    "Montant": "50 €",
+    "Metiers_concernes": "Agent d'accueil - Agent administratif",
+    "Direction": "DSA",
+    "Service": "Prestations de solidarité"
+  },
+  {
+    "Motif": "Prime accueil 1",
+    "Montant": "50 €",
+    "Metiers_concernes": "Secrétaire accueil",
+    "Direction": "DCJ",
+    "Service": "Cinéma Jean Vigo"
+  },
+  {
+    "Motif": "Prime accueil 1",
+    "Montant": "50 €",
+    "Metiers_concernes": "Chef d'équipe",
+    "Direction": "DCJ",
+    "Service": "Conservatoire"
+  },
+  {
+    "Motif": "Prime accueil 1",
+    "Montant": "50 €",
+    "Metiers_concernes": "Secrétaire accueil",
+    "Direction": "DCJ",
+    "Service": "Ecole musique"
+  },
+  {
+    "Motif": "Prime accueil 1",
+    "Montant": "50 €",
+    "Metiers_concernes": "Gestionnaire administratif et financier",
+    "Direction": "DCJ",
+    "Service": "Direction"
+  },
+  {
+    "Motif": "Prime accueil 1",
+    "Montant": "50 €",
+    "Metiers_concernes": "Responsable des bibliothèques",
+    "Direction": "DCJ",
+    "Service": "Bibliothèques"
+  },
+  {
+    "Motif": "Prime accueil 1",
+    "Montant": "50 €",
+    "Metiers_concernes": "Chargé d'information",
+    "Direction": "DCJ",
+    "Service": "Spectacles"
+  },
+  {
+    "Motif": "Prime accueil 1",
+    "Montant": "50 €",
+    "Metiers_concernes": "Agent d'accueil",
+    "Direction": "DCJ",
+    "Service": "Spectacles"
+  },
+  {
+    "Motif": "Prime accueil 1",
+    "Montant": "50 €",
+    "Metiers_concernes": "Agent chargé des mandatements",
+    "Direction": "DESS",
+    "Service": "SSE"
+  },
+  {
+    "Motif": "Prime accueil 1",
+    "Montant": "50 €",
+    "Metiers_concernes": "Assistante",
+    "Direction": "DME",
+    "Service": "PRE"
+  },
+  {
+    "Motif": "Prime accueil 1",
+    "Montant": "50 €",
+    "Metiers_concernes": "Agent d'accueil",
+    "Direction": "DME",
+    "Service": "Séjours éducatifs"
+  },
+  {
+    "Motif": "Prime accueil 1",
+    "Montant": "50 €",
+    "Metiers_concernes": "Secrétaire",
+    "Direction": "DME",
+    "Service": "Enfance"
+  },
+  {
+    "Motif": "Prime accueil 1",
+    "Montant": "50 €",
+    "Metiers_concernes": "Agent d'accueil administratif",
+    "Direction": "DH",
+    "Service": "Logement"
+  },
+  {
+    "Motif": "Prime accueil 1",
+    "Montant": "50 €",
+    "Metiers_concernes": "Adjoint au responsable de service",
+    "Direction": "DH",
+    "Service": "Logement"
   }
 ]

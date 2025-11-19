@@ -367,12 +367,140 @@ const INITIAL_QUESTIONS: Question[] = faqData.slice(0, 10).map((f, idx) => {
   }
   const questionText = idx === 9 ? CUSTOM_Q10.question : f.question;
   return { id: idx + 1, question: questionText, options: opts, correctIndex } as Question;
-});
+}).concat([
+  // 10 nouvelles questions (questions 11-20)
+  {
+    id: 11,
+    question: "Quelle est la procédure pour demander un congé sabbatique ?",
+    options: [
+      "C'est un congé d'une durée de 6 mois à 3 ans accordé de droit après 10 ans d'ancienneté",
+      "C'est un congé payé d'une durée de 1 mois minimum accordé sur demande",
+      "C'est un congé non-rémunéré accordé après accord de la hiérarchie et du service RH",
+      "C'est un congé qui doit être pris avant 55 ans, sur autorisation préalable"
+    ],
+    correctIndex: 0
+  },
+  {
+    id: 12,
+    question: "Que sont les droits de visite médicale pour les agents ?",
+    options: [
+      "La visite médicale obligatoire une fois par an pour tous les agents",
+      "La visite médicale est un droit de l'agent pour avoir un arrêt de travail",
+      "La visite médicale est obligatoire une fois tous les 5 ans uniquement",
+      "Les agents n'ont pas de droits concernant les visites médicales"
+    ],
+    correctIndex: 0
+  },
+  {
+    id: 13,
+    question: "Quel est le délai de prévenance pour démissionner d'un poste ?",
+    options: [
+      "1 mois pour tous les agents sans exception",
+      "2 mois pour les cadres, 1 mois pour les autres agents",
+      "Le délai dépend de la durée du contrat",
+      "Il n'y a pas de délai obligatoire à respecter"
+    ],
+    correctIndex: 2
+  },
+  {
+    id: 14,
+    question: "Comment fonctionnent les jours de repos compensateur ?",
+    options: [
+      "Ils sont automatiquement attribués après 4 heures de travail le dimanche",
+      "Ce sont des jours de repos accordés en compensation de travaux de nuit ou le dimanche",
+      "Ils doivent être pris dans les 3 mois suivant l'événement qui les génère",
+      "Ils s'ajoutent automatiquement aux congés annuels"
+    ],
+    correctIndex: 1
+  },
+  {
+    id: 15,
+    question: "Quels sont les droits des agents en cas de maladie longue durée ?",
+    options: [
+      "Les agents perdent leurs primes mais gardent leur salaire pendant 3 ans",
+      "Les agents continuent à percevoir leur traitement et peuvent bénéficier d'aménagements de poste",
+      "Les agents doivent prendre un congé sabbatique obligatoirement",
+      "Les agents n'ont aucune protection particulière"
+    ],
+    correctIndex: 0
+  },
+  {
+    id: 16,
+    question: "Qu'est-ce que le compte personnel de formation (CPF) ?",
+    options: [
+      "Un compte d'épargne rémunéré mis en place par la mairie",
+      "Un compte permettant d'accumuler des heures de formation tout au long de la carrière",
+      "Un compte bancaire obligatoire pour tous les agents",
+      "Un fonds destiné aux augmentations de salaire"
+    ],
+    correctIndex: 1
+  },
+  {
+    id: 17,
+    question: "Quelles sont les conditions pour bénéficier d'un congé parental ?",
+    options: [
+      "C'est un droit accordé aux parents ayant au moins 1 enfant à charge",
+      "C'est accordé uniquement après 5 ans d'ancienneté dans la fonction publique",
+      "C'est un congé payé d'une durée maximale de 6 mois",
+      "Seules les mères peuvent en bénéficier"
+    ],
+    correctIndex: 0
+  },
+  {
+    id: 18,
+    question: "Comment se calcule la pension de retraite d'un agent public ?",
+    options: [
+      "Elle est basée uniquement sur le dernier salaire perçu avant la retraite",
+      "Elle se calcule sur la moyenne des 6 derniers mois et le nombre d'années de service",
+      "Elle est forfaitaire et identique pour tous les agents",
+      "Elle dépend uniquement de l'age de départ en retraite"
+    ],
+    correctIndex: 1
+  },
+  {
+    id: 19,
+    question: "Quel est le rôle du médecin de prévention ?",
+    options: [
+      "C'est le médecin qui traite les maladies des agents",
+      "C'est un professionnel qui intervient en prévention et suivi médical au travail",
+      "C'est uniquement responsable des vaccinations obligatoires",
+      "Il n'y a pas de médecin de prévention dans la fonction publique territoriale"
+    ],
+    correctIndex: 1
+  },
+  {
+    id: 20,
+    question: "Qu'est-ce que le système de notation des agents ?",
+    options: [
+      "C'est un système permettant d'évaluer les compétences et le travail fourni par chaque agent",
+      "C'est une notation basée uniquement sur l'ancienneté",
+      "C'est un système de bonus/malus sur les congés",
+      "Les agents n'ont pas de notation formelle"
+    ],
+    correctIndex: 0
+  }
+]);
+
+// Fonction pour sélectionner aléatoirement 10 questions parmi 20 sans doublons
+function getRandomQuestions(): Question[] {
+  const shuffled = [...INITIAL_QUESTIONS].sort(() => Math.random() - 0.5);
+  const selected = shuffled.slice(0, 10);
+  
+  // Vérifier qu'il n'y a pas de doublons (par id)
+  const ids = new Set(selected.map(q => q.id));
+  if (ids.size !== selected.length) {
+    // En cas de doublon (très rare), relancer récursivement
+    return getRandomQuestions();
+  }
+  
+  return selected;
+}
 
 export default function Quiz({ onBack }: QuizProps) {
+  const [randomQuestions] = useState<Question[]>(getRandomQuestions());
   const [index, setIndex] = useState(0);
-  const [questions, setQuestions] = useState<Question[]>(INITIAL_QUESTIONS);
-  const [answers, setAnswers] = useState<(number | null)[]>(Array(INITIAL_QUESTIONS.length).fill(null));
+  const [questions, setQuestions] = useState<Question[]>(randomQuestions);
+  const [answers, setAnswers] = useState<(number | null)[]>(Array(randomQuestions.length).fill(null));
   const [submitted, setSubmitted] = useState(false);
 
   // helper to regenerate options for questions starting at startIdx (0-based)
@@ -540,7 +668,9 @@ export default function Quiz({ onBack }: QuizProps) {
   };
 
   const restart = () => {
-    setAnswers(Array(questions.length).fill(null));
+    const newQuestions = getRandomQuestions();
+    setQuestions(newQuestions);
+    setAnswers(Array(newQuestions.length).fill(null));
     setIndex(0);
     setSubmitted(false);
   };

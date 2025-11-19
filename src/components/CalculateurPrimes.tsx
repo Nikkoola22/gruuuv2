@@ -284,37 +284,24 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
       </div>
 
       <div className="space-y-6 flex-1 overflow-y-auto p-6 max-w-2xl mx-auto w-full">
-        {/* PROGRESS TRACKER */}
-        <div className="space-y-3">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-semibold text-slate-300">Progression du calcul</h3>
-            <span className="text-xs font-medium text-slate-400">{progressPercent}%</span>
-          </div>
-          <div className="w-full h-2 bg-slate-700/50 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-gradient-to-r from-blue-500 via-cyan-500 to-teal-500 transition-all duration-500"
-              style={{ width: `${progressPercent}%` }}
-            ></div>
-          </div>
-        </div>
 
         {/* ÉTAPE 1: CATÉGORIE */}
-        <div className={`transition-all duration-300 ${currentStep === 1 ? 'ring-2 ring-blue-400/50' : ''} bg-gradient-to-br from-slate-800/60 to-slate-800/40 rounded-xl p-6 border border-slate-700/50 hover:border-slate-600/50`}>
+        <div className={`transition-all duration-500 transform ${!selectedCategory ? 'ring-2 ring-blue-400/50 shadow-lg shadow-blue-500/30 bg-blue-500/10' : ''} ${currentStep === 1 ? 'ring-2 ring-blue-400/50 shadow-lg shadow-blue-500/20 scale-100' : 'opacity-95 hover:opacity-100'} bg-gradient-to-br from-indigo-950/70 via-slate-800/50 to-indigo-900/40 rounded-xl p-6 border border-indigo-700/30 hover:border-blue-400/30 backdrop-blur-sm`}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-sm">
+            <div className={`w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-sm shadow-lg ${!selectedCategory ? 'animate-pulse' : ''} ${currentStep === 1 ? 'animate-pulse' : ''}`}>
               1
             </div>
             <div>
-              <h4 className="text-xl font-bold text-white">Catégorie d'emploi</h4>
+              <h4 className={`text-lg font-bold tracking-tight ${!selectedCategory ? 'text-blue-300 font-bold' : 'text-white'}`}>{!selectedCategory ? '👉 ' : ''}Catégorie d'emploi</h4>
               <p className="text-xs text-slate-400">Sélectionnez votre grille indiciaire (A, B ou C)</p>
             </div>
           </div>
-          {selectedCategory && <CheckCircle2 className="w-5 h-5 text-green-400" />}
+          {selectedCategory && <CheckCircle2 className="w-5 h-5 text-emerald-400 animate-bounce" />}
         </div>
 
         <div className="max-w-md mx-auto">
-          <label className="text-xs text-slate-400 mb-2 block font-medium">Choisir une catégorie:</label>
+          <label className="text-xs text-slate-400 mb-2 block font-medium uppercase tracking-wide">Choisir une catégorie:</label>
           <select
             value={selectedCategory}
             onChange={(e) => {
@@ -323,7 +310,7 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
                 setCurrentStep(2)
               }
             }}
-            className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/30 rounded-lg text-white text-base focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 outline-none transition"
+            className="w-full px-4 py-3 bg-gradient-to-r from-indigo-900/40 to-slate-800/40 border border-indigo-600/30 rounded-lg text-white text-base focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 outline-none transition-all duration-300 hover:border-indigo-500/50 shadow-md hover:shadow-lg hover:shadow-blue-500/10"
           >
             <option value="">-- Sélectionnez une catégorie --</option>
             {['A', 'B', 'C'].map(cat => (
@@ -335,24 +322,30 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
         </div>
       </div>
 
+      {selectedCategory && !selectedFunctionCode && (
+        <div className="flex justify-center py-4 animate-bounce">
+          <div className="text-blue-400 text-6xl">↓</div>
+        </div>
+      )}
+
       {/* ÉTAPE 2: FONCTION (IFSE 1) */}
       {selectedCategory && (
-        <div className={`transition-all duration-300 ${currentStep === 2 ? 'ring-2 ring-cyan-400/50' : ''} bg-gradient-to-br from-slate-800/60 to-slate-800/40 rounded-xl p-6 border border-slate-700/50 hover:border-slate-600/50`}>
+        <div className={`transition-all duration-500 transform ${!selectedFunctionCode ? 'ring-2 ring-cyan-400/50 shadow-lg shadow-cyan-500/30 bg-cyan-500/10' : ''} ${currentStep === 2 ? 'ring-2 ring-cyan-400/50 shadow-lg shadow-cyan-500/20 scale-100' : 'opacity-95 hover:opacity-100'} bg-gradient-to-br from-indigo-950/70 via-slate-800/50 to-indigo-900/40 rounded-xl p-6 border border-indigo-700/30 hover:border-cyan-400/30 backdrop-blur-sm animate-in fade-in slide-in-from-bottom-4 duration-500`}>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-teal-500 flex items-center justify-center text-white font-bold text-sm">
+              <div className={`w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-teal-500 flex items-center justify-center text-white font-bold text-sm shadow-lg ${!selectedFunctionCode ? 'animate-pulse' : ''} ${currentStep === 2 ? 'animate-pulse' : ''}`}>
                 2
               </div>
               <div>
-                <h4 className="text-xl font-bold text-white">Fonction & IFSE 1</h4>
+                <h4 className={`text-lg font-bold tracking-tight ${!selectedFunctionCode ? 'text-cyan-300 font-bold' : 'text-white'}`}>{!selectedFunctionCode ? '👉 ' : ''}Fonction & IFSE 1</h4>
                 <p className="text-xs text-slate-400">Prime de base selon votre poste</p>
               </div>
             </div>
-            {selectedFunctionCode && <CheckCircle2 className="w-5 h-5 text-green-400" />}
+            {selectedFunctionCode && <CheckCircle2 className="w-5 h-5 text-emerald-400 animate-bounce" />}
           </div>
 
           <div className="max-w-md mx-auto">
-            <label className="text-xs text-slate-400 mb-2 block font-medium">Choisir une fonction:</label>
+            <label className="text-xs text-slate-400 mb-2 block font-medium uppercase tracking-wide">Choisir une fonction:</label>
             <select
               value={selectedFunctionCode}
               onChange={(e) => {
@@ -361,7 +354,7 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
                   setCurrentStep(3)
                 }
               }}
-              className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/30 rounded-lg text-white text-base focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 outline-none transition"
+              className="w-full px-4 py-3 bg-gradient-to-r from-indigo-900/40 to-slate-800/40 border border-indigo-600/30 rounded-lg text-white text-base focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 outline-none transition-all duration-300 hover:border-indigo-500/50 shadow-md hover:shadow-lg hover:shadow-cyan-500/10"
             >
               <option value="">-- Sélectionnez une fonction --</option>
               {ifse1Data
@@ -376,36 +369,48 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
         </div>
       )}
 
+      {selectedFunctionCode && !selectedDirection && (
+        <div className="flex justify-center py-4 animate-bounce">
+          <div className="text-cyan-400 text-6xl">↓</div>
+        </div>
+      )}
+
       {/* ÉTAPE 3: PRIMES COMPLÉMENTAIRES (IFSE 2 & 3) */}
       {selectedFunctionCode && (
-        <div className={`transition-all duration-300 ${currentStep === 3 ? 'ring-2 ring-teal-400/50' : ''} bg-gradient-to-br from-slate-800/60 to-slate-800/40 rounded-xl p-6 border border-slate-700/50 hover:border-slate-600/50`}>
+        <div className={`transition-all duration-300 ${currentStep === 3 ? 'ring-2 ring-teal-400/50' : ''} bg-gradient-to-br from-indigo-950/60 to-indigo-900/30 rounded-xl p-6 border border-indigo-700/30 hover:border-indigo-600/50`}>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-teal-500 to-green-500 flex items-center justify-center text-white font-bold text-sm">
                 3
               </div>
               <div>
-                                <h4 className="text-xl font-bold text-white">Primes complémentaires</h4>
+                <h4 className="text-lg font-bold text-white tracking-tight">Primes complémentaires</h4>
                 <p className="text-xs text-slate-400">IFSE 2 - Services et sujétions</p>
               </div>
             </div>
-            {(selectedDirection || ifse3Total > 0) && <CheckCircle2 className="w-5 h-5 text-green-400" />}
+            {(selectedDirection || ifse3Total > 0) && <CheckCircle2 className="w-5 h-5 text-emerald-400 animate-bounce" />}
           </div>
 
           {/* IFSE 2 */}
-          <div className="mb-6 space-y-4">
-            <h5 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+          <div className="mb-6 space-y-4 p-4 bg-gradient-to-br from-teal-500/5 to-cyan-500/5 rounded-lg border border-teal-500/20">
+            <h5 className="text-sm font-semibold text-white mb-3 flex items-center gap-2 uppercase tracking-wide">
               <TrendingUp className="w-4 h-4 text-teal-400" />
               IFSE 2 — Primes de sujétion
             </h5>
 
             {/* Étape 1: Direction */}
-            <div className="max-w-sm mx-auto w-full">
-              <label className="text-xs text-slate-400 mb-2 block font-medium">Étape 1 - Sélectionnez votre direction:</label>
+            <div className={`max-w-sm mx-auto w-full transform transition-all duration-300 hover:scale-102 p-3 rounded-lg ${!selectedDirection ? 'ring-2 ring-teal-400/50 bg-teal-500/10 shadow-lg shadow-teal-500/20' : ''}`}>
+              <label className={`text-xs mb-2 block font-medium uppercase tracking-wide transition-all duration-300 ${!selectedDirection ? 'text-teal-300 font-bold' : 'text-slate-300'}`}>
+                {!selectedDirection && '👉 '} Étape 1 - Direction:
+              </label>
               <select
                 value={selectedDirection}
                 onChange={(e) => handleDirectionSelect(e.target.value)}
-                className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/30 rounded-lg text-white text-base focus:border-teal-400 focus:ring-2 focus:ring-teal-400/30 outline-none transition"
+                className={`w-full px-4 py-3 bg-slate-700/50 border rounded-lg text-white text-base outline-none transition-all duration-300 hover:border-slate-500/50 shadow-md hover:shadow-lg ${
+                  !selectedDirection 
+                    ? 'border-teal-400 focus:border-teal-400 focus:ring-2 focus:ring-teal-400/40 ring-2 ring-teal-400/50 hover:shadow-lg hover:shadow-teal-500/20' 
+                    : 'border-slate-600/30 focus:border-teal-400 focus:ring-2 focus:ring-teal-400/30 hover:shadow-teal-500/10'
+                }`}
               >
                 <option value="">-- Choisir une direction --</option>
                 {getAllDirections().map(dir => (
@@ -416,14 +421,27 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
               </select>
             </div>
 
+            {/* Flèche vers étape 2 */}
+            {selectedDirection && !selectedService && (
+              <div className="flex justify-center py-4 animate-bounce">
+                <div className="text-teal-400 text-6xl">↓</div>
+              </div>
+            )}
+
             {/* Étape 2: Service */}
             {selectedDirection && (
-              <div className="max-w-sm mx-auto w-full">
-                <label className="text-xs text-slate-400 mb-2 block font-medium">Étape 2 - Sélectionnez votre service:</label>
+              <div className={`max-w-sm mx-auto w-full transform transition-all duration-300 animate-in fade-in slide-in-from-bottom-2 p-3 rounded-lg ${!selectedService ? 'ring-2 ring-cyan-400/50 bg-cyan-500/10 shadow-lg shadow-cyan-500/20' : ''}`}>
+                <label className={`text-xs mb-2 block font-medium uppercase tracking-wide transition-all duration-300 ${!selectedService ? 'text-cyan-300 font-bold' : 'text-slate-300'}`}>
+                  {!selectedService && '👉 '} Étape 2 - Service:
+                </label>
                 <select
                   value={selectedService}
                   onChange={(e) => handleServiceSelect(e.target.value)}
-                  className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/30 rounded-lg text-white text-base focus:border-teal-400 focus:ring-2 focus:ring-teal-400/30 outline-none transition"
+                  className={`w-full px-4 py-3 bg-slate-700/50 border rounded-lg text-white text-base outline-none transition-all duration-300 hover:border-slate-500/50 shadow-md hover:shadow-lg ${
+                    !selectedService && selectedDirection
+                      ? 'border-cyan-400 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/40 ring-2 ring-cyan-400/50 hover:shadow-lg hover:shadow-cyan-500/20' 
+                      : 'border-slate-600/30 focus:border-teal-400 focus:ring-2 focus:ring-teal-400/30 hover:shadow-teal-500/10'
+                  }`}
                 >
                   <option value="">-- Tous les services --</option>
                   {getServicesByDirection(selectedDirection).map(service => (
@@ -435,22 +453,41 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
               </div>
             )}
 
+            {/* Flèche vers étape 3 */}
+            {selectedDirection && selectedService && !selectedJob && (
+              <div className="flex justify-center py-4 animate-bounce">
+                <div className="text-blue-400 text-6xl">↓</div>
+              </div>
+            )}
+
             {/* Étape 3: Métier */}
             {selectedDirection && (
-              <div className="max-w-sm mx-auto w-full p-4 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/30 rounded-lg">
-                <h6 className="text-sm font-semibold text-blue-300 mb-3 flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 bg-blue-400 rounded-full" />
-                  Étape 3 - Sélectionner un métier
+              <div className={`max-w-sm mx-auto w-full p-4 rounded-lg transform transition-all duration-300 animate-in fade-in slide-in-from-bottom-2 shadow-lg ${
+                !selectedJob
+                  ? 'bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border-2 border-blue-400/60 shadow-lg shadow-blue-500/30 ring-2 ring-blue-400/50'
+                  : 'bg-gradient-to-br from-blue-500/15 to-cyan-500/15 border border-blue-500/40 shadow-blue-500/10'
+              }`}>
+                <h6 className={`text-sm font-semibold mb-3 flex items-center gap-2 uppercase tracking-wide transition-all duration-300 ${
+                  !selectedJob ? 'text-blue-200 font-bold' : 'text-blue-200'
+                }`}>
+                  <span className={`w-2 h-2 rounded-full ${!selectedJob ? 'animate-pulse bg-blue-300' : 'animate-pulse bg-blue-400'}`} />
+                  {!selectedJob && '👉 '} Étape 3 - Métier
                 </h6>
-                <p className="text-xs text-slate-300 mb-3 italic">
+                <p className="text-xs text-slate-300 mb-3 italic font-medium">
                   Si vous ne trouvez pas votre metiers merci de nous appeler
                 </p>
                 
-                <label className="text-xs text-slate-400 mb-2 block font-medium">Choisir un métier:</label>
+                <label className={`text-xs mb-2 block font-medium uppercase tracking-wide transition-all duration-300 ${
+                  !selectedJob ? 'text-blue-300 font-bold' : 'text-slate-300'
+                }`}>Choisir un métier:</label>
                 <select
                   value={selectedJob}
                   onChange={(e) => handleJobSelect(e.target.value)}
-                  className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/30 rounded-lg text-white text-base focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 outline-none transition"
+                  className={`w-full px-4 py-3 bg-slate-700/50 border rounded-lg text-white text-base outline-none transition-all duration-300 hover:border-slate-500/50 shadow-md hover:shadow-lg ${
+                    !selectedJob
+                      ? 'border-blue-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/40 ring-2 ring-blue-400/50 hover:shadow-lg hover:shadow-blue-500/20'
+                      : 'border-slate-600/30 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 hover:shadow-blue-500/10'
+                  }`}
                 >
                   <option value="">-- Sélectionnez un métier --</option>
                   {getIFSE2ByDirection(selectedDirection)
@@ -513,7 +550,7 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
             )}
 
             {!selectedJob && selectedDirection && (
-              <div className="max-w-sm mx-auto w-full p-3 bg-slate-700/50 border border-slate-600/30 rounded-lg text-center">
+              <div className="max-w-sm mx-auto w-full p-3 bg-gradient-to-r from-indigo-900/30 to-slate-800/30 border border-indigo-600/30 rounded-lg text-center">
                 <p className="text-xs text-slate-400">Sélectionnez un métier pour afficher les primes</p>
               </div>
             )}
@@ -527,29 +564,35 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
         </div>
       )}
 
+      {selectedFunctionCode && selectedJob && (weekendSaturdays === 0 && weekendSundays === 0) && (
+        <div className="flex justify-center py-4 animate-bounce">
+          <div className="text-purple-400 text-6xl">↓</div>
+        </div>
+      )}
+
       {/* ÉTAPE 4: PRIMES WEEK-END (IFSE 3) */}
       {selectedFunctionCode && (
-        <div className={`transition-all duration-300 ${currentStep === 4 ? 'ring-2 ring-purple-400/50' : ''} bg-gradient-to-br from-slate-800/60 to-slate-800/40 rounded-xl p-6 border border-slate-700/50 hover:border-slate-600/50`}>
+        <div className={`transition-all duration-300 ${(weekendSaturdays === 0 && weekendSundays === 0) ? 'ring-2 ring-purple-400/50 shadow-lg shadow-purple-500/30 bg-purple-500/10' : ''} ${currentStep === 4 ? 'ring-2 ring-purple-400/50 shadow-lg shadow-purple-500/20' : ''} bg-gradient-to-br from-indigo-950/60 to-indigo-900/30 rounded-xl p-6 border border-indigo-700/30 hover:border-indigo-600/50`}>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-sm">
+              <div className={`w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-sm shadow-lg ${(weekendSaturdays === 0 && weekendSundays === 0) ? 'animate-pulse' : ''} ${currentStep === 4 ? 'animate-pulse' : ''}`}>
                 4
               </div>
               <div>
-                <h4 className="text-xl font-bold text-white">Primes week-end</h4>
+                <h4 className={`text-lg font-bold tracking-tight ${(weekendSaturdays === 0 && weekendSundays === 0) ? 'text-purple-300 font-bold' : 'text-white'}`}>{(weekendSaturdays === 0 && weekendSundays === 0) ? '👉 ' : ''}Primes week-end</h4>
                 <p className="text-xs text-slate-400">IFSE 3 - Samedis et dimanches travaillés</p>
               </div>
             </div>
-            {(weekendSaturdays > 0 || weekendSundays > 0) && <CheckCircle2 className="w-5 h-5 text-green-400" />}
+            {(weekendSaturdays > 0 || weekendSundays > 0) && <CheckCircle2 className="w-5 h-5 text-emerald-400 animate-bounce" />}
           </div>
 
-          <div className="grid grid-cols-2 gap-4 mb-6">
-            <div>
-              <label className="text-xs text-slate-400 mb-2 block font-medium">Samedis travaillés par mois</label>
+          <div className="grid grid-cols-2 gap-4 mb-6 transform transition-all duration-300">
+            <div className="transform transition-all duration-300 hover:scale-102">
+              <label className="text-xs text-slate-300 mb-2 block font-medium uppercase tracking-wide">Samedis travaillés par mois</label>
               <select
                 value={weekendSaturdays}
                 onChange={(e) => setWeekendSaturdays(Number(e.target.value))}
-                className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/30 rounded-lg text-white text-base focus:border-purple-400 focus:ring-2 focus:ring-purple-400/30 outline-none transition"
+                className="w-full px-4 py-3 bg-gradient-to-r from-indigo-900/40 to-slate-800/40 border border-indigo-600/30 rounded-lg text-white text-base focus:border-purple-400 focus:ring-2 focus:ring-purple-400/30 outline-none transition-all duration-300 hover:border-indigo-500/50 shadow-md hover:shadow-lg hover:shadow-purple-500/10"
               >
                 {[0, 1, 2, 3, 4, 5].map(n => (
                   <option key={n} value={n}>
@@ -559,12 +602,12 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
               </select>
             </div>
 
-            <div>
-              <label className="text-xs text-slate-400 mb-2 block font-medium">Dimanches travaillés par mois</label>
+            <div className="transform transition-all duration-300 hover:scale-102">
+              <label className="text-xs text-slate-300 mb-2 block font-medium uppercase tracking-wide">Dimanches travaillés par mois</label>
               <select
                 value={weekendSundays}
                 onChange={(e) => setWeekendSundays(Number(e.target.value))}
-                className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/30 rounded-lg text-white text-base focus:border-purple-400 focus:ring-2 focus:ring-purple-400/30 outline-none transition"
+                className="w-full px-4 py-3 bg-gradient-to-r from-indigo-900/40 to-slate-800/40 border border-indigo-600/30 rounded-lg text-white text-base focus:border-purple-400 focus:ring-2 focus:ring-purple-400/30 outline-none transition-all duration-300 hover:border-indigo-500/50 shadow-md hover:shadow-lg hover:shadow-purple-500/10"
               >
                 {[0, 1, 2, 3, 4, 5].map(n => (
                   <option key={n} value={n}>
@@ -575,18 +618,30 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
             </div>
           </div>
 
+          {weekendSaturdays === 0 && weekendSundays === 0 && (
+            <button
+              onClick={() => setCurrentStep(5)}
+              className="w-full p-4 mb-6 bg-gradient-to-r from-slate-700/50 to-slate-600/50 border-2 border-slate-500/50 hover:border-purple-400/50 hover:bg-purple-500/10 rounded-lg text-slate-300 hover:text-purple-300 font-medium uppercase tracking-wide transition-all duration-300 transform hover:scale-102"
+            >
+              ✓ Pas de primes week-end sélectionnées
+            </button>
+          )}
+
           {(weekendSaturdays > 0 || weekendSundays > 0) && (
             <>
-              <div className="mb-6 pb-6 border-b border-slate-600/30">
-                <h5 className="text-sm font-semibold text-slate-200 mb-4">Sélectionnez les taux horaires</h5>
+              <div className="mb-6 pb-6 border-b border-slate-600/30 transform transition-all duration-300 animate-in fade-in slide-in-from-bottom-2">
+                <h5 className="text-sm font-semibold text-slate-200 mb-4 uppercase tracking-wide">Sélectionnez les taux horaires</h5>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-xs text-slate-400 mb-2 block font-medium">Taux pour les samedis</label>
+                  <div className="transform transition-all duration-300 hover:scale-102">
+                    <label className="text-xs text-slate-300 mb-2 block font-medium uppercase tracking-wide">Taux pour les samedis</label>
                     <select
                       value={weekendRateSat}
-                      onChange={(e) => setWeekendRateSat(Number(e.target.value))}
-                      className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/30 rounded-lg text-white text-base focus:border-purple-400 focus:ring-2 focus:ring-purple-400/30 outline-none transition"
+                      onChange={(e) => {
+                        setWeekendRateSat(Number(e.target.value))
+                        setCurrentStep(5)
+                      }}
+                      className="w-full px-4 py-3 bg-gradient-to-r from-indigo-900/40 to-slate-800/40 border border-indigo-600/30 rounded-lg text-white text-base focus:border-purple-400 focus:ring-2 focus:ring-purple-400/30 outline-none transition-all duration-300 hover:border-indigo-500/50 shadow-md hover:shadow-lg hover:shadow-purple-500/10"
                     >
                       <option value={40}>40€ par samedi - Jusqu'à 3h13 de travail</option>
                       <option value={60}>60€ par samedi - Entre 3h16 et 7h12 de travail</option>
@@ -594,12 +649,15 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
                     </select>
                   </div>
 
-                  <div>
-                    <label className="text-xs text-slate-400 mb-2 block font-medium">Taux pour les dimanches</label>
+                  <div className="transform transition-all duration-300 hover:scale-102">
+                    <label className="text-xs text-slate-300 mb-2 block font-medium uppercase tracking-wide">Taux pour les dimanches</label>
                     <select
                       value={weekendRateSun}
-                      onChange={(e) => setWeekendRateSun(Number(e.target.value))}
-                      className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/30 rounded-lg text-white text-base focus:border-purple-400 focus:ring-2 focus:ring-purple-400/30 outline-none transition"
+                      onChange={(e) => {
+                        setWeekendRateSun(Number(e.target.value))
+                        setCurrentStep(5)
+                      }}
+                      className="w-full px-4 py-3 bg-gradient-to-r from-indigo-900/40 to-slate-800/40 border border-indigo-600/30 rounded-lg text-white text-base focus:border-purple-400 focus:ring-2 focus:ring-purple-400/30 outline-none transition-all duration-300 hover:border-indigo-500/50 shadow-md hover:shadow-lg hover:shadow-purple-500/10"
                     >
                       <option value={40}>40€ par dimanche - Jusqu'à 3h13 de travail</option>
                       <option value={60}>60€ par dimanche - Entre 3h16 et 7h12 de travail</option>
@@ -627,28 +685,29 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
               )}
             </>
           )}
+        </div>
+      )}
 
-          {weekendSaturdays === 0 && weekendSundays === 0 && (
-            <div className="p-3 bg-slate-700/50 border border-slate-600/30 rounded-lg text-center">
-              <p className="text-xs text-slate-400">Pas de primes week-end sélectionnées</p>
-            </div>
-          )}
+      {selectedFunctionCode && currentStep >= 5 && (selectedSpecialPrimes.length === 0) && (
+        <div className="flex justify-center py-4 animate-bounce">
+          <div className="text-orange-400 text-6xl">↓</div>
         </div>
       )}
 
       {/* ÉTAPE 5: PRIMES PARTICULIÈRES */}
       {selectedFunctionCode && (
-        <div className={`transition-all duration-300 ${currentStep === 5 ? 'ring-2 ring-orange-400/50' : ''} bg-gradient-to-br from-slate-800/60 to-slate-800/40 rounded-xl p-6 border border-slate-700/50 hover:border-slate-600/50`}>
+        <div className={`transition-all duration-300 ${selectedSpecialPrimes.length === 0 ? 'ring-2 ring-orange-400/50 shadow-lg shadow-orange-500/30 bg-orange-500/10' : ''} ${currentStep === 5 ? 'ring-2 ring-orange-400/50 shadow-lg shadow-orange-500/20' : ''} bg-gradient-to-br from-indigo-950/60 to-indigo-900/30 rounded-xl p-6 border border-indigo-700/30 hover:border-indigo-600/50`}>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-500 to-yellow-500 flex items-center justify-center text-white font-bold text-sm">
+              <div className={`w-10 h-10 rounded-full bg-gradient-to-br from-orange-500 to-yellow-500 flex items-center justify-center text-white font-bold text-sm shadow-lg ${selectedSpecialPrimes.length === 0 ? 'animate-pulse' : ''} ${currentStep === 5 ? 'animate-pulse' : ''}`}>
                 5
               </div>
               <div>
-                <h4 className="text-xl font-bold text-white">Primes particulières</h4>
+                <h4 className={`text-xl font-bold ${selectedSpecialPrimes.length === 0 ? 'text-orange-300 font-bold' : 'text-white'}`}>{selectedSpecialPrimes.length === 0 ? '👉 ' : ''}Primes particulières</h4>
                 <p className="text-xs text-slate-400">Primes additionnelles non liées à un métier spécifique</p>
               </div>
             </div>
+            {selectedSpecialPrimes.length > 0 && <CheckCircle2 className="w-5 h-5 text-emerald-400 animate-bounce" />}
           </div>
 
           <div className="max-w-sm mx-auto w-full space-y-2 max-h-48 overflow-y-auto">
@@ -690,51 +749,57 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
           </div>
 
           {specialPrimesAmount > 0 && (
-            <div className="max-w-sm mx-auto w-full mt-3 p-2 bg-orange-500/10 border border-orange-500/30 rounded text-sm text-orange-200">
-              Primes sélectionnées: <span className="font-bold">{specialPrimesAmount}€/mois</span>
+            <div className="max-w-sm mx-auto w-full mt-4 p-3 bg-gradient-to-r from-orange-500/20 to-yellow-500/20 border border-orange-500/40 rounded-lg text-sm text-orange-200 font-semibold shadow-lg shadow-orange-500/10 transform transition-all duration-300 animate-in fade-in slide-in-from-bottom-2">
+              ✓ Primes sélectionnées: <span className="font-bold text-orange-300">{specialPrimesAmount}€/mois</span>
             </div>
           )}
         </div>
       )}
 
+      {selectedFunctionCode && selectedSpecialPrimes.length > 0 && (
+        <div className="flex justify-center py-4 animate-bounce">
+          <div className="text-green-400 text-6xl">↓</div>
+        </div>
+      )}
+
       {/* ÉTAPE 6: RÉSULTAT FINAL */}
       {selectedFunctionCode && (
-        <div className={`transition-all duration-300 ${currentStep === 6 ? 'ring-2 ring-green-400/50' : ''} bg-gradient-to-br from-green-900/40 via-emerald-900/40 to-teal-900/40 rounded-xl p-6 border border-green-500/40 shadow-lg`}>
+        <div className={`transition-all duration-500 transform ${!selectedSpecialPrimes.length > 0 ? 'ring-2 ring-green-400/50 shadow-xl shadow-green-500/30 bg-green-500/10' : ''} ${currentStep === 6 ? 'ring-2 ring-green-400/50 shadow-xl shadow-green-500/20 scale-100' : 'opacity-95'} bg-gradient-to-br from-emerald-950/50 via-teal-900/40 to-cyan-900/30 rounded-xl p-6 border border-emerald-600/30 shadow-lg backdrop-blur-sm animate-in fade-in duration-500`}>
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center text-white font-bold text-sm">
+              <div className={`w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center text-white font-bold text-sm shadow-lg ${!selectedSpecialPrimes.length > 0 ? 'animate-pulse' : ''} ${currentStep === 6 ? 'animate-pulse' : ''}`}>
                 6
               </div>
               <div>
-                <h4 className="text-xl font-bold text-white">Résumé total</h4>
-                <p className="text-xs text-slate-300">Somme de toutes vos primes</p>
+                <h4 className={`text-lg font-bold tracking-tight ${!selectedSpecialPrimes.length > 0 ? 'text-green-300 font-bold' : 'text-white'}`}>{!selectedSpecialPrimes.length > 0 ? '👉 ' : ''}Résumé total</h4>
+                <p className="text-xs text-slate-200">Somme de toutes vos primes</p>
               </div>
             </div>
-            <ChevronRight className="w-6 h-6 text-green-400" />
+            <ChevronRight className={`w-6 h-6 text-emerald-400 transition-all duration-300 ${currentStep === 6 ? 'animate-bounce' : ''}`} />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <div className="bg-blue-500/20 border border-blue-500/40 rounded-lg p-4">
-              <p className="text-xs text-slate-400 mb-1">IFSE 1</p>
-              <p className="text-2xl font-bold text-blue-300">{ifse1Amount}€</p>
+            <div className="bg-blue-500/30 border border-blue-500/50 rounded-lg p-4 transform transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20 cursor-pointer">
+              <p className="text-xs text-slate-300 mb-1 font-semibold uppercase tracking-wide">IFSE 1</p>
+              <p className="text-3xl font-bold text-blue-300">{ifse1Amount}€</p>
               <p className="text-xs text-slate-400 mt-1">Prime de fonction</p>
             </div>
 
-            <div className="bg-teal-500/20 border border-teal-500/40 rounded-lg p-4">
-              <p className="text-xs text-slate-400 mb-1">IFSE 2</p>
-              <p className="text-2xl font-bold text-teal-300">{ifse2Amount}€</p>
+            <div className="bg-teal-500/30 border border-teal-500/50 rounded-lg p-4 transform transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-teal-500/20 cursor-pointer">
+              <p className="text-xs text-slate-300 mb-1 font-semibold uppercase tracking-wide">IFSE 2</p>
+              <p className="text-3xl font-bold text-teal-300">{ifse2Amount}€</p>
               <p className="text-xs text-slate-400 mt-1">Primes sélectionnées</p>
             </div>
 
-            <div className="bg-purple-500/20 border border-purple-500/40 rounded-lg p-4">
-              <p className="text-xs text-slate-400 mb-1">IFSE 3</p>
-              <p className="text-2xl font-bold text-purple-300">{ifse3Total}€</p>
+            <div className="bg-purple-500/30 border border-purple-500/50 rounded-lg p-4 transform transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-purple-500/20 cursor-pointer">
+              <p className="text-xs text-slate-300 mb-1 font-semibold uppercase tracking-wide">IFSE 3</p>
+              <p className="text-3xl font-bold text-purple-300">{ifse3Total}€</p>
               <p className="text-xs text-slate-400 mt-1">Primes week-end</p>
             </div>
 
-            <div className="bg-orange-500/20 border border-orange-500/40 rounded-lg p-4">
-              <p className="text-xs text-slate-400 mb-1">Spéciales</p>
-              <p className="text-2xl font-bold text-orange-300">{specialPrimesAmount}€</p>
+            <div className="bg-orange-500/30 border border-orange-500/50 rounded-lg p-4 transform transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-orange-500/20 cursor-pointer">
+              <p className="text-xs text-slate-300 mb-1 font-semibold uppercase tracking-wide">Spéciales</p>
+              <p className="text-3xl font-bold text-orange-300">{specialPrimesAmount}€</p>
               <p className="text-xs text-slate-400 mt-1">Primes particulières</p>
             </div>
           </div>
@@ -747,7 +812,27 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
             </p>
           </div>
 
-          <div className="mt-4 p-3 bg-slate-700/50 border border-slate-600/30 rounded-lg flex items-start gap-2">
+          <button
+            onClick={() => {
+              setSelectedCategory('')
+              setSelectedFunctionCode('')
+              setSelectedDirection('')
+              setSelectedService('')
+              setSelectedJob('')
+              setSelectedIFSE2(new Set())
+              setWeekendSaturdays(0)
+              setWeekendSundays(0)
+              setWeekendRateSat(40)
+              setWeekendRateSun(40)
+              setSelectedSpecialPrimes(new Set())
+              setCurrentStep(1)
+            }}
+            className="w-full mt-6 px-6 py-3 bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-500 hover:to-slate-600 border border-slate-500/50 rounded-lg text-white font-semibold uppercase tracking-wide transition-all duration-300 transform hover:scale-102 shadow-lg hover:shadow-xl"
+          >
+            ← Retour au menu
+          </button>
+
+          <div className="mt-4 p-3 bg-gradient-to-r from-indigo-900/30 to-slate-800/30 border border-indigo-600/30 rounded-lg flex items-start gap-2">
             <AlertCircle className="w-4 h-4 text-slate-400 mt-0.5 flex-shrink-0" />
             <p className="text-xs text-slate-400">
               ℹ️ Ces montants sont calculés selon vos sélections. Consultez la RH pour confirmation avant demande de régularisation.
