@@ -331,8 +331,8 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
               className="w-full mt-3 px-4 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white text-center"
             >
               <option value="">Choisir...</option>
-              <option value="indiciaire">Indiciaires</option>
-              <option value="horaire">Horaires</option>
+              <option value="indiciaire">Indiciaire (sur un emploi permanent)</option>
+              <option value="horaire">Horaire (animateurs, écoles, crèches, "vacataires",...)</option>
             </select>
           </div>
         </div>
@@ -360,8 +360,8 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
                   </>
                 ) : (
                   <>
-                    <option value="indice">Base IM + IR</option>
-                    <option value="taux">Base taux horaire</option>
+                    <option value="indice">En référence à un indice ex:366</option>
+                    <option value="taux">Sur la base d'un taux de vacation à l'heure ex 11,5 euro/h</option>
                   </>
                 )}
               </select>
@@ -380,7 +380,7 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
                 <p className="text-xs text-slate-400">Profil : <span className="text-white font-semibold capitalize">{indiciaireProfile}</span></p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 max-w-sm mx-auto w-full">
                 {indiciaireProfile !== 'assistante' ? (
                   <>
                     <div>
@@ -405,14 +405,14 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
                       />
                       <p className="text-xs text-slate-400 mt-1">Saisir l'indice NBI (conversion × 4,92278 utilisée dans le calcul).</p>
                     </div>
-                    <div className="md:col-span-2 bg-white/5 border border-white/10 rounded-lg p-3 text-xs text-slate-200">
+                    <div className="bg-white/5 border border-white/10 rounded-lg p-3 text-xs text-slate-200">
                       <p className="font-semibold text-white">Traitement indiciaire (TI) converti : <span className="text-emerald-300">{formatEUR(indiciaireTI)}</span></p>
                       <p className="mt-1">Indemnité de résidence (3% du TI) : <span className="text-emerald-300">{formatEUR(indiciaireIRValue)}</span></p>
                       <p className="text-slate-400 mt-1">Le calcul applique automatiquement 3% du TI conformément à la procédure.</p>
                     </div>
                   </>
                 ) : (
-                  <div className="md:col-span-2">
+                  <div>
                     <label className="text-xs uppercase tracking-wide text-slate-400">Montant rubrique 7587 en paie</label>
                     <input
                       value={rubrique7587}
@@ -461,7 +461,7 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
                 <p className="text-xs text-slate-400">Mode retenu : <span className="text-white font-semibold">{horaireBaseType === 'indice' ? 'Indice + IR' : 'Taux horaire'}</span></p>
               </div>
 
-              <div className="bg-white/5 border border-white/10 rounded-lg p-4 text-xs text-slate-200 space-y-2">
+              <div className="bg-white/5 border border-white/10 rounded-lg p-4 text-xs text-slate-200 space-y-2 hidden">
                 <p className="text-sm font-semibold text-white">Cas gérés pour les agents horaires</p>
                 <ul className="list-disc pl-4 space-y-1">
                   <li>Rémunération sur IM : montant = (IM + IR) converti en euros × (heures retenues / 910 h).</li>
@@ -469,7 +469,7 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
                 </ul>
                 <p>Pour le taux SMIC : part CR = SMIC/2 (ex : 900,9 €) proratisée, part PS = (base 6 mois - SMIC/2) proratisée.</p>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 max-w-sm mx-auto w-full">
                 <div>
                   <label className="text-xs uppercase tracking-wide text-slate-400">Période de versement</label>
                   <select
@@ -481,7 +481,7 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
                     <option value="novembre">Novembre (heures Mai → Octobre)</option>
                   </select>
                 </div>
-                <div>
+                <div className="hidden">
                   <label className="text-xs uppercase tracking-wide text-slate-400">Ancienneté sur la période (mois)</label>
                   <input
                     type="number"
@@ -494,8 +494,8 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="md:col-span-2">
+              <div className="grid grid-cols-1 gap-4 max-w-sm mx-auto w-full">
+                <div>
                   <label className="text-xs uppercase tracking-wide text-slate-400">Heures rémunérées dans la période (min {HOURS_MIN}h)</label>
                   <input
                     type="number"
@@ -519,10 +519,9 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
                       />
                       <p className="text-xs text-slate-400 mt-1">Indice converti en euros via 4,92278 pour le calcul.</p>
                     </div>
-                    <div className="md:col-span-2 bg-white/5 border border-white/10 rounded-lg p-3 text-xs text-slate-200">
+                    <div className="bg-white/5 border border-white/10 rounded-lg p-3 text-xs text-slate-200">
                       <p className="font-semibold text-white">TI converti à partir de l'indice : <span className="text-emerald-300">{formatEUR(horaireTI)}</span></p>
                       <p className="mt-1">IR appliquée automatiquement (3% du TI) : <span className="text-emerald-300">{formatEUR(horaireIRValue)}</span></p>
-                      <p className="text-slate-400 mt-1">Les montants IM et IR sont déduits de l'indice saisi conformément à la procédure.</p>
                     </div>
                   </>
                 ) : (
@@ -605,11 +604,7 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
                           <p className="text-xs text-slate-400 mt-3">
                             Part fixe = (SMIC brut ÷ 2) proratisé ; Part variable = dépassement du total IM + NBI + IR sur le SMIC versé, proratisé.
                           </p>
-                        ) : (
-                          <p className="text-xs text-slate-400 mt-3">
-                            Pour les agents horaires, l'intégralité du montant est basée sur IM+IR ou sur le taux horaire majoré congés et proratisée selon les heures rémunérées.
-                          </p>
-                        )}
+                        ) : null}
                       </div>
 
                       <div className="bg-slate-900/60 border border-slate-700 rounded-xl p-4 space-y-3">
@@ -682,9 +677,9 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
                       </div>
 
                       <div className="bg-gradient-to-r from-emerald-600/30 via-teal-600/30 to-green-600/30 border border-emerald-500/40 rounded-xl p-4 text-sm text-white">
-                        <p className="font-semibold">⚠️ À communiquer à votre gestionnaire RH</p>
+                        <p className="font-semibold">⚠️ SIMULATEUR informatif</p>
                         <p className="text-xs mt-2 text-emerald-50">
-                          Ce simulateur reprend la procédure « Gestion du 13ème mois – indiciaires & horaires » (MAJ 01/06/2025). Pour validation officielle, merci de transmettre les éléments justificatifs (tableau heures, rubrique 7587, etc.).
+                          Ce simulateur n est pas officiel. Seul les collegues de la GCR savent faire le calcul officiel.
                         </p>
                       </div>
                     </div>

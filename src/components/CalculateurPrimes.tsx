@@ -95,6 +95,7 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
   const [selectedService, setSelectedService] = useState('')
   const [selectedJob, setSelectedJob] = useState('')
   const [selectedIFSE2, setSelectedIFSE2] = useState<Set<number>>(new Set())
+  const [selectedSpecialPrimes, setSelectedSpecialPrimes] = useState<Set<number>>(new Set())
   const [weekendSaturdays, setWeekendSaturdays] = useState(0)
   const [weekendSundays, setWeekendSundays] = useState(0)
   const [weekendRateSat, setWeekendRateSat] = useState(40)
@@ -138,7 +139,22 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
   const ifse3SunTotal = weekendSundays * weekendRateSun
   const ifse3Total = ifse3SatTotal + ifse3SunTotal
 
-  const totalMonthly = Math.round((ifse1Amount + ifse2Amount + ifse3Total) * 100) / 100
+  const specialPrimesData = [
+    150,    // Prime intérim
+    75,     // Prime technicité
+    98.46,  // Prime Maître apprentissage
+    40,     // Prime Référent financier suppléant
+    40,     // Prime ODEC Partiel
+  ]
+
+  const specialPrimesAmount = useMemo(() => {
+    if (selectedSpecialPrimes.size === 0) return 0
+    return Array.from(selectedSpecialPrimes).reduce((sum, idx) => {
+      return sum + (specialPrimesData[idx] || 0)
+    }, 0)
+  }, [selectedSpecialPrimes])
+
+  const totalMonthly = Math.round((ifse1Amount + ifse2Amount + ifse3Total + specialPrimesAmount) * 100) / 100
 
   // Note: Commented out for future enhancement of UI
   // const stepDescriptions = [
@@ -182,9 +198,9 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
     setSelectedJob(job)
     if (!job) return
     
-    // Récupérer tous les primes associés à ce métier dans cette direction
+    // Récupérer tous les primes associés à ce métier dans cette direction ET ce service
     const directionPrimes = getIFSE2ByDirection(selectedDirection)
-    const jobPrimes = directionPrimes.filter(p => p.jobs?.includes(job))
+    const jobPrimes = directionPrimes.filter(p => p.jobs?.includes(job) && (!selectedService || p.service === selectedService || p.service === 'Tous services'))
     
     // Pré-sélectionner les primes associées
     const newSelectedIFSE2 = new Set(selectedIFSE2)
@@ -205,6 +221,16 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
       newSet.add(idx)
     }
     setSelectedIFSE2(newSet)
+  }
+
+  const handleToggleSpecialPrime = (idx: number) => {
+    const newSet = new Set(selectedSpecialPrimes)
+    if (newSet.has(idx)) {
+      newSet.delete(idx)
+    } else {
+      newSet.add(idx)
+    }
+    setSelectedSpecialPrimes(newSet)
   }
 
   // Auto-advance to next step when current step is complete
@@ -367,14 +393,15 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
           </div>
 
           {/* IFSE 2 */}
-          <div className="mb-6">
+          <div className="mb-6 space-y-4">
             <h5 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-teal-400" />
               IFSE 2 — Primes de sujétion
             </h5>
 
-            <div className="mb-3">
-              <label className="text-xs text-slate-400 mb-2 block font-medium">Sélectionnez votre direction:</label>
+            {/* Étape 1: Direction */}
+            <div className="max-w-sm mx-auto w-full">
+              <label className="text-xs text-slate-400 mb-2 block font-medium">Étape 1 - Sélectionnez votre direction:</label>
               <select
                 value={selectedDirection}
                 onChange={(e) => handleDirectionSelect(e.target.value)}
@@ -389,10 +416,10 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
               </select>
             </div>
 
-            {/* Section Sélectionner un service */}
+            {/* Étape 2: Service */}
             {selectedDirection && (
-              <div className="mb-3">
-                <label className="text-xs text-slate-400 mb-2 block font-medium">Sélectionnez votre service:</label>
+              <div className="max-w-sm mx-auto w-full">
+                <label className="text-xs text-slate-400 mb-2 block font-medium">Étape 2 - Sélectionnez votre service:</label>
                 <select
                   value={selectedService}
                   onChange={(e) => handleServiceSelect(e.target.value)}
@@ -408,15 +435,15 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
               </div>
             )}
 
-            {/* Section Sélectionner un métier */}
+            {/* Étape 3: Métier */}
             {selectedDirection && (
-              <div className="mb-4 p-4 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/30 rounded-lg">
+              <div className="max-w-sm mx-auto w-full p-4 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/30 rounded-lg">
                 <h6 className="text-sm font-semibold text-blue-300 mb-3 flex items-center gap-2">
                   <span className="w-1.5 h-1.5 bg-blue-400 rounded-full" />
-                  Sélectionner un métier (optionnel)
+                  Étape 3 - Sélectionner un métier
                 </h6>
                 <p className="text-xs text-slate-300 mb-3 italic">
-                  Pré-remplit les IFSE 2 applicables à votre service
+                  Si vous ne trouvez pas votre metiers merci de nous appeler
                 </p>
                 
                 <label className="text-xs text-slate-400 mb-2 block font-medium">Choisir un métier:</label>
@@ -425,11 +452,11 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
                   onChange={(e) => handleJobSelect(e.target.value)}
                   className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/30 rounded-lg text-white text-base focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 outline-none transition"
                 >
-                  <option value="">-- Sélectionnez un métier (optionnel) --</option>
+                  <option value="">-- Sélectionnez un métier --</option>
                   {getIFSE2ByDirection(selectedDirection)
-                    .filter(p => !selectedService || p.service === selectedService || p.service === 'Tous services' || p.direction === 'Toutes dir°' || p.direction === 'Toutes directions')
+                    .filter(p => (!selectedService || p.service === selectedService || p.service === 'Tous services' || p.direction === 'Toutes dir°' || p.direction === 'Toutes directions') && p.jobs && p.jobs.length > 0 && p.jobs[0] !== '')
                     .flatMap(p => p.jobs || [])
-                    .filter((job, idx, arr) => arr.indexOf(job) === idx)
+                    .filter((job, idx, arr) => arr.indexOf(job) === idx && job !== '')
                     .sort()
                     .map((job, idx) => (
                       <option key={idx} value={job}>
@@ -440,12 +467,11 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
               </div>
             )}
 
-
-
-            {selectedDirection && (
-              <div className="space-y-2 max-h-48 overflow-y-auto">
+            {/* Primes - Affichées seulement après sélection d'un métier */}
+            {selectedJob && selectedDirection && (
+              <div className="max-w-sm mx-auto w-full space-y-2 max-h-48 overflow-y-auto">
                 {getIFSE2ByDirection(selectedDirection)
-                  .filter(prime => !selectedService || prime.service === selectedService || prime.service === 'Tous services' || prime.direction === 'Toutes dir°' || prime.direction === 'Toutes directions')
+                  .filter(prime => (selectedService ? prime.service === selectedService : true) && prime.jobs && prime.jobs.length > 0 && prime.jobs[0] !== '' && prime.jobs.some(job => job === selectedJob))
                   .map((prime, idx) => {
                     // Calculer l'index réel dans la liste complète pour la sélection
                     const allPrimes = getIFSE2ByDirection(selectedDirection)
@@ -486,8 +512,14 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
               </div>
             )}
 
+            {!selectedJob && selectedDirection && (
+              <div className="max-w-sm mx-auto w-full p-3 bg-slate-700/50 border border-slate-600/30 rounded-lg text-center">
+                <p className="text-xs text-slate-400">Sélectionnez un métier pour afficher les primes</p>
+              </div>
+            )}
+
             {ifse2Amount > 0 && (
-              <div className="mt-3 p-2 bg-teal-500/10 border border-teal-500/30 rounded text-sm text-teal-200">
+              <div className="max-w-sm mx-auto w-full p-2 bg-teal-500/10 border border-teal-500/30 rounded text-sm text-teal-200">
                 Primes sélectionnées: <span className="font-bold">{ifse2Amount}€/mois</span>
               </div>
             )}
@@ -604,13 +636,74 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
         </div>
       )}
 
-      {/* ÉTAPE 5: RÉSULTAT FINAL */}
+      {/* ÉTAPE 5: PRIMES PARTICULIÈRES */}
       {selectedFunctionCode && (
-        <div className={`transition-all duration-300 ${currentStep === 5 ? 'ring-2 ring-green-400/50' : ''} bg-gradient-to-br from-green-900/40 via-emerald-900/40 to-teal-900/40 rounded-xl p-6 border border-green-500/40 shadow-lg`}>
+        <div className={`transition-all duration-300 ${currentStep === 5 ? 'ring-2 ring-orange-400/50' : ''} bg-gradient-to-br from-slate-800/60 to-slate-800/40 rounded-xl p-6 border border-slate-700/50 hover:border-slate-600/50`}>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-500 to-yellow-500 flex items-center justify-center text-white font-bold text-sm">
+                5
+              </div>
+              <div>
+                <h4 className="text-xl font-bold text-white">Primes particulières</h4>
+                <p className="text-xs text-slate-400">Primes additionnelles non liées à un métier spécifique</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="max-w-sm mx-auto w-full space-y-2 max-h-48 overflow-y-auto">
+            {[
+              { motif: 'Prime intérim', montant: '150', description: 'Travail en intérim' },
+              { motif: 'Prime technicité', montant: '75', description: 'Expertise technique' },
+              { motif: 'Prime Maître apprentissage', montant: '98,46', description: 'Formation apprentis' },
+              { motif: 'Prime Référent financier suppléant', montant: '40', description: 'Fonction référente' },
+              { motif: 'Prime ODEC Partiel', montant: '40', description: 'Prime spécifique' },
+            ].map((prime, idx) => (
+              <button
+                key={idx}
+                onClick={() => handleToggleSpecialPrime(idx)}
+                className={`w-full p-3 rounded-lg text-left transition-all border ${
+                  selectedSpecialPrimes.has(idx)
+                    ? 'bg-orange-500/30 border-orange-400/60 shadow-md'
+                    : 'bg-slate-700/30 border-slate-600/20 hover:bg-slate-700/50'
+                }`}
+              >
+                <div className="flex items-start gap-3">
+                  <div className={`w-5 h-5 rounded border-2 mt-0.5 flex items-center justify-center transition ${
+                    selectedSpecialPrimes.has(idx)
+                      ? 'bg-green-500 border-green-400'
+                      : 'border-slate-500'
+                  }`}>
+                    {selectedSpecialPrimes.has(idx) && <span className="text-white text-xs">✓</span>}
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-slate-200">{prime.motif}</p>
+                    <p className="text-xs text-slate-400 mt-0.5">{prime.description}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-bold text-orange-400">{prime.montant}€</p>
+                    <p className="text-xs text-slate-500">/mois</p>
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+
+          {specialPrimesAmount > 0 && (
+            <div className="max-w-sm mx-auto w-full mt-3 p-2 bg-orange-500/10 border border-orange-500/30 rounded text-sm text-orange-200">
+              Primes sélectionnées: <span className="font-bold">{specialPrimesAmount}€/mois</span>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ÉTAPE 6: RÉSULTAT FINAL */}
+      {selectedFunctionCode && (
+        <div className={`transition-all duration-300 ${currentStep === 6 ? 'ring-2 ring-green-400/50' : ''} bg-gradient-to-br from-green-900/40 via-emerald-900/40 to-teal-900/40 rounded-xl p-6 border border-green-500/40 shadow-lg`}>
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center text-white font-bold text-sm">
-                5
+                6
               </div>
               <div>
                 <h4 className="text-xl font-bold text-white">Résumé total</h4>
@@ -620,7 +713,7 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
             <ChevronRight className="w-6 h-6 text-green-400" />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             <div className="bg-blue-500/20 border border-blue-500/40 rounded-lg p-4">
               <p className="text-xs text-slate-400 mb-1">IFSE 1</p>
               <p className="text-2xl font-bold text-blue-300">{ifse1Amount}€</p>
@@ -637,6 +730,12 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
               <p className="text-xs text-slate-400 mb-1">IFSE 3</p>
               <p className="text-2xl font-bold text-purple-300">{ifse3Total}€</p>
               <p className="text-xs text-slate-400 mt-1">Primes week-end</p>
+            </div>
+
+            <div className="bg-orange-500/20 border border-orange-500/40 rounded-lg p-4">
+              <p className="text-xs text-slate-400 mb-1">Spéciales</p>
+              <p className="text-2xl font-bold text-orange-300">{specialPrimesAmount}€</p>
+              <p className="text-xs text-slate-400 mt-1">Primes particulières</p>
             </div>
           </div>
 
