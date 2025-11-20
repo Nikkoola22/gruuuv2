@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Euro, ArrowLeft, CheckCircle, ChevronRight } from 'lucide-react';
+import { Euro, ArrowLeft, CheckCircle, ChevronRight, ChevronDown } from 'lucide-react';
 
 interface CalculateurCIAProps {
   onClose: () => void;
@@ -9,35 +9,29 @@ export default function CalculateurCIA({ onClose }: CalculateurCIAProps) {
   const [ifseMensuel, setIfseMensuel] = useState<number>(0);
   const [weekendServices, setWeekendServices] = useState<number>(0);
   const [weekendRate, setWeekendRate] = useState<number>(40);
-  const [tauxEvaluation, setTauxEvaluation] = useState<number>(100);
+  const [tauxEvaluation, setTauxEvaluation] = useState<number>(0);
   const [joursAbsenceN1, setJoursAbsenceN1] = useState<number>(0);
   const [etapeActive, setEtapeActive] = useState<number>(1); // Suivi de l'étape active
   const [absencesTouched, setAbsencesTouched] = useState<boolean>(false); // Track if user touched absences field
   const [evaluationTouched, setEvaluationTouched] = useState<boolean>(false); // Track if user touched evaluation
+  const [expandDetail, setExpandDetail] = useState<boolean>(false); // État pour détail du calcul
+  const [weekendMode, setWeekendMode] = useState<'estimate' | 'exact'>('estimate'); // Mode estimation ou nombre exact
+  const [weekendExact, setWeekendExact] = useState<number>(0); // Nombre exact de week-ends (max 52)
+  const [etape3Collapsed, setEtape3Collapsed] = useState<boolean>(false); // État pour collapse l'étape 3
 
   const weekendOptions = Array.from({ length: 6 }, (_, i) => i); // Limité à 5 week-ends max (0 à 5)
-  const ifseMensuelTotal = ifseMensuel + weekendServices * weekendRate;
+  // Utiliser weekendExact si en mode exact et > 0, sinon weekendServices
+  const finalWeekendServices = weekendMode === 'exact' && weekendExact > 0 ? weekendExact : weekendServices;
+  const ifseMensuelTotal = ifseMensuel + finalWeekendServices * weekendRate;
   
   // Auto-advance to next step when IFSE is filled (only advance to step 2, not beyond)
-  useEffect(() => {
-    if (etapeActive === 1 && ifseMensuelTotal > 0) {
-      setTimeout(() => setEtapeActive(2), 300);
-    }
-  }, [ifseMensuelTotal, etapeActive]);
+  // Removed: étape 1 now stays visible even after filling IFSE
 
   // Auto-advance to next step when Évaluation is selected
-  useEffect(() => {
-    if (etapeActive === 2 && evaluationTouched) {
-      setTimeout(() => setEtapeActive(3), 300);
-    }
-  }, [evaluationTouched, etapeActive]);
+  // Removed: étape 2 now stays visible, collapse happens via Valider button
 
   // Auto-advance to next step when Absences is filled by user
-  useEffect(() => {
-    if (etapeActive === 3 && absencesTouched) {
-      setTimeout(() => setEtapeActive(4), 300);
-    }
-  }, [absencesTouched, etapeActive]);
+  // Removed: étape 3 now stays visible
   
   // Calcul du CIA
   const calculerCIA = () => {
@@ -175,86 +169,185 @@ Calcul détaillé du CIA:
 
         {/* ÉTAPE 1: IFSE Mensuel */}
         <div className={`rounded-xl shadow-md overflow-hidden transition-all ${etapeActive >= 1 ? 'ring-2 ring-orange-400' : ''}`}>
-          <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4">
+          <div className="bg-gradient-to-r from-amber-600 via-orange-600 to-orange-700 text-white p-6">
             <div className="flex items-center gap-3">
-              <div className="text-2xl">💰</div>
+              <div className="text-3xl">💰</div>
               <div>
-                <h4 className="font-bold text-lg">Étape 1: Votre IFSE mensuel</h4>
-                <p className="text-blue-100 text-sm">La base de votre calcul</p>
+                <h4 className="font-bold text-xl uppercase tracking-wide">◆ Étape 1</h4>
+                <p className="text-amber-100 text-sm mt-1">Votre IFSE mensuel - La base de votre calcul</p>
               </div>
             </div>
           </div>
           
-          <div className="bg-white p-6 space-y-4">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <label className="block text-sm font-medium text-gray-700 mb-3">
-                Montant IFSE que vous percevez mensuellement
-              </label>
-              <div className="flex items-center gap-3">
-                <span className="text-2xl font-bold text-blue-600">€</span>
-                <input
-                  type="number"
-                  value={ifseMensuel || ''}
-                  onChange={(e) => {
-                    const val = Number(e.target.value);
-                    setIfseMensuel(val);
-                    if (val > 0 && etapeActive === 1) setEtapeActive(2);
-                  }}
-                  placeholder="Ex: 250"
-                  className="flex-1 px-4 py-3 text-lg border-2 border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
+          {etapeActive < 2 && (
+          <div className="bg-gradient-to-br from-amber-950/40 via-slate-900/50 to-orange-900/40 border-2 border-orange-500/40 p-8 space-y-6">
+            {/* Section 1: Montant IFSE */}
+            <div className="bg-white/5 border border-orange-500/20 rounded-xl p-5 space-y-4">
+              <h5 className="text-sm font-semibold text-orange-200 uppercase tracking-wide">📊 Montant IFSE mensuel</h5>
               
-              {ifseMensuelTotal > 0 && (
-                <div className="mt-4 p-3 bg-green-100 border border-green-400 rounded-lg">
-                  <p className="text-green-800 font-semibold flex items-center gap-2">
-                    <CheckCircle className="w-5 h-5" />
-                    Depuis la mise en place de IFSE3 déclaratif il faut estimer le nombre de samedi/dimanche fait en moyenne dans un mois
-                  </p>
+              <div>
+                <label className="block text-xs uppercase tracking-wide text-orange-300 font-semibold mb-3">
+                  Montant que vous percevez mensuellement
+                </label>
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl font-bold text-orange-300">€</span>
+                  <input
+                    type="number"
+                    value={ifseMensuel || ''}
+                    onChange={(e) => {
+                      const val = Number(e.target.value);
+                      setIfseMensuel(val);
+                    }}
+                    placeholder="Ex: 250"
+                    className="flex-1 px-4 py-3 rounded-lg bg-orange-900/20 border-2 border-orange-500/40 text-white font-semibold placeholder-slate-500 focus:border-orange-400 focus:outline-none"
+                  />
+                </div>
+                <p className="text-xs text-slate-400 mt-2">Veuillez regarder sur votre fiche de paie</p>
+              </div>
+            </div>
+
+            {ifseMensuelTotal > 0 && (
+              <div className="bg-gradient-to-r from-orange-600 via-amber-600 to-orange-700 rounded-xl p-6 border-2 border-orange-400/60 shadow-lg">
+                <p className="text-white font-bold text-lg flex items-center gap-3 mb-2">
+                  <span className="text-2xl">📊</span>
+                  Estimation des week-ends
+                </p>
+                <p className="text-orange-50 text-sm font-semibold">Depuis IFSE3 déclaratif, estimez le nombre de samedi/dimanche par mois</p>
+                <div className="mt-3 pt-3 border-t border-orange-400/40">
+                  <p className="text-xs text-orange-100 italic">💡 Ce nombre servira à calculer votre complément IFSE</p>
+                </div>
+              </div>
+            )}
+
+            {/* Section 2: Week-ends et Taux */}
+            <div className="bg-white/5 border border-orange-500/20 rounded-xl p-5 space-y-4">
+              <h5 className="text-sm font-semibold text-orange-200 uppercase tracking-wide">📈 Paramètres supplémentaires</h5>
+              
+              {/* Choix mode: Estimation ou Nombre exact */}
+              <div className="flex gap-3 p-3 bg-orange-900/20 rounded-lg">
+                <button
+                  onClick={() => setWeekendMode('estimate')}
+                  className={`flex-1 py-2 px-3 rounded-lg font-semibold text-xs uppercase transition-all ${
+                    weekendMode === 'estimate'
+                      ? 'bg-orange-500 text-white'
+                      : 'bg-orange-900/30 text-orange-300 hover:bg-orange-900/50'
+                  }`}
+                >
+                  📊 Estimation
+                </button>
+                <button
+                  onClick={() => setWeekendMode('exact')}
+                  className={`flex-1 py-2 px-3 rounded-lg font-semibold text-xs uppercase transition-all ${
+                    weekendMode === 'exact'
+                      ? 'bg-orange-500 text-white'
+                      : 'bg-orange-900/30 text-orange-300 hover:bg-orange-900/50'
+                  }`}
+                >
+                  🎯 Nombre exact
+                </button>
+              </div>
+
+              {/* Mode Estimation */}
+              {weekendMode === 'estimate' && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs uppercase tracking-wide text-orange-300 font-semibold mb-2">
+                      Week-ends (samedi/dimanche) en N-1
+                    </label>
+                    <select
+                      value={weekendServices}
+                      onChange={(e) => setWeekendServices(Number(e.target.value))}
+                      className="w-full px-4 py-3 rounded-lg bg-orange-900/20 border-2 border-orange-500/40 text-white font-semibold focus:border-orange-400 focus:outline-none"
+                    >
+                      {weekendOptions.map((value) => (
+                        <option key={value} value={value}>{value} week-end{value > 1 ? 's' : ''}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs uppercase tracking-wide text-orange-300 font-semibold mb-2">
+                      Taux appliqué par week-end
+                    </label>
+                    <select
+                      value={weekendRate}
+                      onChange={(e) => setWeekendRate(Number(e.target.value))}
+                      className="w-full px-4 py-3 rounded-lg bg-orange-900/20 border-2 border-orange-500/40 text-white font-semibold focus:border-orange-400 focus:outline-none"
+                    >
+                      {[40, 60, 80].map(rate => (
+                        <option key={rate} value={rate}>{rate} €</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
               )}
 
-              <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Week-ends (samedi/dimanche) réalisés en N-1
-                  </label>
-                  <select
-                    value={weekendServices}
-                    onChange={(e) => setWeekendServices(Number(e.target.value))}
-                    className="w-full px-3 py-2 border-2 border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    {weekendOptions.map((value) => (
-                      <option key={value} value={value}>{value} week-end{value > 1 ? 's' : ''}</option>
-                    ))}
-                  </select>
+              {/* Mode Nombre exact */}
+              {weekendMode === 'exact' && (
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs uppercase tracking-wide text-orange-300 font-semibold mb-2">
+                      Je connais le nombre exact de week-ends réalisés
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="number"
+                        min="0"
+                        max="52"
+                        value={weekendExact || ''}
+                        onChange={(e) => {
+                          const val = Math.min(52, Math.max(0, Number(e.target.value) || 0));
+                          setWeekendExact(val);
+                        }}
+                        placeholder="0 - 52"
+                        className="flex-1 px-4 py-3 rounded-lg bg-orange-900/20 border-2 border-orange-500/40 text-white font-semibold placeholder-slate-500 focus:border-orange-400 focus:outline-none"
+                      />
+                      <span className="text-sm text-orange-300 font-semibold py-3 px-2">week-ends</span>
+                    </div>
+                    <p className="text-xs text-slate-400 mt-2">Maximum 52 week-ends par année</p>
+                  </div>
+                  <div>
+                    <label className="block text-xs uppercase tracking-wide text-orange-300 font-semibold mb-2">
+                      Taux appliqué par week-end
+                    </label>
+                    <select
+                      value={weekendRate}
+                      onChange={(e) => setWeekendRate(Number(e.target.value))}
+                      className="w-full px-4 py-3 rounded-lg bg-orange-900/20 border-2 border-orange-500/40 text-white font-semibold focus:border-orange-400 focus:outline-none"
+                    >
+                      {[40, 60, 80].map(rate => (
+                        <option key={rate} value={rate}>{rate} €</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Taux appliqué par week-end
-                  </label>
-                  <select
-                    value={weekendRate}
-                    onChange={(e) => setWeekendRate(Number(e.target.value))}
-                    className="w-full px-3 py-2 border-2 border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    {[40, 60, 80].map(rate => (
-                      <option key={rate} value={rate}>{rate} €</option>
-                    ))}
-                  </select>
+              )}
+            </div>
+
+            {/* Section 3: Résumé du montant total */}
+            <div className="bg-orange-950/30 border-2 border-orange-500/60 rounded-xl p-5 space-y-3">
+              <h5 className="text-sm font-semibold text-orange-200 uppercase tracking-wide">💵 Montant IFSE total retenu</h5>
+              <div className="space-y-2">
+                <div className="flex justify-between items-center py-2 px-3 bg-orange-900/20 rounded-lg">
+                  <span className="text-sm text-slate-300">IFSE déclaré :</span>
+                  <span className="text-base font-bold text-orange-300">{ifseMensuel.toFixed(2)}€</span>
+                </div>
+                <div className="flex justify-between items-center py-2 px-3 bg-orange-900/20 rounded-lg">
+                  <span className="text-sm text-slate-300">Week-ends ({finalWeekendServices} × {weekendRate}€) :</span>
+                  <span className="text-base font-bold text-orange-300">{(finalWeekendServices * weekendRate).toFixed(2)}€</span>
+                </div>
+                <div className="flex justify-between items-center py-3 px-3 bg-orange-500/30 border border-orange-500/50 rounded-lg">
+                  <span className="text-sm font-semibold text-white">Total IFSE mensuel :</span>
+                  <span className="text-lg font-bold text-orange-300">{ifseMensuelTotal.toFixed(2)}€</span>
                 </div>
               </div>
+              <p className="text-xs text-slate-400 italic mt-3">✓ Ce montant sert de base pour les étapes suivantes</p>
+            </div>
 
-              <div className="mt-4 p-3 bg-blue-100 border border-blue-300 rounded-lg text-sm text-blue-900">
-                <p className="font-semibold">IFSE total retenu : {ifseMensuel.toFixed(2)}€ + ({weekendServices} × {weekendRate}€) = {ifseMensuelTotal.toFixed(2)}€</p>
-                <p className="text-xs mt-1">Ce montant sert de base pour les étapes suivantes.</p>
-              </div>
-
-              <div className="mt-3 p-3 bg-slate-100 rounded-lg text-xs text-slate-700">
-                <strong>💡 Conseil:</strong> Trouvez ce montant sur votre bulletin de paie ou demandez à la RH
-              </div>
+            <div className="bg-slate-500/20 border border-slate-400/20 rounded-xl p-4">
+              <p className="text-xs text-slate-300"><strong>💡 Conseil :</strong> Trouvez ce montant sur votre bulletin de paie ou demandez à la RH</p>
             </div>
           </div>
+          )}
         </div>
 
         {/* ÉTAPE 2: Taux d'Évaluation */}
@@ -270,6 +363,7 @@ Calcul détaillé du CIA:
               </div>
             </div>
             
+            {!etape3Collapsed && (
             <div className="bg-white p-6 space-y-4">
               <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
                 <p className="text-sm text-gray-700 mb-4">Sélectionnez le taux de votre dernière évaluation annuelle:</p>
@@ -286,7 +380,9 @@ Calcul détaillé du CIA:
                       onClick={() => {
                         setTauxEvaluation(option.value);
                         setEvaluationTouched(true);
-                        if (etapeActive === 2) setEtapeActive(3);
+                        if (etapeActive === 2) {
+                          setEtapeActive(3); // Ouvre l'étape 3 et collapse l'étape 1 (car etapeActive >= 2)
+                        }
                       }}
                       className={`p-4 rounded-lg font-bold transition-all transform hover:scale-105 text-center ${
                         tauxEvaluation === option.value
@@ -321,78 +417,119 @@ Calcul détaillé du CIA:
                 </div>
               )}
             </div>
+            )}
           </div>
         )}
 
         {/* ÉTAPE 3: Jours d'Absence N-1 */}
         {ifseMensuelTotal > 0 && tauxEvaluation >= 0 && (
           <div className={`rounded-xl shadow-md overflow-hidden transition-all ${etapeActive >= 3 ? 'ring-2 ring-red-400' : ''}`}>
-            <div className="bg-gradient-to-r from-red-500 to-red-600 text-white p-4">
+            <div className="bg-gradient-to-r from-red-600 via-red-700 to-rose-700 text-white p-6">
               <div className="flex items-center gap-3">
-                <div className="text-2xl">📅</div>
+                <div className="text-3xl">📅</div>
                 <div>
-                  <h4 className="font-bold text-lg">Étape 3: Vos jours d'absence en N-1</h4>
-                  <p className="text-red-100 text-sm">Deuxième moitié de votre CIA (50%)</p>
+                  <h4 className="font-bold text-xl uppercase tracking-wide">◆ Étape 3</h4>
+                  <p className="text-red-100 text-sm mt-1">Vos jours d'absence en N-1 - Deuxième moitié de votre CIA (50%)</p>
                 </div>
               </div>
             </div>
             
-            <div className="bg-white p-6 space-y-4">
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                <label className="block text-sm font-medium text-gray-700 mb-4">
-                  Combien de jours d'absence aviez-vous en N-1?
-                </label>
+            <div className="bg-gradient-to-br from-red-950/40 via-slate-900/50 to-red-900/40 border-2 border-red-500/40 p-8 space-y-6">
+              {/* Section 1: Saisie des jours d'absence */}
+              <div className="bg-white/5 border border-red-500/20 rounded-xl p-5 space-y-4">
+                <h5 className="text-sm font-semibold text-red-200 uppercase tracking-wide">📝 Nombre de jours d'absence</h5>
                 
-                <div className="flex items-center gap-4 mb-4">
-                  <input
-                    type="number"
-                    min="0"
-                    value={joursAbsenceN1}
-                    onChange={(e) => {
-                      setJoursAbsenceN1(Math.max(0, Number(e.target.value)));
-                      setAbsencesTouched(true);
-                    }}
-                    placeholder="Ex: 3"
-                    className="w-24 px-4 py-3 text-2xl font-bold border-2 border-red-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-center"
-                  />
-                  <span className="text-lg font-semibold text-gray-600">jours</span>
-                </div>
-
-                {/* Indicateur de seuil */}
-                <div className="space-y-2 mb-4">
-                  <div className={`p-3 rounded-lg ${joursAbsenceN1 < 5 ? 'bg-green-100 border border-green-400' : 'bg-slate-100'}`}>
-                    <p className={`text-sm font-semibold ${joursAbsenceN1 < 5 ? 'text-green-800' : 'text-gray-600'}`}>
-                      {joursAbsenceN1 < 5 ? '✅' : '🔘'} Moins de 5 jours = <span className="text-lg">100%</span>
-                    </p>
-                  </div>
-                  <div className={`p-3 rounded-lg ${joursAbsenceN1 >= 5 && joursAbsenceN1 <= 10 ? 'bg-yellow-100 border border-yellow-400' : 'bg-slate-100'}`}>
-                    <p className={`text-sm font-semibold ${joursAbsenceN1 >= 5 && joursAbsenceN1 <= 10 ? 'text-yellow-800' : 'text-gray-600'}`}>
-                      {joursAbsenceN1 >= 5 && joursAbsenceN1 <= 10 ? '⚠️' : '🔘'} Entre 5 et 10 jours = <span className="text-lg">50%</span>
-                    </p>
-                  </div>
-                  <div className={`p-3 rounded-lg ${joursAbsenceN1 > 10 ? 'bg-red-100 border border-red-400' : 'bg-slate-100'}`}>
-                    <p className={`text-sm font-semibold ${joursAbsenceN1 > 10 ? 'text-red-800' : 'text-gray-600'}`}>
-                      {joursAbsenceN1 > 10 ? '❌' : '🔘'} Plus de 10 jours = <span className="text-lg">0%</span>
-                    </p>
+                <div>
+                  <label className="block text-xs uppercase tracking-wide text-red-300 font-semibold mb-3">
+                    Combien de jours d'absence aviez-vous l'année dernière (N-1)?
+                  </label>
+                  
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="number"
+                      min="0"
+                      value={joursAbsenceN1 || ''}
+                      onChange={(e) => {
+                        setJoursAbsenceN1(Math.max(0, Number(e.target.value)));
+                        setAbsencesTouched(true);
+                      }}
+                      placeholder="0"
+                      className="w-20 px-4 py-3 text-2xl font-bold rounded-lg bg-red-900/20 border-2 border-red-500/40 text-white text-center placeholder-slate-500 focus:border-red-400 focus:outline-none"
+                    />
+                    <span className="text-red-300 font-semibold text-lg">jours</span>
+                    <button
+                      onClick={() => {
+                        setEtapeActive(2); // Collapse l'étape 2
+                        setEtape3Collapsed(true); // Collapse le contenu de l'étape 3
+                      }}
+                      className="ml-auto px-4 py-2 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-semibold rounded-lg transition-all transform hover:scale-105 shadow-md"
+                    >
+                      ✓ Valider
+                    </button>
                   </div>
                 </div>
-
-                <div className="p-3 bg-slate-100 rounded-lg text-xs text-slate-700 mb-4">
-                  <strong>📝 Note:</strong> Les arrêts se comptent en jours calendaires. Un arrêt couvrant un week-end compte tous les jours inclus.
-                </div>
-
-                {joursAbsenceN1 >= 0 && (
-                  <div className="p-3 bg-red-100 border border-red-400 rounded-lg">
-                    <p className="text-red-800 font-semibold flex items-center gap-2">
-                      <CheckCircle className="w-5 h-5" />
-                      CIA Absence: {joursAbsenceN1 < 5 ? ((ifseMensuelTotal * 12 * 0.10) / 2).toFixed(2) : joursAbsenceN1 <= 10 ? ((ifseMensuelTotal * 12 * 0.10) / 2 * 0.5).toFixed(2) : '0.00'}€/an
-                    </p>
-                    <p className="text-xs text-red-700 mt-1">
-                      Base (50%): {((ifseMensuelTotal * 12 * 0.10) / 2).toFixed(2)}€ × {joursAbsenceN1 < 5 ? '100%' : joursAbsenceN1 <= 10 ? '50%' : '0%'}
-                    </p>
-                  </div>
-                )}
               </div>
+
+              {!etape3Collapsed && (
+              <>
+              {/* Section 2: Grille des seuils */}
+              <div className="bg-white/5 border border-red-500/20 rounded-xl p-5">
+                <h5 className="text-sm font-semibold text-red-200 uppercase tracking-wide mb-4">📊 Barème d'absence</h5>
+                
+                <div className="space-y-2">
+                  <div className={`p-4 rounded-lg border-2 transition-all ${joursAbsenceN1 < 5 ? 'bg-emerald-900/30 border-emerald-500/60 shadow-lg' : 'bg-slate-800/30 border-slate-600/30'}`}>
+                    <p className={`font-semibold flex items-center gap-2 ${joursAbsenceN1 < 5 ? 'text-emerald-300' : 'text-slate-400'}`}>
+                      {joursAbsenceN1 < 5 ? '✅' : '🔘'} 
+                      <span>Moins de 5 jours</span>
+                      <span className={`ml-auto text-lg font-bold ${joursAbsenceN1 < 5 ? 'text-emerald-300' : 'text-slate-400'}`}>100%</span>
+                    </p>
+                  </div>
+                  
+                  <div className={`p-4 rounded-lg border-2 transition-all ${joursAbsenceN1 >= 5 && joursAbsenceN1 <= 10 ? 'bg-amber-900/30 border-amber-500/60 shadow-lg' : 'bg-slate-800/30 border-slate-600/30'}`}>
+                    <p className={`font-semibold flex items-center gap-2 ${joursAbsenceN1 >= 5 && joursAbsenceN1 <= 10 ? 'text-amber-300' : 'text-slate-400'}`}>
+                      {joursAbsenceN1 >= 5 && joursAbsenceN1 <= 10 ? '⚠️' : '🔘'}
+                      <span>Entre 5 et 10 jours</span>
+                      <span className={`ml-auto text-lg font-bold ${joursAbsenceN1 >= 5 && joursAbsenceN1 <= 10 ? 'text-amber-300' : 'text-slate-400'}`}>50%</span>
+                    </p>
+                  </div>
+                  
+                  <div className={`p-4 rounded-lg border-2 transition-all ${joursAbsenceN1 > 10 ? 'bg-red-900/30 border-red-500/60 shadow-lg' : 'bg-slate-800/30 border-slate-600/30'}`}>
+                    <p className={`font-semibold flex items-center gap-2 ${joursAbsenceN1 > 10 ? 'text-red-300' : 'text-slate-400'}`}>
+                      {joursAbsenceN1 > 10 ? '❌' : '🔘'}
+                      <span>Plus de 10 jours</span>
+                      <span className={`ml-auto text-lg font-bold ${joursAbsenceN1 > 10 ? 'text-red-300' : 'text-slate-400'}`}>0%</span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 3: Note explicative */}
+              <div className="bg-slate-500/20 border border-slate-400/20 rounded-xl p-4">
+                <p className="text-xs text-slate-300"><strong>📝 Note :</strong> Les arrêts se comptent en jours calendaires. Un arrêt couvrant un week-end compte tous les jours inclus.</p>
+              </div>
+              </>
+              )}
+
+              {/* Section 4: Résumé du calcul */}
+              {joursAbsenceN1 >= 0 && (
+                <div className="bg-red-950/30 border-2 border-red-500/60 rounded-xl p-5 space-y-3">
+                  <h5 className="text-sm font-semibold text-red-200 uppercase tracking-wide">💰 CIA Absence calculée</h5>
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center py-2 px-3 bg-red-900/20 rounded-lg">
+                      <span className="text-sm text-slate-300">Base (50% de la CIA) :</span>
+                      <span className="text-base font-bold text-red-300">{((ifseMensuelTotal * 12 * 0.10) / 2).toFixed(2)}€</span>
+                    </div>
+                    <div className="flex justify-between items-center py-2 px-3 bg-red-900/20 rounded-lg">
+                      <span className="text-sm text-slate-300">Taux appliqué :</span>
+                      <span className="text-base font-bold text-red-300">{joursAbsenceN1 < 5 ? '100%' : joursAbsenceN1 <= 10 ? '50%' : '0%'}</span>
+                    </div>
+                    <div className="flex justify-between items-center py-3 px-3 bg-red-500/30 border border-red-500/50 rounded-lg">
+                      <span className="text-sm font-semibold text-white">CIA Absence annuelle :</span>
+                      <span className="text-lg font-bold text-red-300">{joursAbsenceN1 < 5 ? ((ifseMensuelTotal * 12 * 0.10) / 2).toFixed(2) : joursAbsenceN1 <= 10 ? ((ifseMensuelTotal * 12 * 0.10) / 2 * 0.5).toFixed(2) : '0.00'}€</span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -437,51 +574,61 @@ Calcul détaillé du CIA:
                 </div>
               </div>
 
-              {/* Détail du calcul pédagogique */}
-              <div className="bg-white rounded-xl p-5 border-2 border-slate-300 space-y-3">
-                <h5 className="font-bold text-gray-800 flex items-center gap-2">
-                  <ChevronRight className="w-5 h-5 text-orange-600" />
-                  Détail du calcul
-                </h5>
-                
-                <div className="space-y-2 text-sm font-mono text-gray-700 bg-slate-50 p-4 rounded-lg">
-                  <div className="flex justify-between">
-                    <span>IFSE de base</span>
-                    <span className="font-bold">{ifseMensuel}€</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Week-ends valorisés ({weekendServices} × {weekendRate}€)</span>
-                    <span className="font-bold text-blue-600">{(weekendServices * weekendRate).toFixed(2)}€</span>
-                  </div>
-                  <div className="border-t pt-2 flex justify-between">
-                    <span>IFSE Mensuel retenu</span>
-                    <span className="font-bold">{ifseMensuelTotal.toFixed(2)}€</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>IFSE Annuel (× 12 mois)</span>
-                    <span className="font-bold text-blue-600">{resultat.ifseAnnuel.toFixed(2)}€</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Base CIA (10% × IFSE Annuel)</span>
-                    <span className="font-bold text-orange-600">{resultat.base10Pourcent.toFixed(2)}€</span>
-                  </div>
-                  
-                  <div className="border-t pt-2 mt-2">
-                    <div className="flex justify-between text-purple-700">
-                      <span>50% Évaluation ({tauxEvaluation}%)</span>
-                      <span className="font-bold">{resultat.ciaEvaluation.toFixed(2)}€</span>
+              {/* Détail du calcul pédagogique - COLLAPSIBLE */}
+              <div className="bg-gradient-to-br from-orange-950/40 via-slate-900/50 to-orange-900/40 border-2 border-orange-500/40 rounded-xl overflow-hidden">
+                <button
+                  onClick={() => setExpandDetail(!expandDetail)}
+                  className="w-full px-5 py-4 flex items-center justify-between hover:bg-orange-900/20 transition-colors"
+                >
+                  <h5 className="font-bold text-orange-200 flex items-center gap-2">
+                    <span className="text-xl">📋</span>
+                    Détail du calcul
+                  </h5>
+                  <ChevronDown className={`w-5 h-5 text-orange-400 transition-transform ${expandDetail ? 'rotate-180' : ''}`} />
+                </button>
+
+                {expandDetail && (
+                  <div className="px-5 pb-4 space-y-3 bg-black/20 border-t border-orange-500/30">
+                    <div className="space-y-2 text-sm font-mono text-slate-200 bg-slate-900/40 p-5 rounded-lg">
+                      <div className="flex justify-between">
+                        <span>IFSE de base</span>
+                        <span className="font-bold text-orange-300">{ifseMensuel}€</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Week-ends valorisés ({weekendServices} × {weekendRate}€)</span>
+                        <span className="font-bold text-orange-300">{(weekendServices * weekendRate).toFixed(2)}€</span>
+                      </div>
+                      <div className="border-t border-slate-600 pt-2 flex justify-between bg-slate-800/30 -mx-5 px-5 py-2">
+                        <span className="font-semibold">IFSE Mensuel retenu</span>
+                        <span className="font-bold text-orange-300">{ifseMensuelTotal.toFixed(2)}€</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>IFSE Annuel (× 12 mois)</span>
+                        <span className="font-bold text-orange-300">{resultat.ifseAnnuel.toFixed(2)}€</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Base CIA (10% × IFSE Annuel)</span>
+                        <span className="font-bold text-emerald-300">{resultat.base10Pourcent.toFixed(2)}€</span>
+                      </div>
+                      
+                      <div className="border-t border-slate-600 pt-2 mt-2 space-y-1">
+                        <div className="flex justify-between text-blue-300">
+                          <span>50% Évaluation ({tauxEvaluation}%)</span>
+                          <span className="font-bold">{resultat.ciaEvaluation.toFixed(2)}€</span>
+                        </div>
+                        <div className="flex justify-between text-purple-300">
+                          <span>50% Absences ({resultat.tauxAbsence}%)</span>
+                          <span className="font-bold">{resultat.ciaAbsence.toFixed(2)}€</span>
+                        </div>
+                      </div>
+                      
+                      <div className="border-t-2 border-b-2 border-orange-500/50 py-3 mt-2 flex justify-between bg-orange-900/30 -mx-5 px-5">
+                        <span className="font-bold text-white">CIA ANNUEL TOTAL</span>
+                        <span className="font-bold text-xl text-orange-300">{resultat.ciaFinal.toFixed(2)}€</span>
+                      </div>
                     </div>
-                    <div className="flex justify-between text-red-700">
-                      <span>50% Absences ({resultat.tauxAbsence}%)</span>
-                      <span className="font-bold">{resultat.ciaAbsence.toFixed(2)}€</span>
-                    </div>
                   </div>
-                  
-                  <div className="border-t-2 border-b-2 py-2 mt-2 flex justify-between text-orange-700">
-                    <span>CIA ANNUEL TOTAL</span>
-                    <span className="font-bold text-lg">{resultat.ciaFinal.toFixed(2)}€</span>
-                  </div>
-                </div>
+                )}
               </div>
 
               {/* Info additionnelle */}
