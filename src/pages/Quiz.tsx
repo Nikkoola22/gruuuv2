@@ -478,18 +478,135 @@ const INITIAL_QUESTIONS: Question[] = faqData.slice(0, 10).map((f, idx) => {
       "Les agents n'ont pas de notation formelle"
     ],
     correctIndex: 0
+  },
+  {
+    id: 21,
+    question: "Quelle est la durée légale annuelle du temps de travail dans la fonction publique ?",
+    options: [
+      "1500 heures par année",
+      "1607 heures par année",
+      "1800 heures par année",
+      "2000 heures par année"
+    ],
+    correctIndex: 1
+  },
+  {
+    id: 22,
+    question: "Combien de jours de formation obligatoire sont accordés lors de l'intégration en catégorie A ou B ?",
+    options: [
+      "3 jours de formation",
+      "5 jours de formation",
+      "10 jours de formation",
+      "15 jours de formation"
+    ],
+    correctIndex: 2
+  },
+  {
+    id: 23,
+    question: "Combien d'heures de formation sont crédités annuellement au Compte Personnel de Formation (CPF) ?",
+    options: [
+      "10 heures par année",
+      "15 heures par année",
+      "25 heures par année",
+      "50 heures par année"
+    ],
+    correctIndex: 2
+  },
+  {
+    id: 24,
+    question: "Quel est le plafond maximal d'heures accumulables sur le CPF ?",
+    options: [
+      "100 heures",
+      "120 heures",
+      "150 heures",
+      "200 heures"
+    ],
+    correctIndex: 2
+  },
+  {
+    id: 25,
+    question: "Combien de jours fixes de télétravail par semaine sont accordés selon le protocole de télétravail ?",
+    options: [
+      "1 jour fixe par semaine",
+      "2 jours fixes par semaine",
+      "3 jours fixes par semaine",
+      "Jusqu'à 5 jours par semaine"
+    ],
+    correctIndex: 0
+  },
+  {
+    id: 26,
+    question: "Quel est le nombre maximal de jours de télétravail sur l'année (au-delà du jour fixe) ?",
+    options: [
+      "5 jours par année",
+      "10 jours par année",
+      "15 jours par année",
+      "30 jours par année"
+    ],
+    correctIndex: 2
+  },
+  {
+    id: 27,
+    question: "Quelle est la limite maximale de jours de télétravail par mois (hors jour fixe) ?",
+    options: [
+      "1 jour par mois",
+      "2 jours par mois",
+      "3 jours par mois",
+      "5 jours par mois"
+    ],
+    correctIndex: 2
+  },
+  {
+    id: 28,
+    question: "Le télétravail est-il obligatoire ou facultatif pour les agents ?",
+    options: [
+      "Il est obligatoire pour tous les agents",
+      "Il est facultatif et réversible à tout moment",
+      "Il dépend uniquement de la décision du chef de service",
+      "Il est réservé aux agents de catégorie A"
+    ],
+    correctIndex: 1
+  },
+  {
+    id: 29,
+    question: "Quel est le nombre maximal de jours d'absence incompressible pour raison de santé avant remplacement ?",
+    options: [
+      "30 jours",
+      "60 jours",
+      "90 jours",
+      "180 jours"
+    ],
+    correctIndex: 2
+  },
+  {
+    id: 30,
+    question: "Les heures supplémentaires au-delà de 1607 heures annuelles sont-elles majorées ?",
+    options: [
+      "Non, elles sont payées au taux normal",
+      "Oui, avec des majorations progressives (25%, 27% et jusqu'à 100%)",
+      "Elles sont comptabilisées comme jours de congés",
+      "Les heures supplémentaires ne sont pas autorisées"
+    ],
+    correctIndex: 1
   }
 ]);
 
-// Fonction pour sélectionner aléatoirement 10 questions parmi 20 sans doublons
+// Fonction pour sélectionner aléatoirement 10 questions parmi 30 sans doublons (Fisher-Yates)
 function getRandomQuestions(): Question[] {
-  const shuffled = [...INITIAL_QUESTIONS].sort(() => Math.random() - 0.5);
-  const selected = shuffled.slice(0, 10);
+  const questions = [...INITIAL_QUESTIONS];
+  
+  // Fisher-Yates shuffle
+  for (let i = questions.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [questions[i], questions[j]] = [questions[j], questions[i]];
+  }
+  
+  const selected = questions.slice(0, 10);
   
   // Vérifier qu'il n'y a pas de doublons (par id)
   const ids = new Set(selected.map(q => q.id));
   if (ids.size !== selected.length) {
-    // En cas de doublon (très rare), relancer récursivement
+    // En cas de doublon (très théorique avec Fisher-Yates), relancer récursivement
     return getRandomQuestions();
   }
   
@@ -686,7 +803,7 @@ export default function Quiz({ onBack }: QuizProps) {
         </div>
         <div className="flex items-center gap-2">
           <button onClick={onBack} className="px-3 py-1 rounded-full bg-slate-100 border border-slate-200 hover:bg-slate-200">Retour</button>
-          <button onClick={restart} className="px-3 py-1 rounded-full bg-orange-600 text-white hover:bg-orange-700">Recommencer</button>
+          <button onClick={restart} className="px-3 py-1 rounded-full bg-orange-600 text-white hover:bg-orange-700">Recommencer avec des nouvelles questions !</button>
         </div>
       </div>
 

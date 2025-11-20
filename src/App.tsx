@@ -671,11 +671,12 @@ ${contexte}
       <header className="relative bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 shadow-2xl border-b border-slate-700 z-10">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex flex-col sm:flex-row items-center gap-8 flex-grow">
-            <div className="relative">
-              <div className="absolute -inset-3 bg-gradient-to-r from-blue-500 via-cyan-500 to-blue-600 rounded-2xl blur-xl opacity-30" />
-              <div className="relative p-5 bg-gradient-to-br from-slate-100 to-white rounded-2xl shadow-2xl border border-slate-200">
-                <Users className="w-16 h-16 text-slate-700" />
-              </div>
+            <div className="relative w-24 h-24 sm:w-28 sm:h-28 overflow-hidden rounded-lg shadow-lg border-2 border-slate-200">
+              <img
+                src="./deco.jpg"
+                alt="Décoration"
+                className="w-full h-full object-cover"
+              />
             </div>
             <div className="text-center sm:text-left">
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-2 tracking-tight">
