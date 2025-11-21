@@ -827,7 +827,7 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
               setSelectedSpecialPrimes(new Set())
               setCurrentStep(1)
             }}
-            className="w-full mt-6 px-6 py-3 bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-500 hover:to-slate-600 border border-slate-500/50 rounded-lg text-white font-semibold uppercase tracking-wide transition-all duration-300 transform hover:scale-102 shadow-lg hover:shadow-xl"
+            className="w-full mt-6 px-6 py-3 bg-red-600 hover:bg-red-700 border border-red-500/50 rounded-lg text-white font-semibold uppercase tracking-wide transition-all duration-300 transform hover:scale-102 shadow-lg hover:shadow-xl"
           >
             ← Retour au menu
           </button>

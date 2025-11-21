@@ -175,7 +175,7 @@ const FAQ: React.FC<Props> = ({ onBack }) => {
           <button
             onClick={onBack}
             aria-label="Retour"
-            className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-md border border-blue-700"
+            className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-md border border-red-700"
           >
             Retour
           </button>

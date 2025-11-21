@@ -58,7 +58,7 @@ export default function Calculateurs({ onBack }: CalculateursProps) {
         {onBack && (
           <button
             onClick={onBack}
-            className="px-4 py-2 rounded-full bg-slate-100 border border-slate-200 hover:bg-slate-200 flex items-center gap-2"
+            className="px-4 py-2 rounded-full bg-red-600 hover:bg-red-700 text-white font-semibold flex items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
             Retour

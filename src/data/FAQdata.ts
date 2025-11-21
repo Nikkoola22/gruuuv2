@@ -8,8 +8,8 @@ export interface FAQItem {
 export const faqData: FAQItem[] = [
   {
     id: 26,
-    question: "J'ai droit à combien de jours de forfait ?",
-    answer: "À la mairie de Gennevilliers, le forfait télétravail annuel est de 15 jours par an, à utiliser dans la limite de 3 jours maximum par mois. Ce forfait s’ajoute à votre jour fixe de télétravail hebdomadaire, sans dépasser un total de 2 jours de télétravail par semaine. Pour les agents à temps partiel en dessous de 80%, ce forfait est proratisé en fonction du temps de travail. En cas de non-utilisation, le report des jours de forfait n’est pas possible. Pour toute demande d’utilisation des jours de forfait, elle doit être validée par la hiérarchie au moins 5 jours à l’avance.",
+    question: "J'ai droit à combien de jours de télétravail mobile ?",
+    answer: "À la mairie de Gennevilliers, le forfait télétravail annuel est de 15 jours par an, à utiliser dans la limite de 3 jours maximum par mois. Ce forfait s'ajoute à votre jour fixe de télétravail hebdomadaire, sans dépasser un total de 2 jours de télétravail par semaine. Pour les agents à temps partiel en dessous de 80%, ce forfait est proratisé en fonction du temps de travail. En cas de non-utilisation, le report des jours de forfait n'est pas possible. Pour toute demande d'utilisation des jours de forfait, elle doit être validée par la hiérarchie au moins 5 jours à l'avance.",
     category: 'general'
   },
   {
