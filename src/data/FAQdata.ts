@@ -61,7 +61,7 @@ export const faqData: FAQItem[] = [
   },
   {
     id: 5,
-    question: "Qu'est-ce que la journée de solidarité ?",
+    question: "Combien dure la journée de solidarité ?",
     answer: "La journée de solidarité représente 7 heures de travail supplémentaires par an. Elle peut être fractionnée et prise sur des jours RTT, des jours fériés ou des congés selon les modalités définies par la collectivité.",
     category: 'temps-travail'
   },

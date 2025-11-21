@@ -301,7 +301,7 @@ const INITIAL_QUESTIONS: Question[] = faqData.slice(0, 10).map((f, idx) => {
     ];
     correctIndex = 1; // second option is correct (1607 heures)
   } else if (idx === 6) {
-    // explicit options for 'Qu'est-ce que la journée de solidarité ?' (faq slice index 6 in the slice)
+    // explicit options for 'Combien dure la journée de solidarité ?' (faq slice index 6 in the slice)
     opts = [
       "La journée de solidarité représente 7 heures de travail supplémentaires par an (sous conditions)",
       "La journée de solidarité représente 8 heures de travail supplémentaires par an",
@@ -588,10 +588,120 @@ const INITIAL_QUESTIONS: Question[] = faqData.slice(0, 10).map((f, idx) => {
       "Les heures supplémentaires ne sont pas autorisées"
     ],
     correctIndex: 1
+  },
+  {
+    id: 31,
+    question: "Quel est le nombre maximum d'heures supplémentaires par mois ?",
+    options: [
+      "20 heures par mois",
+      "25 heures par mois",
+      "30 heures par mois",
+      "40 heures par mois"
+    ],
+    correctIndex: 1
+  },
+  {
+    id: 32,
+    question: "Les heures supplémentaires de nuit (22h à 7h) sont majorées de combien ?",
+    options: [
+      "25%",
+      "50%",
+      "100%",
+      "66%"
+    ],
+    correctIndex: 2
+  },
+  {
+    id: 33,
+    question: "Quel est le cycle de travail hebdomadaire à Gennevilliers pour les agents des crèches ?",
+    options: [
+      "37 heures par semaine",
+      "37.5 heures par semaine",
+      "38 heures par semaine",
+      "39 heures par semaine"
+    ],
+    correctIndex: 3
+  },
+  {
+    id: 34,
+    question: "Quelles sont les quotités de temps partiel proposées à Gennevilliers ?",
+    options: [
+      "40%, 60%, 80%",
+      "50%, 75%, 90%",
+      "50%, 60%, 70%, 80% ou 90%",
+      "55%, 70%, 85%"
+    ],
+    correctIndex: 2
+  },
+  {
+    id: 35,
+    question: "À partir de combien de dimanches travaillés a-t-on droit à une compensation ?",
+    options: [
+      "À partir de 5 dimanches",
+      "À partir de 8 dimanches",
+      "À partir de 10 dimanches",
+      "À partir de 15 dimanches"
+    ],
+    correctIndex: 2
+  },
+  {
+    id: 36,
+    question: "Combien de jours de congés annuels a-t-on droit à Gennevilliers sur 5 jours de travail par semaine ?",
+    options: [
+      "20 jours ouvrés",
+      "22 jours ouvrés",
+      "25 jours ouvrés",
+      "30 jours ouvrés"
+    ],
+    correctIndex: 2
+  },
+  {
+    id: 37,
+    question: "Quel est le délai minimum de demande de congé pour 1 journée ?",
+    options: [
+      "2 jours ouvrés",
+      "5 jours ouvrés",
+      "10 jours ouvrés",
+      "15 jours ouvrés"
+    ],
+    correctIndex: 1
+  },
+  {
+    id: 38,
+    question: "Quelle est la durée maximale d'absence consecutive autorisée pour les congés annuels ?",
+    options: [
+      "20 jours consécutifs",
+      "25 jours consécutifs",
+      "31 jours consécutifs",
+      "45 jours consécutifs"
+    ],
+    correctIndex: 2
+  },
+  {
+    id: 39,
+    question: "Qu'est-ce que le fractionnement de congés annuels ?",
+    options: [
+      "Le partage des congés entre plusieurs années",
+      "Des jours de congé supplémentaires accordés pour congés pris en periods creuses",
+      "La division des congés entre les agents d'un service",
+      "L'obligation de prendre au moins 2 semaines consécutives"
+    ],
+    correctIndex: 1
+  },
+  {
+    id: 40,
+    question: "Après combien d'heures continues de travail minimum a-t-on droit à une pause ?",
+    options: [
+      "Après 4 heures",
+      "Après 5 heures",
+      "Après 6 heures",
+      "Après 8 heures"
+    ],
+    correctIndex: 2
   }
 ]);
 
-// Fonction pour sélectionner aléatoirement 10 questions parmi 30 sans doublons (Fisher-Yates)
+// Fonction pour sélectionner aléatoirement 10 questions parmi 40 sans doublons (Fisher-Yates)
 function getRandomQuestions(): Question[] {
   const questions = [...INITIAL_QUESTIONS];
   
