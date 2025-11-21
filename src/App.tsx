@@ -265,6 +265,21 @@ const PodcastPlayer: React.FC = () => {
     };
   }, [currentEpisode]);
 
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    if (isPlaying) {
+      audio.play().catch((err) => {
+        console.error("Error playing audio:", err);
+        setError("Impossible de lire ce podcast.");
+        setIsPlaying(false);
+      });
+    } else {
+      audio.pause();
+    }
+  }, [isPlaying]);
+
   const playPause = async () => {
     const audio = audioRef.current;
     if (!audio || !currentEpisode) return;
@@ -285,7 +300,9 @@ const PodcastPlayer: React.FC = () => {
   const selectEpisode = (episode: PodcastEpisode) => {
     if (currentEpisode?.id !== episode.id) {
       setCurrentEpisode(episode);
-      setIsPlaying(false);
+      setIsPlaying(true); // Démarre automatiquement la lecture
+    } else if (!isPlaying) {
+      setIsPlaying(true); // Si le même épisode est cliqué, reprend la lecture
     }
   };
 
@@ -380,13 +397,6 @@ export default function App() {
     const saved = localStorage.getItem('primes-blocked');
     return saved ? JSON.parse(saved) : false;
   });
-
-  const setIsPrimesBlocked = (value: boolean) => {
-    setIsPrimesBlockedState(value);
-    localStorage.setItem('primes-blocked', JSON.stringify(value));
-    // Émettre un événement personnalisé pour notifier les autres onglets
-    window.dispatchEvent(new CustomEvent('primes-blocked-changed', { detail: value }));
-  };
 
   useEffect(() => {
     const handlePrimesBlockedChanged = (e: Event) => {
@@ -1111,22 +1121,22 @@ ${contexte}
                 Services
               </h4>
               </div>
-              <ul className="space-y-3 text-white/80">
-                <li className="flex items-center justify-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-400" />
+              <ul className="space-y-3 text-white/80 flex flex-col items-center justify-center">
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
+                  <span>Accompagnement syndical</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
                   <span>Santé</span>
                 </li>
-                <li className="flex items-center justify-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-400" />
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
                   <span>Retraite</span>
                 </li>
-                <li className="flex items-center justify-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-400" />
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
                   <span>Juridique</span>
-                </li>
-                <li className="flex items-center justify-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-400" />
-                  <span>Accompagnement syndical</span>
                 </li>
               </ul>
             </div>

@@ -459,7 +459,7 @@ Calcul détaillé du CIA:
                     <span className="text-red-300 font-semibold text-lg">jours</span>
                     <button
                       onClick={() => {
-                        setEtapeActive(2); // Collapse l'étape 2
+                        setEtapeActive(4); // Affiche l'étape 4 (Résultat)
                         setEtape3Collapsed(true); // Collapse le contenu de l'étape 3
                       }}
                       className="ml-auto px-4 py-2 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-semibold rounded-lg transition-all transform hover:scale-105 shadow-md"
