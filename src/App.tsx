@@ -782,6 +782,15 @@ ${contexte}
         `}</style>
       </section>
   <main className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 z-10">
+        {selectedInfo && (
+          <section className="info-detail bg-white/95 backdrop-blur-sm p-6 rounded-lg shadow-md mb-8 max-w-4xl mx-auto">
+            <h3 className="text-xl font-bold mb-4">{selectedInfo.title}</h3>
+            <p className="whitespace-pre-wrap">{selectedInfo.content}</p>
+            <button onClick={() => setSelectedInfo(null)} className="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+              Fermer
+            </button>
+          </section>
+        )}
         {chatState.currentView === 'quiz' ? (
           <Quiz onBack={() => setChatState({ currentView: 'menu', selectedDomain: null, messages: [], isProcessing: false })} />
         ) : chatState.currentView === 'public' ? (
@@ -790,16 +799,6 @@ ${contexte}
           <Calculateurs onBack={() => setShowCalculator(false)} />
         ) : chatState.currentView === "menu" ? (
           <>
-
-            {selectedInfo && (
-              <section className="info-detail bg-white/95 backdrop-blur-sm p-6 rounded-lg shadow-md mt-8 max-w-4xl mx-auto">
-                <h3 className="text-xl font-bold mb-4">{selectedInfo.title}</h3>
-                <p className="whitespace-pre-wrap">{selectedInfo.content}</p>
-                <button onClick={() => setSelectedInfo(null)} className="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
-                  Fermer
-                </button>
-              </section>
-            )}
 
             <section className="text-center -mt-6 mb-6 max-w-xl mx-auto">
               <div className="inline-block bg-gradient-to-r from-blue-600/60 via-purple-600/60 to-indigo-600/60 px-4 py-3 rounded-xl shadow-md">

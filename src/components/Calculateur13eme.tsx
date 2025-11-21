@@ -322,7 +322,7 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
 
       <div className="space-y-6 flex-1 overflow-y-auto p-6 max-w-md mx-auto w-full">
         {/* ÉTAPE 1 - Mode de rémunération */}
-        <div className="bg-gradient-to-br from-blue-950/40 via-slate-900/50 to-blue-900/40 border-2 border-blue-500/40 rounded-2xl p-8 space-y-6">
+        <div className="bg-gradient-to-br from-blue-950/40 via-slate-900/50 to-blue-900/40 border-2 border-blue-500/40 rounded-2xl p-5 space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm uppercase tracking-widest font-bold text-blue-300">◆ Étape 1</p>
@@ -332,11 +332,11 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
           <div className="h-px bg-gradient-to-r from-blue-500/0 via-blue-500/40 to-blue-500/0"></div>
           
           <div>
-            <label className="block text-xs uppercase tracking-wide text-blue-300 font-semibold mb-3">Quel est votre mode ?</label>
+            <label className="block text-xs uppercase tracking-wide text-blue-300 font-semibold mb-2">Quel est votre mode ?</label>
             <select
               value={agentType}
               onChange={(e) => handleSelectAgentType(e.target.value as AgentType)}
-              className="w-full px-4 py-3 rounded-lg bg-blue-900/20 border-2 border-blue-500/40 text-white font-semibold focus:border-blue-400 focus:outline-none"
+              className="w-full px-4 py-2 rounded-lg bg-blue-900/20 border-2 border-blue-500/40 text-white font-semibold focus:border-blue-400 focus:outline-none"
             >
               <option value="">Choisir...</option>
               <option value="indiciaire">Indiciaire (sur un emploi permanent)</option>
@@ -347,7 +347,7 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
 
         {agentType && (
           /* ÉTAPE 2 - Profil ou Mode horaire */
-          <div className="bg-gradient-to-br from-cyan-950/40 via-slate-900/50 to-cyan-900/40 border-2 border-cyan-500/40 rounded-2xl p-8 space-y-6">
+          <div className="bg-gradient-to-br from-cyan-950/40 via-slate-900/50 to-cyan-900/40 border-2 border-cyan-500/40 rounded-2xl p-5 space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm uppercase tracking-widest font-bold text-cyan-300">◆ Étape 2</p>
@@ -357,7 +357,7 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
             <div className="h-px bg-gradient-to-r from-cyan-500/0 via-cyan-500/40 to-cyan-500/0"></div>
             
             <div>
-              <label className="block text-xs uppercase tracking-wide text-cyan-300 font-semibold mb-3">
+              <label className="block text-xs uppercase tracking-wide text-cyan-300 font-semibold mb-2">
                 {agentType === 'indiciaire' ? 'Quel est votre profil ?' : 'Choisissez votre mode'}
               </label>
               <select
@@ -365,7 +365,7 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
                 onChange={(e) => agentType === 'indiciaire' 
                   ? handleSelectIndiciaireProfile(e.target.value as IndiciaireProfile)
                   : handleSelectHoraireBaseType(e.target.value as HoraireBase)}
-                className="w-full px-4 py-3 rounded-lg bg-cyan-900/20 border-2 border-cyan-500/40 text-white font-semibold focus:border-cyan-400 focus:outline-none"
+                className="w-full px-4 py-2 rounded-lg bg-cyan-900/20 border-2 border-cyan-500/40 text-white font-semibold focus:border-cyan-400 focus:outline-none"
               >
                 <option value="">Choisir...</option>
                 {agentType === 'indiciaire' ? (
@@ -409,27 +409,39 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
                         <p className="text-xs text-emerald-400 italic bg-emerald-900/30 px-3 py-1 rounded-lg">Veuillez regarder sur votre fiche de paie</p>
                       </div>
                       
+                      {/* Alerte pour remplir les champs */}
+                      <div className="bg-yellow-900/40 border-2 border-yellow-500/60 rounded-xl p-4 mb-4">
+                        <p className="text-sm font-semibold text-yellow-200 text-center">⚠️ Remplissez les deux champs ci-dessous pour calculer votre 13ème mois</p>
+                      </div>
+
                       <div>
-                        <label className="block text-xs uppercase tracking-wide text-emerald-300 font-semibold mb-2">Indice Majoré (IM)</label>
+                        <label className="block text-sm uppercase tracking-wide text-emerald-300 font-bold mb-3 flex items-center gap-2">
+                          <span className="inline-flex items-center justify-center w-6 h-6 bg-emerald-500 text-white rounded-full text-xs font-bold">1</span>
+                          Indice Majoré (IM)
+                        </label>
                         <input
                           value={im}
                           onChange={(e) => setIm(e.target.value)}
                           inputMode="decimal"
-                          className="w-full px-4 py-3 rounded-lg bg-emerald-900/20 border-2 border-emerald-500/40 text-white font-semibold placeholder-slate-500 focus:border-emerald-400 focus:outline-none"
+                          className="w-full px-4 py-4 rounded-lg bg-emerald-900/30 border-3 border-emerald-400/60 text-white font-bold placeholder-slate-400 focus:border-emerald-300 focus:outline-none text-lg"
                           placeholder="ex : 366"
                         />
+                        <p className="text-xs text-emerald-300 mt-2 font-semibold">Trouvez cette valeur sur votre dernière fiche de paie</p>
                       </div>
 
                       <div>
-                        <label className="block text-xs uppercase tracking-wide text-emerald-300 font-semibold mb-2">Nouvelle Bonification Indiciaire (NBI)</label>
+                        <label className="block text-sm uppercase tracking-wide text-emerald-300 font-bold mb-3 flex items-center gap-2">
+                          <span className="inline-flex items-center justify-center w-6 h-6 bg-emerald-500 text-white rounded-full text-xs font-bold">2</span>
+                          Nouvelle Bonification Indiciaire (NBI)
+                        </label>
                         <input
                           value={nbi}
                           onChange={(e) => setNbi(e.target.value)}
                           inputMode="decimal"
-                          className="w-full px-4 py-3 rounded-lg bg-emerald-900/20 border-2 border-emerald-500/40 text-white font-semibold placeholder-slate-500 focus:border-emerald-400 focus:outline-none"
+                          className="w-full px-4 py-4 rounded-lg bg-emerald-900/30 border-3 border-emerald-400/60 text-white font-bold placeholder-slate-400 focus:border-emerald-300 focus:outline-none text-lg"
                           placeholder="ex : 10"
                         />
-                        <p className="text-xs text-slate-400 mt-2">Conversion appliquée : indice × 4,92278</p>
+                        <p className="text-xs text-emerald-300 mt-2 font-semibold">Conversion appliquée : indice × 4,92278</p>
                       </div>
                     </div>
 
