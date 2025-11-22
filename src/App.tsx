@@ -96,11 +96,43 @@ const NewsTicker: React.FC = () => {
   useEffect(() => {
     const chargerFlux = async () => {
       try {
-        // Appelle la nouvelle API serverless
-        const res = await fetch("/api/rss");
+        // Utilise un proxy CORS pour récupérer le flux RSS
+        const feedUrl = 'https://www.franceinfo.fr/politique.rss';
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(feedUrl)}&json`;
+        
+        const res = await fetch(proxyUrl);
         if (!res.ok) throw new Error("Échec de la récupération du flux RSS");
 
-        const items = await res.json();
+        const data = await res.json();
+        const xmlText = data.contents;
+        
+        // Parse XML
+        const items: { title: string; link: string; pubDate: string; guid: string }[] = [];
+        const itemRegex = /<item>([\s\S]*?)<\/item>/g;
+        let match, count = 0;
+
+        while ((match = itemRegex.exec(xmlText)) !== null && count < 10) {
+          const itemXml = match[1];
+          const getTag = (tag: string) => {
+            const regex = new RegExp(`<${tag}[^>]*>(.*?)<\\/${tag}>`, 's');
+            const m = regex.exec(itemXml);
+            return m && m[1] ? m[1].replace(/<[^>]*>/g, '').trim() : '';
+          };
+
+          const title = getTag('title');
+          const link = getTag('link');
+
+          if (title && link) {
+            items.push({ 
+              title, 
+              link,
+              pubDate: getTag('pubDate'),
+              guid: getTag('guid') || link
+            });
+            count++;
+          }
+        }
+
         if (items.length) setActualites(items);
       } catch (err) {
         console.error("Erreur lors du chargement du flux RSS, utilisation des données de secours.", err);
