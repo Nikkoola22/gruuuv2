@@ -30,10 +30,18 @@ export default function RssFeed() {
 
         while ((match = itemRegex.exec(xmlText)) !== null && count < 10) {
           const itemXml = match[1];
+          
+          // Fonction pour décoder les entités HTML
+          const decodeHTML = (html: string) => {
+            const txt = document.createElement('textarea');
+            txt.innerHTML = html;
+            return txt.value;
+          };
+          
           const getTag = (tag: string) => {
             const regex = new RegExp(`<${tag}[^>]*>(.*?)<\\/${tag}>`, 's');
             const m = regex.exec(itemXml);
-            return m && m[1] ? m[1].replace(/<[^>]*>/g, '').trim() : '';
+            return m && m[1] ? decodeHTML(m[1].replace(/<[^>]*>/g, '')).trim() : '';
           };
 
           const title = getTag('title');

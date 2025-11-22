@@ -112,10 +112,18 @@ const NewsTicker: React.FC = () => {
 
         while ((match = itemRegex.exec(xmlText)) !== null && count < 10) {
           const itemXml = match[1];
+          
+          // Fonction pour décoder les entités HTML
+          const decodeHTML = (html: string) => {
+            const txt = document.createElement('textarea');
+            txt.innerHTML = html;
+            return txt.value;
+          };
+          
           const getTag = (tag: string) => {
             const regex = new RegExp(`<${tag}[^>]*>(.*?)<\\/${tag}>`, 's');
             const m = regex.exec(itemXml);
-            return m && m[1] ? m[1].replace(/<[^>]*>/g, '').trim() : '';
+            return m && m[1] ? decodeHTML(m[1].replace(/<[^>]*>/g, '')).trim() : '';
           };
 
           const title = getTag('title');
@@ -145,10 +153,7 @@ const NewsTicker: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center p-4 bg-blue-900/80 rounded-lg">
-        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
-        <span className="ml-2 text-white text-sm">Chargement des actualités...</span>
-      </div>
+        <span className="ml-2 text-white text-sm">Chargement du flux RSS...</span>
     );
   }
 
