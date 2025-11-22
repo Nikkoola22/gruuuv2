@@ -150,13 +150,16 @@ export const infoItems: InfoItem[] = ${JSON.stringify(infoItems, null, 2)};
 // Pour compatibilité avec l'ancien système
 export const infoData = infoItems.map(item => item.title).join(" • ");`;
 
-    const script = `#!/bin/bash
+    // Échappe les backticks et guillemets pour zsh
+    const escapedCode = code.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/"/g, '\\"');
+    
+    const script = `#!/bin/zsh
 cd /Users/nikkoolagarnier/Downloads/gruuuv2-master
 cat > src/data/info-data.ts << 'EOFSCRIPT'
 ${code}
 EOFSCRIPT
 git add src/data/info-data.ts
-git commit -m "Synchronisation: mise à jour des \${new Date().toLocaleDateString('fr-FR')} news FPT depuis AdminInfo"
+git commit -m "Synchronisation: mise à jour news FPT depuis AdminInfo"
 git push
 echo "✅ News FPT mises à jour et poussées sur GitHub !"`;
 
