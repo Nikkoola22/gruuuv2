@@ -377,12 +377,19 @@ const PodcastPlayer: React.FC = () => {
 
 export default function App() {
   const [infoItems, setInfoItems] = useState<InfoItem[]>(() => {
-    // Charger d'abord depuis le localStorage (modifications locales)
+    // Charger d'abord depuis le fichier source (info-data.ts = source de vérité)
+    // Le localStorage n'est utilisé que si l'utilisateur a fait des modifications en admin
     const savedInfo = localStorage.getItem('cfdt-info-items');
     if (savedInfo) {
-      return JSON.parse(savedInfo);
+      const parsed = JSON.parse(savedInfo);
+      // Vérifier que le localStorage est à jour en comparant les IDs
+      // Si les IDs ne correspondent pas (ancien format), ignorer et recharger depuis la source
+      if (parsed.length === defaultInfoItems.length && 
+          parsed[parsed.length - 1]?.id === defaultInfoItems[defaultInfoItems.length - 1]?.id) {
+        return parsed;
+      }
     }
-    // Sinon charger depuis le fichier source (info-data.ts)
+    // Utiliser la source de vérité
     return defaultInfoItems;
   });
   
