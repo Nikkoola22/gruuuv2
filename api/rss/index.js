@@ -27,7 +27,7 @@ function parseXML(xmlText) {
   return items;
 }
 
-export default async (req, res) => {
+module.exports = async (req, res) => {
   // Configuration CORS
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -41,7 +41,7 @@ export default async (req, res) => {
   }
 
   // Récupère l'URL du flux depuis les query params ou utilise l'URL par défaut
-  const feedUrl = req.query?.url || 'https://www.franceinfo.fr/politique.rss';
+  const feedUrl = (req.query && req.query.url) || 'https://www.franceinfo.fr/politique.rss';
 
   try {
     // Cache-buster pour éviter les caches

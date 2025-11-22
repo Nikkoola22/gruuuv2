@@ -9,6 +9,14 @@ export default defineConfig({
   // Si on déploie sur GitHub Pages, on garde /gruuuu/
   // Sinon (local ou Vercel), on met "./"
   base: process.env.GITHUB_PAGES ? '/gruuuu/' : './',
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+      },
+    },
+  },
   build: {
     rollupOptions: {
       input: {
