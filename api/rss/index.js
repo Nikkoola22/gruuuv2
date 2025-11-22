@@ -1,33 +1,33 @@
 // Fonction serverless Vercel pour le flux RSS
 // Parse XML simplifiée sans dépendances externes
 
-function parseXML(xmlText) {
-  const items = [];
-  const itemRegex = /<item>([\s\S]*?)<\/item>/g;
-  let match;
-
-  while ((match = itemRegex.exec(xmlText)) !== null) {
-    const itemXml = match[1];
-
-    const extractTag = (tag) => {
-      const regex = new RegExp(`<${tag}>(.*?)<\/${tag}>`);
-      const m = regex.exec(itemXml);
-      return m ? m[1].replace(/<[^>]*>/g, '').trim() : '';
-    };
-
-    items.push({
-      title: extractTag('title') || 'Sans titre',
-      link: extractTag('link') || '#',
-      pubDate: extractTag('pubDate') || new Date().toISOString(),
-      description: extractTag('description') || '',
-      guid: extractTag('guid') || extractTag('link'),
-    });
-  }
-
-  return items;
-}
-
 module.exports = async (req, res) => {
+  // Fonction pour parser le XML
+  const parseXML = (xmlText) => {
+    const items = [];
+    const itemRegex = /<item>([\s\S]*?)<\/item>/g;
+    let match;
+
+    while ((match = itemRegex.exec(xmlText)) !== null) {
+      const itemXml = match[1];
+
+      const extractTag = (tag) => {
+        const regex = new RegExp(`<${tag}>(.*?)<\/${tag}>`);
+        const m = regex.exec(itemXml);
+        return m ? m[1].replace(/<[^>]*>/g, '').trim() : '';
+      };
+
+      items.push({
+        title: extractTag('title') || 'Sans titre',
+        link: extractTag('link') || '#',
+        pubDate: extractTag('pubDate') || new Date().toISOString(),
+        description: extractTag('description') || '',
+        guid: extractTag('guid') || extractTag('link'),
+      });
+    }
+
+    return items;
+  };
   // Configuration CORS
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
