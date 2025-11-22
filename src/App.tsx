@@ -66,7 +66,6 @@ const API_KEY = import.meta.env.VITE_APP_PERPLEXITY_KEY;
 const API_URL = "https://api.perplexity.ai/chat/completions";
 
 const fluxOriginal = "https://www.franceinfo.fr/politique.rss";
-const proxyUrl = "https://api.allorigins.win/get?url=";
 
 // Fonction pour nettoyer les chaînes de caractères
 const nettoyerChaine = (chaine: string): string => {
@@ -81,22 +80,6 @@ const nettoyerChaine = (chaine: string): string => {
 
 // Parser les données du sommaire
 const sommaireData = JSON.parse(sommaire);
-
-// Fonction pour obtenir l'URL du flux RSS
-const getRssUrl = (): string => {
-  try {
-    const savedConfig = localStorage.getItem('rssConfig');
-    if (savedConfig) {
-      const config = JSON.parse(savedConfig);
-      if (config.enabled && config.url) {
-        return proxyUrl + encodeURIComponent(config.url);
-      }
-    }
-  } catch (err) {
-    console.warn('Erreur lors du chargement de la configuration RSS:', err);
-  }
-  return proxyUrl + encodeURIComponent(fluxOriginal);
-};
 
 const actualitesSecours = [
   { title: "Réforme des retraites : nouvelles négociations prévues", link: "#", pubDate: new Date().toISOString(), guid: "1" },
@@ -113,19 +96,11 @@ const NewsTicker: React.FC = () => {
   useEffect(() => {
     const chargerFlux = async () => {
       try {
-        const res = await fetch(getRssUrl());
+        // Appelle la nouvelle API serverless
+        const res = await fetch("/api/rss");
         if (!res.ok) throw new Error("Échec de la récupération du flux RSS");
 
-        const data = await res.json();
-        const xml = data.contents;
-        const doc = new DOMParser().parseFromString(xml, "text/xml");
-        const items = Array.from(doc.querySelectorAll("item")).slice(0, 10).map((item, i) => ({
-          title: item.querySelector("title")?.textContent || `Actualité ${i + 1}`,
-          link: item.querySelector("link")?.textContent || "#",
-          pubDate: item.querySelector("pubDate")?.textContent || new Date().toISOString(),
-          guid: item.querySelector("guid")?.textContent || `${i}`,
-        }));
-
+        const items = await res.json();
         if (items.length) setActualites(items);
       } catch (err) {
         console.error("Erreur lors du chargement du flux RSS, utilisation des données de secours.", err);
