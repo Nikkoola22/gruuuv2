@@ -45,29 +45,39 @@ module.exports = async (req, res) => {
 
   try {
     // Cache-buster pour éviter les caches
-    const urlAvecCacheBuster = `${feedUrl}?_=${new Date().getTime()}`;
+    const urlAvecCacheBuster = `${feedUrl}${feedUrl.includes('?') ? '&' : '?'}_=${new Date().getTime()}`;
 
     const response = await fetch(urlAvecCacheBuster, {
-      cache: 'no-store',
+      method: 'GET',
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+      },
     });
 
     if (!response.ok) {
+      console.error(`Statut HTTP ${response.status} pour ${urlAvecCacheBuster}`);
       throw new Error(`Le serveur du flux a répondu avec le statut : ${response.status}`);
     }
 
     const xmlText = await response.text();
+    
+    if (!xmlText || xmlText.length < 100) {
+      throw new Error('Réponse vide ou invalide du serveur RSS');
+    }
 
     // Parser XML
     let items = parseXML(xmlText).slice(0, 10);
+    
+    if (!items || items.length === 0) {
+      throw new Error('Aucun article trouvé dans le flux');
+    }
 
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
-    res.setHeader('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate');
-    res.setHeader('Pragma', 'no-cache');
-    res.setHeader('Expires', '0');
+    res.setHeader('Cache-Control', 'public, max-age=300');
 
     res.status(200).json(items);
   } catch (error) {
-    console.error('Erreur API RSS :', error);
+    console.error('Erreur API RSS :', error.message);
     res.status(502).json({
       error: 'Impossible de récupérer le flux RSS.',
       details: error.message,
