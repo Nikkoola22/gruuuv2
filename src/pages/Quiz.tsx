@@ -912,8 +912,8 @@ export default function Quiz({ onBack }: QuizProps) {
           <p className="text-sm text-gray-600">10 questions à choix multiple — obtenez votre score à la fin</p>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={onBack} className="px-3 py-1 rounded-full bg-red-600 hover:bg-red-700 text-white font-semibold">Retour</button>
-          <button onClick={restart} className="px-3 py-1 rounded-full bg-orange-600 text-white hover:bg-orange-700">Recommencer avec des nouvelles questions !</button>
+          <button onClick={onBack} className="px-4 py-2 rounded-full bg-red-600 hover:bg-red-700 text-white font-semibold text-base">Retour</button>
+          <button onClick={restart} className="px-4 py-2 rounded-full bg-orange-600 text-white hover:bg-orange-700 text-base">Recommencer avec des nouvelles questions !</button>
         </div>
       </div>
 
@@ -983,8 +983,8 @@ export default function Quiz({ onBack }: QuizProps) {
           </div>
 
           <div className="mt-6 flex items-center gap-3">
-            <button onClick={restart} className="px-4 py-2 rounded bg-orange-600 text-white">Refaire le quizz</button>
-            {onBack && <button onClick={onBack} className="px-4 py-2 rounded bg-red-600 hover:bg-red-700 text-white font-semibold">Retour au menu</button>}
+            <button onClick={restart} className="px-5 py-3 rounded bg-orange-600 text-white text-base font-semibold">Refaire le quizz</button>
+            {onBack && <button onClick={onBack} className="px-5 py-3 rounded bg-red-600 hover:bg-red-700 text-white font-semibold text-base">Retour au menu</button>}
           </div>
         </div>
       )}

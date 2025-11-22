@@ -952,7 +952,10 @@ ${contexte}
                   <p className="text-orange-100 text-xs sm:text-sm hidden sm:block">Posez vos questions, je suis là pour vous aider</p>
                 </div>
               </div>
-              <Users className="w-6 h-6 sm:w-8 sm:h-8 text-white flex-shrink-0" />
+              <div className="flex items-center gap-2 sm:gap-4">
+                <Users className="w-6 h-6 sm:w-8 sm:h-8 text-white flex-shrink-0" />
+                <button onClick={returnToMenu} className="px-4 py-2 rounded-full bg-red-600 hover:bg-red-700 text-white font-semibold text-base">Retour</button>
+              </div>
             </div>
             
             <div className="flex flex-col sm:flex-row items-center py-4 bg-gray-50/50 px-4 sm:px-6 gap-4">
