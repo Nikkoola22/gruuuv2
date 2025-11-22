@@ -16,13 +16,12 @@ export default function RssFeed() {
     const fetchRss = async () => {
       try {
         const feedUrl = 'https://www.franceinfo.fr/politique.rss';
-        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(feedUrl)}&json`;
+        const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(feedUrl)}`;
         
         const res = await fetch(proxyUrl);
         if (!res.ok) throw new Error(`Statut HTTP ${res.status}`);
         
-        const data = await res.json();
-        const xmlText = data.contents;
+        const xmlText = await res.text();
 
         // Parse XML
         const items: RssItem[] = [];

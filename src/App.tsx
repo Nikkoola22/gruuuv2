@@ -96,15 +96,14 @@ const NewsTicker: React.FC = () => {
   useEffect(() => {
     const chargerFlux = async () => {
       try {
-        // Utilise un proxy CORS pour récupérer le flux RSS
+        // Utilise le proxy CORS corsproxy.io qui fonctionne en production
         const feedUrl = 'https://www.franceinfo.fr/politique.rss';
-        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(feedUrl)}&json`;
+        const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(feedUrl)}`;
         
         const res = await fetch(proxyUrl);
         if (!res.ok) throw new Error("Échec de la récupération du flux RSS");
 
-        const data = await res.json();
-        const xmlText = data.contents;
+        const xmlText = await res.text();
         
         // Parse XML
         const items: { title: string; link: string; pubDate: string; guid: string }[] = [];
