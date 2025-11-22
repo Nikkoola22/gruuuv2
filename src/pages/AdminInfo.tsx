@@ -116,6 +116,66 @@ const AdminInfo: React.FC = () => {
     saveInfoItems(updatedItems);
   };
 
+  const exportToInfoDataTs = () => {
+    const code = `export interface InfoItem {
+  id: number;
+  title: string;
+  content: string;
+}
+
+export const infoItems: InfoItem[] = ${JSON.stringify(infoItems, null, 2)};
+
+// Pour compatibilité avec l'ancien système
+export const infoData = infoItems.map(item => item.title).join(" • ");`;
+
+    const element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(code));
+    element.setAttribute('download', 'info-data.ts');
+    element.style.display = 'none';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+    alert('✅ Fichier info-data.ts téléchargé !\n\nÉtapes:\n1. Remplacez le fichier src/data/info-data.ts\n2. Poussez les changements sur GitHub\n3. Vercel se redéploiera automatiquement');
+  };
+
+  const generateAndCopyScript = () => {
+    const code = `export interface InfoItem {
+  id: number;
+  title: string;
+  content: string;
+}
+
+export const infoItems: InfoItem[] = ${JSON.stringify(infoItems, null, 2)};
+
+// Pour compatibilité avec l'ancien système
+export const infoData = infoItems.map(item => item.title).join(" • ");`;
+
+    const script = `#!/bin/bash
+cd /Users/nikkoolagarnier/Downloads/gruuuv2-master
+cat > src/data/info-data.ts << 'EOFSCRIPT'
+${code}
+EOFSCRIPT
+git add src/data/info-data.ts
+git commit -m "Synchronisation: mise à jour des \${new Date().toLocaleDateString('fr-FR')} news FPT depuis AdminInfo"
+git push
+echo "✅ News FPT mises à jour et poussées sur GitHub !"`;
+
+    // Copier dans le clipboard
+    navigator.clipboard.writeText(script).then(() => {
+      alert('✅ Script copié dans le clipboard !\n\n1. Ouvrez un terminal\n2. Collez le script (Cmd+V ou Ctrl+V)\n3. Appuyez sur Entrée\n4. Voilà ! Les changements sont pushés vers GitHub');
+    }).catch(() => {
+      alert('❌ Erreur lors de la copie. Téléchargez le fichier à la place.');
+      // Fallback: télécharger le script
+      const element = document.createElement('a');
+      element.setAttribute('href', 'data:text/bash;charset=utf-8,' + encodeURIComponent(script));
+      element.setAttribute('download', 'update-news.sh');
+      element.style.display = 'none';
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
+    });
+  };
+
   const handleMoveUp = (id: number) => {
     const index = infoItems.findIndex(item => item.id === id);
     if (index > 0) {
@@ -322,6 +382,39 @@ const AdminInfo: React.FC = () => {
       <p style={{ color: "#666", marginBottom: "2rem" }}>
         Gérez les informations qui apparaissent dans le bandeau déroulant "NEWS FPT"
       </p>
+
+      {/* Section d'Export */}
+      <div style={{
+        marginBottom: "2rem",
+        padding: "1.5rem",
+        background: "#e3f2fd",
+        border: "2px solid #2196F3",
+        borderRadius: "8px"
+      }}>
+        <h2 style={{ marginTop: 0, color: "#1976d2" }}>📤 Synchroniser avec GitHub</h2>
+        <p style={{ color: "#555", marginBottom: "1rem" }}>
+          Vous avez modifié <strong>{infoItems.length} news FPT</strong>. 
+          Cliquez sur le bouton ci-dessous pour générer un script de mise à jour automatique.
+        </p>
+        <button
+          onClick={generateAndCopyScript}
+          style={{
+            padding: "0.75rem 1.5rem",
+            fontSize: "1rem",
+            fontWeight: "bold",
+            color: "white",
+            background: "#4caf50",
+            border: "none",
+            borderRadius: "6px",
+            cursor: "pointer",
+            transition: "background 0.3s"
+          }}
+          onMouseOver={(e) => e.currentTarget.style.background = "#388e3c"}
+          onMouseOut={(e) => e.currentTarget.style.background = "#4caf50"}
+        >
+          🚀 Pousser les changements
+        </button>
+      </div>
       
       <form onSubmit={handleSubmit} style={{ marginBottom: "2rem", background: "#f9f9f9", padding: "1.5rem", borderRadius: "8px" }}>
         <h2>{editingId ? "Modifier" : "Ajouter"} une information</h2>
