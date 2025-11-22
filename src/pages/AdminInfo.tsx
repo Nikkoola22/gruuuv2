@@ -150,18 +150,19 @@ export const infoItems: InfoItem[] = ${JSON.stringify(infoItems, null, 2)};
 // Pour compatibilité avec l'ancien système
 export const infoData = infoItems.map(item => item.title).join(" • ");`;
 
-    // Échappe les backticks et guillemets pour zsh
-    const escapedCode = code.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/"/g, '\\"');
-    
-    const script = `#!/bin/zsh
-cd /Users/nikkoolagarnier/Downloads/gruuuv2-master
-cat > src/data/info-data.ts << 'EOFSCRIPT'
-${code}
-EOFSCRIPT
-git add src/data/info-data.ts
-git commit -m "Synchronisation: mise à jour news FPT depuis AdminInfo"
-git push
-echo "✅ News FPT mises à jour et poussées sur GitHub !"`;
+    // Crée le script en évitant tout risque d'interpolation
+    const lines = [
+      '#!/bin/zsh',
+      'cd /Users/nikkoolagarnier/Downloads/gruuuv2-master',
+      "cat > src/data/info-data.ts << 'EOFSCRIPT'",
+      code,
+      'EOFSCRIPT',
+      'git add src/data/info-data.ts',
+      'git commit -m "Synchronisation: mise à jour news FPT depuis AdminInfo"',
+      'git push',
+      'echo "✅ News FPT mises à jour et poussées sur GitHub !"'
+    ];
+    const script = lines.join('\n');
 
     // Copier dans le clipboard
     navigator.clipboard.writeText(script).then(() => {
@@ -170,7 +171,7 @@ echo "✅ News FPT mises à jour et poussées sur GitHub !"`;
       alert('❌ Erreur lors de la copie. Téléchargez le fichier à la place.');
       // Fallback: télécharger le script
       const element = document.createElement('a');
-      element.setAttribute('href', 'data:text/bash;charset=utf-8,' + encodeURIComponent(script));
+      element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(script));
       element.setAttribute('download', 'update-news.sh');
       element.style.display = 'none';
       document.body.appendChild(element);
