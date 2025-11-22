@@ -86,6 +86,8 @@ const AdminInfo: React.FC = () => {
   const saveInfoItems = (items: InfoItem[]) => {
     setInfoItems(items);
     localStorage.setItem('cfdt-info-items', JSON.stringify(items));
+    // Déclenche un événement pour que App.tsx se synchronise
+    window.dispatchEvent(new CustomEvent('info-items-updated', { detail: items }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {

@@ -439,8 +439,17 @@ export default function App() {
       }
     };
 
+    // Écoute l'événement custom depuis AdminInfo
+    const handleInfoItemsUpdate = (e: any) => {
+      setInfoItems(e.detail);
+    };
+
     window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    window.addEventListener('info-items-updated', handleInfoItemsUpdate);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('info-items-updated', handleInfoItemsUpdate);
+    };
   }, []);
 
   useEffect(() => {
