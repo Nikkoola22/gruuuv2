@@ -377,8 +377,13 @@ const PodcastPlayer: React.FC = () => {
 
 export default function App() {
   const [infoItems, setInfoItems] = useState<InfoItem[]>(() => {
+    // Charger d'abord depuis le localStorage (modifications locales)
     const savedInfo = localStorage.getItem('cfdt-info-items');
-    return savedInfo ? JSON.parse(savedInfo) : defaultInfoItems;
+    if (savedInfo) {
+      return JSON.parse(savedInfo);
+    }
+    // Sinon charger depuis le fichier source (info-data.ts)
+    return defaultInfoItems;
   });
   
   const [chatState, setChatState] = useState<ChatbotState>({
@@ -428,6 +433,9 @@ export default function App() {
       const savedInfo = localStorage.getItem('cfdt-info-items');
       if (savedInfo) {
         setInfoItems(JSON.parse(savedInfo));
+      } else {
+        // Si pas de modification locale, recharger depuis info-data.ts
+        setInfoItems(defaultInfoItems);
       }
     };
 
