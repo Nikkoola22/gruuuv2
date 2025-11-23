@@ -295,23 +295,23 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
   const eligibility = agentType === 'indiciaire' ? indiciaireEligibility : horaireEligibility
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex flex-col">
       {/* Header avec bouton retour */}
-      <div className="bg-gradient-to-b from-green-800/50 via-emerald-800/50 to-teal-800/50 py-6 text-left border-b border-green-700 px-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="relative p-4 bg-white/20 rounded-full">
+      <div className="bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 py-8 shadow-xl animate-fade-in">
+        <div className="px-6 flex items-center justify-between max-w-6xl mx-auto">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-white/20 rounded-full shadow-lg backdrop-blur-sm">
               <DollarSign className="w-8 h-8 text-white" />
             </div>
             <div>
-              <h3 className="text-3xl font-bold text-white">Calculateur 13ème Mois</h3>
-              <p className="text-green-100 text-sm">Simulation du 13ème mois - Calcul pas à pas</p>
+              <h1 className="text-3xl sm:text-4xl font-extrabold text-white">Calculateur 13ème Mois</h1>
+              <p className="text-green-100 text-sm mt-1">Simulation pas à pas - Résultat informatif</p>
             </div>
           </div>
           {onClose && (
             <button
               onClick={onClose}
-              className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-full font-semibold transition-all text-sm"
+              className="flex items-center gap-2 px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-full font-semibold transition-all duration-200 transform hover:scale-105 shadow-lg"
             >
               <ArrowLeft className="w-4 h-4" />
               Retour
@@ -320,440 +320,389 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
         </div>
       </div>
 
-      <div className="space-y-6 flex-1 overflow-y-auto p-6 max-w-md mx-auto w-full">
-        {/* ÉTAPE 1 - Mode de rémunération */}
-        <div className="bg-gradient-to-br from-blue-950/40 via-slate-900/50 to-blue-900/40 border-2 border-blue-500/40 rounded-2xl p-5 space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm uppercase tracking-widest font-bold text-blue-300">◆ Étape 1</p>
-              <p className="text-lg font-semibold text-white mt-1">Mode de rémunération</p>
+      <div className="flex-1 overflow-y-auto p-6">
+        <div className="max-w-2xl mx-auto space-y-6">
+          {/* ÉTAPE 1 - Mode de rémunération */}
+          <div className="animate-fade-in">
+            <div className="bg-white rounded-2xl shadow-lg overflow-hidden border-l-4 border-blue-500">
+              <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-center w-8 h-8 bg-white/20 rounded-full text-white font-bold">1</div>
+                  <h2 className="text-xl font-bold text-white">Mode de rémunération</h2>
+                </div>
+              </div>
+              <div className="p-6 space-y-4">
+                <p className="text-sm text-gray-600">Quel est votre mode de rémunération ?</p>
+                <select
+                  value={agentType}
+                  onChange={(e) => handleSelectAgentType(e.target.value as AgentType)}
+                  className="w-full px-4 py-3 rounded-lg border-2 border-blue-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none font-semibold text-gray-800 transition-all duration-200"
+                >
+                  <option value="">Choisir...</option>
+                  <option value="indiciaire">Indiciaire (sur un emploi permanent)</option>
+                  <option value="horaire">Horaire (animateurs, écoles, crèches, vacataires, ...)</option>
+                </select>
+              </div>
             </div>
           </div>
-          <div className="h-px bg-gradient-to-r from-blue-500/0 via-blue-500/40 to-blue-500/0"></div>
-          
-          <div>
-            <label className="block text-xs uppercase tracking-wide text-blue-300 font-semibold mb-2">Quel est votre mode ?</label>
-            <select
-              value={agentType}
-              onChange={(e) => handleSelectAgentType(e.target.value as AgentType)}
-              className="w-full px-4 py-2 rounded-lg bg-blue-900/20 border-2 border-blue-500/40 text-white font-semibold focus:border-blue-400 focus:outline-none"
-            >
-              <option value="">Choisir...</option>
-              <option value="indiciaire">Indiciaire (sur un emploi permanent)</option>
-              <option value="horaire">Horaire (animateurs, écoles, crèches, "vacataires",...)</option>
-            </select>
-          </div>
-        </div>
 
-        {agentType && (
-          /* ÉTAPE 2 - Profil ou Mode horaire */
-          <div className="bg-gradient-to-br from-cyan-950/40 via-slate-900/50 to-cyan-900/40 border-2 border-cyan-500/40 rounded-2xl p-5 space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm uppercase tracking-widest font-bold text-cyan-300">◆ Étape 2</p>
-                <p className="text-lg font-semibold text-white mt-1">{agentType === 'indiciaire' ? 'Profil' : 'Mode horaire'}</p>
-              </div>
-            </div>
-            <div className="h-px bg-gradient-to-r from-cyan-500/0 via-cyan-500/40 to-cyan-500/0"></div>
-            
-            <div>
-              <label className="block text-xs uppercase tracking-wide text-cyan-300 font-semibold mb-2">
-                {agentType === 'indiciaire' ? 'Quel est votre profil ?' : 'Choisissez votre mode'}
-              </label>
-              <select
-                value={agentType === 'indiciaire' ? indiciaireProfile : horaireBaseType}
-                onChange={(e) => agentType === 'indiciaire' 
-                  ? handleSelectIndiciaireProfile(e.target.value as IndiciaireProfile)
-                  : handleSelectHoraireBaseType(e.target.value as HoraireBase)}
-                className="w-full px-4 py-2 rounded-lg bg-cyan-900/20 border-2 border-cyan-500/40 text-white font-semibold focus:border-cyan-400 focus:outline-none"
-              >
-                <option value="">Choisir...</option>
-                {agentType === 'indiciaire' ? (
-                  <>
-                    <option value="permanent">Agent permanent</option>
-                    <option value="medecin">Médecin</option>
-                    <option value="assistante">Assistante maternelle</option>
-                  </>
-                ) : (
-                  <>
-                    <option value="indice">En référence à un indice ex:366</option>
-                    <option value="taux">Sur la base d'un taux de vacation à l'heure ex 11,5 euro/h</option>
-                  </>
-                )}
-              </select>
-            </div>
-          </div>
-        )}
-
-        {wizardStep >= 3 && (
-          agentType === 'indiciaire' ? (
-            <div className="bg-gradient-to-br from-emerald-950/40 via-slate-900/50 to-emerald-900/40 border-2 border-emerald-500/40 rounded-2xl p-8 space-y-8">
-              <div className="flex items-center justify-between mb-2">
-                <div>
-                  <p className="text-sm uppercase tracking-widest font-bold text-emerald-300">◆ Étape 3</p>
-                  <p className="text-lg font-semibold text-white mt-1">Saisissez vos données indiciaires</p>
-                </div>
-                <div className="bg-emerald-900/40 border border-emerald-500/50 rounded-lg px-4 py-2">
-                  <p className="text-xs text-slate-300">Profil : <span className="text-emerald-300 font-bold capitalize">{indiciaireProfile}</span></p>
-                </div>
-              </div>
-
-              <div className="h-px bg-gradient-to-r from-emerald-500/0 via-emerald-500/40 to-emerald-500/0"></div>
-
-              <div className="space-y-6">
-                {indiciaireProfile !== 'assistante' ? (
-                  <>
-                    <div className="bg-white/5 border border-emerald-500/20 rounded-xl p-5 space-y-4">
-                      <div className="flex items-start justify-between">
-                        <h4 className="text-sm font-semibold text-emerald-200 uppercase tracking-wide">📊 Données d'indice</h4>
-                        <p className="text-xs text-emerald-400 italic bg-emerald-900/30 px-3 py-1 rounded-lg">Veuillez regarder sur votre fiche de paie</p>
-                      </div>
-                      
-                      {/* Alerte pour remplir les champs */}
-                      <div className="bg-yellow-900/40 border-2 border-yellow-500/60 rounded-xl p-4 mb-4">
-                        <p className="text-sm font-semibold text-yellow-200 text-center">⚠️ Remplissez les deux champs ci-dessous pour calculer votre 13ème mois</p>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm uppercase tracking-wide text-emerald-300 font-bold mb-3 flex items-center gap-2">
-                          <span className="inline-flex items-center justify-center w-6 h-6 bg-emerald-500 text-white rounded-full text-xs font-bold">1</span>
-                          Indice Majoré (IM)
-                        </label>
-                        <input
-                          value={im}
-                          onChange={(e) => setIm(e.target.value)}
-                          inputMode="decimal"
-                          className="w-full px-4 py-4 rounded-lg bg-emerald-900/30 border-3 border-emerald-400/60 text-white font-bold placeholder-slate-400 focus:border-emerald-300 focus:outline-none text-lg"
-                          placeholder="ex : 366"
-                        />
-                        <p className="text-xs text-emerald-300 mt-2 font-semibold">Trouvez cette valeur sur votre dernière fiche de paie</p>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm uppercase tracking-wide text-emerald-300 font-bold mb-3 flex items-center gap-2">
-                          <span className="inline-flex items-center justify-center w-6 h-6 bg-emerald-500 text-white rounded-full text-xs font-bold">2</span>
-                          Nouvelle Bonification Indiciaire (NBI)
-                        </label>
-                        <input
-                          value={nbi}
-                          onChange={(e) => setNbi(e.target.value)}
-                          inputMode="decimal"
-                          className="w-full px-4 py-4 rounded-lg bg-emerald-900/30 border-3 border-emerald-400/60 text-white font-bold placeholder-slate-400 focus:border-emerald-300 focus:outline-none text-lg"
-                          placeholder="ex : 10"
-                        />
-                        <p className="text-xs text-emerald-300 mt-2 font-semibold">Conversion appliquée : indice × 4,92278</p>
-                      </div>
-                    </div>
-
-                    <div className="bg-emerald-950/30 border-2 border-emerald-500/60 rounded-xl p-5 space-y-3">
-                      <h4 className="text-sm font-semibold text-emerald-200 uppercase tracking-wide">💰 Montants convertis</h4>
-                      <div className="space-y-2">
-                        <div className="flex justify-between items-center py-2 px-3 bg-emerald-900/20 rounded-lg">
-                          <span className="text-sm text-slate-300">Traitement indiciaire (TI) :</span>
-                          <span className="text-base font-bold text-emerald-300">{formatEUR(indiciaireTI)}</span>
-                        </div>
-                        <div className="flex justify-between items-center py-2 px-3 bg-emerald-900/20 rounded-lg">
-                          <span className="text-sm text-slate-300">Indemnité de résidence (3% du TI) :</span>
-                          <span className="text-base font-bold text-emerald-300">{formatEUR(indiciaireIRValue)}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </>
-                ) : (
-                  <div className="bg-white/5 border border-emerald-500/20 rounded-xl p-5">
-                    <label className="block text-xs uppercase tracking-wide text-emerald-300 font-semibold mb-2">Montant rubrique 7587 en paie</label>
-                    <input
-                      value={rubrique7587}
-                      onChange={(e) => setRubrique7587(e.target.value)}
-                      inputMode="decimal"
-                      className="w-full px-4 py-3 rounded-lg bg-emerald-900/20 border-2 border-emerald-500/40 text-white font-semibold placeholder-slate-500 focus:border-emerald-400 focus:outline-none"
-                      placeholder="Montant brut rubrique 7587"
-                    />
-                    <p className="text-xs text-slate-400 mt-2">Le 13ème mois = rubrique 7587 / 2 (proratisé)</p>
-                  </div>
-                )}
-
-                <div className="bg-white/5 border border-emerald-500/20 rounded-xl p-5 space-y-4">
-                  <h4 className="text-sm font-semibold text-emerald-200 uppercase tracking-wide">⏱️ Paramètres de calcul</h4>
-                  
-                  <div>
-                    <label className="block text-xs uppercase tracking-wide text-emerald-300 font-semibold mb-3">Temps de travail</label>
-                    <input
-                      type="range"
-                      min={50}
-                      max={100}
-                      value={tempsEmploi}
-                      onChange={(e) => setTempsEmploi(Number(e.target.value))}
-                      className="w-full accent-emerald-500"
-                    />
-                    <div className="flex justify-between items-center mt-2">
-                      <span className="text-xs text-slate-400">50%</span>
-                      <span className="text-lg font-bold text-emerald-300 bg-emerald-900/30 px-4 py-2 rounded-lg">{tempsEmploi}%</span>
-                      <span className="text-xs text-slate-400">100%</span>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs uppercase tracking-wide text-emerald-300 font-semibold mb-2">Mois travaillés sur l'année</label>
-                    <input
-                      type="number"
-                      min={0}
-                      max={12}
-                      value={monthsWorked}
-                      onChange={(e) => setMonthsWorked(Math.max(0, Math.min(12, Number(e.target.value) || 0)))}
-                      className="w-full px-4 py-3 rounded-lg bg-emerald-900/20 border-2 border-emerald-500/40 text-white font-semibold placeholder-slate-500 focus:border-emerald-400 focus:outline-none"
-                    />
-                    <p className="text-xs text-slate-400 mt-2"><strong>{monthsWorked}/12</strong> mois travaillés</p>
+          {agentType && (
+            /* ÉTAPE 2 - Profil ou Mode horaire */
+            <div className="animate-slide-up">
+              <div className="bg-white rounded-2xl shadow-lg overflow-hidden border-l-4 border-cyan-500">
+                <div className="bg-gradient-to-r from-cyan-600 to-cyan-700 px-6 py-4">
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center justify-center w-8 h-8 bg-white/20 rounded-full text-white font-bold">2</div>
+                    <h2 className="text-xl font-bold text-white">{agentType === 'indiciaire' ? 'Profil' : 'Mode de calcul'}</h2>
                   </div>
                 </div>
-              </div>
-            </div>
-          ) : (
-            <div className="bg-gradient-to-br from-slate-900/60 to-slate-800/60 border border-slate-700 rounded-2xl p-6 space-y-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs uppercase tracking-wide text-cyan-200">Étape 3</p>
-                  <p className="text-sm text-slate-200">Renseignez vos heures et montants</p>
-                </div>
-                <p className="text-xs text-slate-400">Mode retenu : <span className="text-white font-semibold">{horaireBaseType === 'indice' ? 'Indice + IR' : 'Taux horaire'}</span></p>
-              </div>
-
-              <div className="bg-white/5 border border-white/10 rounded-lg p-4 text-xs text-slate-200 space-y-2 hidden">
-                <p className="text-sm font-semibold text-white">Cas gérés pour les agents horaires</p>
-                <ul className="list-disc pl-4 space-y-1">
-                  <li>Rémunération sur IM : montant = (IM + IR) converti en euros × (heures retenues / 910 h).</li>
-                  <li>Rémunération au taux SMIC : taux horaire majoré congés → mensualisé (× 151,67) → base 6 mois (÷ 2).</li>
-                </ul>
-                <p>Pour le taux SMIC : part CR = SMIC/2 (ex : 900,9 €) proratisée, part PS = (base 6 mois - SMIC/2) proratisée.</p>
-              </div>
-              <div className="grid grid-cols-1 gap-4 max-w-sm mx-auto w-full">
-                <div>
-                  <label className="text-xs uppercase tracking-wide text-slate-400">Période de versement</label>
+                <div className="p-6 space-y-4">
+                  <p className="text-sm text-gray-600">{agentType === 'indiciaire' ? 'Quel est votre profil ?' : 'Choisissez votre mode de calcul'}</p>
                   <select
-                    value={horairePeriode}
-                    onChange={(e) => setHorairePeriode(e.target.value as HorairePeriode)}
-                    className="w-full mt-1 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white"
+                    value={agentType === 'indiciaire' ? indiciaireProfile : horaireBaseType}
+                    onChange={(e) => agentType === 'indiciaire' 
+                      ? handleSelectIndiciaireProfile(e.target.value as IndiciaireProfile)
+                      : handleSelectHoraireBaseType(e.target.value as HoraireBase)}
+                    className="w-full px-4 py-3 rounded-lg border-2 border-cyan-300 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none font-semibold text-gray-800 transition-all duration-200"
                   >
-                    <option value="juin">Juin (heures Nov → Avril)</option>
-                    <option value="novembre">Novembre (heures Mai → Octobre)</option>
+                    <option value="">Choisir...</option>
+                    {agentType === 'indiciaire' ? (
+                      <>
+                        <option value="permanent">Agent permanent</option>
+                        <option value="medecin">Médecin</option>
+                        <option value="assistante">Assistante maternelle</option>
+                      </>
+                    ) : (
+                      <>
+                        <option value="indice">En référence à un indice (ex: 366)</option>
+                        <option value="taux">Sur la base d'un taux horaire (ex: 11,5 €/h)</option>
+                      </>
+                    )}
                   </select>
                 </div>
-                <div className="hidden">
-                  <label className="text-xs uppercase tracking-wide text-slate-400">Ancienneté sur la période (mois)</label>
-                  <input
-                    type="number"
-                    min={0}
-                    max={6}
-                    value={horaireAnciennete}
-                    onChange={(e) => setHoraireAnciennete(Math.max(0, Math.min(6, Number(e.target.value) || 0)))}
-                    className="w-full mt-1 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 gap-4 max-w-sm mx-auto w-full">
-                <div>
-                  <label className="text-xs uppercase tracking-wide text-slate-400">Heures rémunérées dans la période (min {HOURS_MIN}h)</label>
-                  <input
-                    type="number"
-                    min={0}
-                    value={horaireHours}
-                    onChange={(e) => setHoraireHours(Math.max(0, Number(e.target.value) || 0))}
-                    className="w-full mt-1 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white"
-                  />
-                  <p className="text-xs text-slate-400 mt-1">{HOURS_REFERENCE_TEXT}</p>
-                </div>
-
-                {horaireBaseType === 'indice' ? (
-                  <>
-                    <div>
-                      <label className="text-xs uppercase tracking-wide text-slate-400">Indice majoré (IM)</label>
-                      <input
-                        value={horaireIM}
-                        onChange={(e) => setHoraireIM(e.target.value)}
-                        inputMode="decimal"
-                        className="w-full mt-1 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white"
-                      />
-                      <p className="text-xs text-slate-400 mt-1">Indice converti en euros via 4,92278 pour le calcul.</p>
-                    </div>
-                    <div className="bg-white/5 border border-white/10 rounded-lg p-3 text-xs text-slate-200">
-                      <p className="font-semibold text-white">TI converti à partir de l'indice : <span className="text-emerald-300">{formatEUR(horaireTI)}</span></p>
-                      <p className="mt-1">IR appliquée automatiquement (3% du TI) : <span className="text-emerald-300">{formatEUR(horaireIRValue)}</span></p>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div>
-                      <label className="text-xs uppercase tracking-wide text-slate-400">Taux horaire brut (€)</label>
-                      <input
-                        value={horaireTaux}
-                        onChange={(e) => setHoraireTaux(e.target.value)}
-                        inputMode="decimal"
-                        className="w-full mt-1 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700 text-white"
-                      />
-                    </div>
-                  </>
-                )}
               </div>
             </div>
-          )
-        )}
+          )}
 
-        {wizardStep >= 3 && (
-          <>
-            <div className="bg-gradient-to-br from-green-900/40 via-emerald-900/40 to-teal-900/40 border border-emerald-600/40 rounded-2xl p-6 space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-emerald-200 uppercase tracking-wide">Étape finale</p>
-                  <h4 className="text-xl font-semibold text-white">Calcul du 13ème mois</h4>
+          {wizardStep >= 3 && (
+            agentType === 'indiciaire' ? (
+              <div className="animate-slide-up">
+                <div className="bg-white rounded-2xl shadow-lg overflow-hidden border-l-4 border-emerald-500">
+                  <div className="bg-gradient-to-r from-emerald-600 to-emerald-700 px-6 py-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center justify-center w-8 h-8 bg-white/20 rounded-full text-white font-bold">3</div>
+                        <h2 className="text-xl font-bold text-white">Données indiciaires</h2>
+                      </div>
+                      <span className="text-xs font-semibold text-emerald-100 bg-emerald-700/50 px-3 py-1 rounded-full">Profil: {indiciaireProfile}</span>
+                    </div>
+                  </div>
+                  <div className="p-6 space-y-6">
+                    {indiciaireProfile !== 'assistante' ? (
+                      <>
+                        {/* Alerte */}
+                        <div className="bg-gradient-to-r from-yellow-100 to-orange-100 border-l-4 border-yellow-500 p-4 rounded-lg">
+                          <p className="text-sm font-semibold text-yellow-900">⚠️ Remplissez les deux champs ci-dessous pour calculer votre 13ème mois</p>
+                        </div>
+
+                        {/* Indice Majoré */}
+                        <div className="space-y-3">
+                          <label className="block text-sm font-bold text-emerald-700 flex items-center gap-2">
+                            <span className="inline-flex items-center justify-center w-6 h-6 bg-emerald-600 text-white rounded-full text-xs font-bold">1</span>
+                            Indice Majoré (IM)
+                          </label>
+                          <input
+                            value={im}
+                            onChange={(e) => setIm(e.target.value)}
+                            inputMode="decimal"
+                            className="w-full px-4 py-3 text-lg rounded-lg border-2 border-emerald-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-200 outline-none font-bold text-gray-800 placeholder-gray-400 transition-all duration-200"
+                            placeholder="ex : 366"
+                          />
+                          <p className="text-xs text-gray-600">Trouvez cette valeur sur votre dernière fiche de paie</p>
+                        </div>
+
+                        {/* Nouvelle Bonification Indiciaire */}
+                        <div className="space-y-3">
+                          <label className="block text-sm font-bold text-emerald-700 flex items-center gap-2">
+                            <span className="inline-flex items-center justify-center w-6 h-6 bg-emerald-600 text-white rounded-full text-xs font-bold">2</span>
+                            Nouvelle Bonification Indiciaire (NBI)
+                          </label>
+                          <input
+                            value={nbi}
+                            onChange={(e) => setNbi(e.target.value)}
+                            inputMode="decimal"
+                            className="w-full px-4 py-3 text-lg rounded-lg border-2 border-emerald-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-200 outline-none font-bold text-gray-800 placeholder-gray-400 transition-all duration-200"
+                            placeholder="ex : 10"
+                          />
+                          <p className="text-xs text-gray-600">Conversion appliquée : indice × 4,92278</p>
+                        </div>
+
+                        {/* Montants convertis */}
+                        <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-lg p-4 space-y-2">
+                          <p className="text-sm font-semibold text-emerald-900">💰 Montants convertis</p>
+                          <div className="flex justify-between items-center py-2 px-3 bg-white rounded">
+                            <span className="text-sm text-gray-700">Traitement indiciaire (TI)</span>
+                            <span className="font-bold text-emerald-700">{formatEUR(indiciaireTI)}</span>
+                          </div>
+                          <div className="flex justify-between items-center py-2 px-3 bg-white rounded">
+                            <span className="text-sm text-gray-700">Indemnité résidence (3% TI)</span>
+                            <span className="font-bold text-emerald-700">{formatEUR(indiciaireIRValue)}</span>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="space-y-3">
+                        <label className="block text-sm font-bold text-emerald-700">Montant rubrique 7587 en paie</label>
+                        <input
+                          value={rubrique7587}
+                          onChange={(e) => setRubrique7587(e.target.value)}
+                          inputMode="decimal"
+                          className="w-full px-4 py-3 rounded-lg border-2 border-emerald-300 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-200 outline-none font-semibold text-gray-800 transition-all duration-200"
+                          placeholder="Montant brut rubrique 7587"
+                        />
+                        <p className="text-xs text-gray-600">Le 13ème mois = rubrique 7587 / 2 (proratisé)</p>
+                      </div>
+                    )}
+
+                    {/* Paramètres de calcul */}
+                    <div className="border-t pt-4 space-y-4">
+                      <p className="text-sm font-semibold text-gray-800">⏱️ Paramètres de calcul</p>
+                      
+                      <div className="space-y-3">
+                        <label className="block text-sm font-semibold text-gray-700">Temps de travail</label>
+                        <input
+                          type="range"
+                          min={50}
+                          max={100}
+                          value={tempsEmploi}
+                          onChange={(e) => setTempsEmploi(Number(e.target.value))}
+                          className="w-full accent-emerald-600"
+                        />
+                        <div className="flex justify-between items-center mt-2 px-2">
+                          <span className="text-xs text-gray-500">50%</span>
+                          <span className="px-4 py-1 bg-emerald-100 text-emerald-700 font-bold rounded-full text-sm">{tempsEmploi}%</span>
+                          <span className="text-xs text-gray-500">100%</span>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="block text-sm font-semibold text-gray-700">Mois travaillés sur l'année</label>
+                        <input
+                          type="number"
+                          min={0}
+                          max={12}
+                          value={monthsWorked}
+                          onChange={(e) => setMonthsWorked(Math.max(0, Math.min(12, Number(e.target.value) || 0)))}
+                          className="w-full px-4 py-2 rounded-lg border-2 border-emerald-300 focus:border-emerald-600 outline-none font-semibold"
+                        />
+                        <p className="text-xs text-gray-600"><strong>{monthsWorked}/12</strong> mois travaillés</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <Calculator className="w-10 h-10 text-emerald-300" />
               </div>
+            ) : (
+              <div className="animate-slide-up">
+                <div className="bg-white rounded-2xl shadow-lg overflow-hidden border-l-4 border-purple-500">
+                  <div className="bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center justify-center w-8 h-8 bg-white/20 rounded-full text-white font-bold">3</div>
+                      <h2 className="text-xl font-bold text-white">Paramètres horaires</h2>
+                    </div>
+                  </div>
+                  <div className="p-6 space-y-6">
+                    <div className="space-y-3">
+                      <label className="block text-sm font-semibold text-gray-700">Période de versement</label>
+                      <select
+                        value={horairePeriode}
+                        onChange={(e) => setHorairePeriode(e.target.value as HorairePeriode)}
+                        className="w-full px-4 py-2 rounded-lg border-2 border-purple-300 focus:border-purple-600 outline-none font-semibold"
+                      >
+                        <option value="juin">Juin (heures Nov → Avril)</option>
+                        <option value="novembre">Novembre (heures Mai → Octobre)</option>
+                      </select>
+                    </div>
 
-              {eligibility.reasons.length > 0 && (
-                <div className="bg-amber-900/30 border border-amber-500/30 rounded-lg p-4 text-sm text-amber-100">
-                  <p className="font-semibold mb-2">Conditions à respecter :</p>
-                  <ul className="space-y-1 text-xs">
-                    {eligibility.reasons.map(reason => (
-                      <li key={reason}>• {reason}</li>
-                    ))}
-                  </ul>
+                    <div className="space-y-3">
+                      <label className="block text-sm font-semibold text-gray-700">Heures rémunérées (min {HOURS_MIN}h)</label>
+                      <input
+                        type="number"
+                        min={0}
+                        value={horaireHours}
+                        onChange={(e) => setHoraireHours(Math.max(0, Number(e.target.value) || 0))}
+                        className="w-full px-4 py-2 rounded-lg border-2 border-purple-300 focus:border-purple-600 outline-none font-semibold"
+                      />
+                      <p className="text-xs text-gray-600">{HOURS_REFERENCE_TEXT}</p>
+                    </div>
+
+                    {horaireBaseType === 'indice' ? (
+                      <div className="space-y-3">
+                        <label className="block text-sm font-semibold text-gray-700">Indice majoré (IM)</label>
+                        <input
+                          value={horaireIM}
+                          onChange={(e) => setHoraireIM(e.target.value)}
+                          inputMode="decimal"
+                          className="w-full px-4 py-2 rounded-lg border-2 border-purple-300 focus:border-purple-600 outline-none font-semibold"
+                          placeholder="ex : 366"
+                        />
+                        <div className="bg-purple-50 border border-purple-200 rounded-lg p-3 space-y-1">
+                          <p className="text-xs text-purple-900"><strong>TI converti :</strong> <span className="text-purple-700 font-bold">{formatEUR(horaireTI)}</span></p>
+                          <p className="text-xs text-purple-900"><strong>IR 3% :</strong> <span className="text-purple-700 font-bold">{formatEUR(horaireIRValue)}</span></p>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        <label className="block text-sm font-semibold text-gray-700">Taux horaire brut (€/h)</label>
+                        <input
+                          value={horaireTaux}
+                          onChange={(e) => setHoraireTaux(e.target.value)}
+                          inputMode="decimal"
+                          className="w-full px-4 py-2 rounded-lg border-2 border-purple-300 focus:border-purple-600 outline-none font-semibold"
+                          placeholder="ex : 11,50"
+                        />
+                      </div>
+                    )}
+                  </div>
                 </div>
-              )}
+              </div>
+            )
+          )}
 
-              <button
-                onClick={handleCompute}
-                className={`w-full px-4 py-3 rounded-lg font-semibold transition-all ${eligibility.eligible ? 'bg-emerald-500 hover:bg-emerald-600 text-white' : 'bg-slate-600/50 text-slate-300 cursor-not-allowed'}`}
-                disabled={!eligibility.eligible}
-              >
-                {eligibility.eligible ? '🧮 Lancer le calcul conforme à la procédure' : 'Complétez les conditions pour calculer'}
-              </button>
-
-              {result && (
-                <div className="space-y-4">
-                  {!result.eligible && (
-                    <div className="bg-rose-900/40 border border-rose-500/40 rounded-xl p-4 text-sm text-rose-100">
-                      <p className="font-semibold">Situations bloquantes</p>
-                      <ul className="mt-2 space-y-1">
-                        {result.reasons?.map((reason: string) => (
-                          <li key={reason}>• {reason}</li>
+          {wizardStep >= 3 && (
+            <>
+              {/* Bouton Calculer */}
+              <div className="animate-slide-up bg-white rounded-2xl shadow-lg overflow-hidden border-l-4 border-green-500">
+                <div className="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4">
+                  <div className="flex items-center gap-3">
+                    <Calculator className="w-6 h-6 text-white" />
+                    <h2 className="text-xl font-bold text-white">Calcul du 13ème mois</h2>
+                  </div>
+                </div>
+                <div className="p-6 space-y-4">
+                  {eligibility.reasons.length > 0 && (
+                    <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded space-y-2">
+                      <p className="text-sm font-semibold text-yellow-900">Conditions à respecter :</p>
+                      <ul className="text-xs text-yellow-800 space-y-1">
+                        {eligibility.reasons.map(reason => (
+                          <li key={reason}>✗ {reason}</li>
                         ))}
                       </ul>
                     </div>
                   )}
 
-                  {result.eligible && (
-                    <div className="space-y-4">
-                      <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                        <p className="text-xs uppercase tracking-wide text-green-200">Total estimé du 13ème mois</p>
-                        <p className="text-4xl font-bold text-white mt-2">{formatEUR(result.total)}</p>
-                        <div className="grid grid-cols-2 gap-3 mt-4 text-sm text-slate-200">
-                          <div>
-                            <p className="text-xs text-slate-400">Complément de rémunération (CR)</p>
-                            <p className="font-semibold text-green-200">{formatEUR(result.compRem)}</p>
-                          </div>
-                          <div>
-                            <p className="text-xs text-slate-400">Prime semestrielle (PS)</p>
-                            <p className="font-semibold text-green-200">{formatEUR(result.primeSem)}</p>
-                          </div>
-                        </div>
-                        {agentType === 'indiciaire' ? (
-                          <p className="text-xs text-slate-400 mt-3">
-                            Part fixe = (SMIC brut ÷ 2) proratisé ; Part variable = dépassement du total IM + NBI + IR sur le SMIC versé, proratisé.
-                          </p>
-                        ) : null}
-                      </div>
+                  <button
+                    onClick={handleCompute}
+                    className={`w-full px-6 py-3 rounded-lg font-bold transition-all duration-200 transform ${eligibility.eligible ? 'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white shadow-lg hover:scale-105' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+                    disabled={!eligibility.eligible}
+                  >
+                    {eligibility.eligible ? '🧮 Lancer le calcul' : 'Complétez les conditions'}
+                  </button>
 
-                      <div className="bg-slate-900/60 border border-slate-700 rounded-xl p-4 space-y-3">
-                        <p className="text-xs uppercase tracking-wide text-slate-400">Ventilation par échéance</p>
-                        <div className="space-y-2">
-                          {result.breakdown?.map((item: any) => (
-                            <div key={item.month} className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/10">
-                              <div>
-                                <p className="text-sm text-white font-semibold">{item.month}</p>
-                                <p className="text-xs text-slate-300">{(item.ratio * 100).toFixed(1)}% • {item.note || 'Part réglementaire'}</p>
+                  {result && (
+                    <div className="space-y-4 border-t pt-4">
+                      {!result.eligible && (
+                        <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded">
+                          <p className="text-sm font-semibold text-red-900 mb-2">Situations bloquantes :</p>
+                          <ul className="text-xs text-red-800 space-y-1">
+                            {result.reasons?.map((reason: string) => (
+                              <li key={reason}>✗ {reason}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      {result.eligible && (
+                        <div className="space-y-4">
+                          {/* Résultat Principal */}
+                          <div className="bg-gradient-to-r from-green-100 to-emerald-100 border-2 border-green-300 rounded-lg p-6 space-y-2">
+                            <p className="text-xs uppercase tracking-wide text-green-700 font-bold">Total estimé du 13ème mois</p>
+                            <p className="text-5xl font-extrabold text-green-700">{formatEUR(result.total)}</p>
+                            <div className="grid grid-cols-2 gap-3 mt-4 pt-3 border-t border-green-300">
+                              <div className="bg-white rounded p-3">
+                                <p className="text-xs text-gray-600">Complément de rémunération</p>
+                                <p className="font-bold text-green-700">{formatEUR(result.compRem)}</p>
                               </div>
-                              <p className="text-lg font-bold text-emerald-300">{formatEUR(item.amount)}</p>
+                              <div className="bg-white rounded p-3">
+                                <p className="text-xs text-gray-600">Prime semestrielle</p>
+                                <p className="font-bold text-green-700">{formatEUR(result.primeSem)}</p>
+                              </div>
                             </div>
-                          ))}
-                        </div>
-                        {result.context && (
-                          <div className="text-xs text-slate-400 border-t border-slate-700 pt-3">
-                            {agentType === 'indiciaire' ? (
-                              <p>
-                                Prorata année : {(result.context.prorataAnnee * 100).toFixed(0)}% • Temps de travail : {(result.context.tempsRatio * 100).toFixed(0)}%
-                                {typeof result.context.tiValue === 'number' && (
-                                  <>
-                                    {' '}• TI converti : {formatEUR(result.context.tiValue)} • NBI convertie : {formatEUR(result.context.nbiValue || 0)} • IR 3% : {formatEUR(result.context.irValue || 0)}
-                                  </>
-                                )}
-                              </p>
-                            ) : (
-                              <p>
-                                Heures retenues : {(result.context.ratioHeures * 100).toFixed(0)}% de la référence ({HOURS_CAP}h)
-                                {result.context.baseType === 'indice' && (
-                                  <>
-                                    {' '}• Base IM + IR : {formatEUR(result.context.baseReference || 0)}
-                                    {' '}• Base 6 mois : {formatEUR(result.context.baseSixMois || 0)}
-                                    {' '}• CR horaire : {formatEUR(result.context.crHoraireUnit || 0)} /h
-                                    {' '}• Base PS : {formatEUR(result.context.basePS || 0)}
-                                  </>
-                                )}
-                                {result.context.baseType === 'taux' && (
-                                  <>
-                                    {' '}• Base taux horaire + congés : {formatEUR(result.context.baseReference || 0)} /h
-                                  </>
-                                )}
-                              </p>
-                            )}
-                            {agentType === 'indiciaire' && typeof result.context.fixedPart === 'number' && (
-                              <p className="mt-1">
-                                Part fixe (SMIC/2 proratisé) : {formatEUR(result.context.fixedPart)} • Part variable : {formatEUR(result.context.variablePart || 0)} • SMIC versé : {formatEUR(result.context.smicVerse || 0)} • IM+NBI+IR proratisés : {formatEUR(result.context.remunerationProratisee || 0)}
-                              </p>
-                            )}
-                            {agentType === 'horaire' && (
-                              <div className="mt-1 space-y-1">
-                                {result.context.baseType === 'indice' ? (
-                                  <p>
-                                    Cas calculé : IM + IR • Montant converti : {formatEUR(result.context.baseReference || 0)} • Heures retenues : {result.context.heuresRetenues}
-                                  </p>
-                                ) : (
-                                  <>
-                                    <p>
-                                      Cas calculé : Taux horaire + congés • Taux majoré : {formatEUR(result.context.tauxHoraireMajore || 0)} /h • Heures retenues : {result.context.heuresRetenues}
-                                    </p>
-                                    <p>
-                                      Base 6 mois : {formatEUR(result.context.baseSixMois || 0)} • Base CR (SMIC/2) : {formatEUR(result.context.crBase || 0)} • Base PS : {formatEUR(result.context.basePS || 0)}
-                                    </p>
-                                  </>
-                                )}
-                              </div>
-                            )}
                           </div>
-                        )}
-                      </div>
 
-                      <div className="bg-gradient-to-r from-emerald-600/30 via-teal-600/30 to-green-600/30 border border-emerald-500/40 rounded-xl p-4 text-sm text-white">
-                        <p className="font-semibold">⚠️ SIMULATEUR informatif</p>
-                        <p className="text-xs mt-2 text-emerald-50">
-                          Ce simulateur n est pas officiel. Seul les collegues de la GCR savent faire le calcul officiel.
-                        </p>
-                      </div>
+                          {/* Ventilation */}
+                          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 space-y-3">
+                            <p className="text-xs uppercase tracking-wide text-gray-700 font-bold">Ventilation par échéance</p>
+                            <div className="space-y-2">
+                              {result.breakdown?.map((item: any) => (
+                                <div key={item.month} className="flex items-center justify-between p-3 bg-white rounded border border-gray-200">
+                                  <div>
+                                    <p className="text-sm font-semibold text-gray-800">{item.month}</p>
+                                    <p className="text-xs text-gray-500">{(item.ratio * 100).toFixed(1)}%</p>
+                                  </div>
+                                  <p className="text-lg font-bold text-green-700">{formatEUR(item.amount)}</p>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Détails techniques */}
+                          {result.context && (
+                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-xs text-blue-900 space-y-2">
+                              <p className="font-semibold">Détails du calcul :</p>
+                              {agentType === 'indiciaire' ? (
+                                <p>Prorata année : {(result.context.prorataAnnee * 100).toFixed(0)}% • Temps de travail : {(result.context.tempsRatio * 100).toFixed(0)}% • SMIC versé : {formatEUR(result.context.smicVerse || 0)}</p>
+                              ) : (
+                                <p>Heures retenues : {(result.context.ratioHeures * 100).toFixed(0)}% • Base calcul : {formatEUR(result.context.baseReference || 0)}</p>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Avertissement */}
+                          <div className="bg-orange-50 border-l-4 border-orange-500 p-3 text-xs text-orange-900">
+                            <p className="font-semibold">⚠️ Simulateur informatif uniquement</p>
+                            <p className="mt-1">Seuls les collègues de la GCR font le calcul officiel.</p>
+                          </div>
+                        </div>
+                      )}
+
+                      <button
+                        onClick={handleReset}
+                        className="w-full px-4 py-2 rounded-lg border-2 border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition-all"
+                      >
+                        ↻ Nouvelle simulation
+                      </button>
                     </div>
                   )}
-
-                  <button
-                    onClick={handleReset}
-                    className="w-full px-4 py-2 rounded-lg border border-slate-600 text-slate-200 text-sm hover:bg-slate-800"
-                  >
-                    ↻ Nouvelle simulation
-                  </button>
                 </div>
-              )}
-            </div>
-          </>
-        )}
+              </div>
+            </>
+          )}
+        </div>
       </div>
+
+      {/* CSS Animations */}
+      <style>{`
+        @keyframes fade-in {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes slide-up {
+          from { 
+            opacity: 0; 
+            transform: translateY(20px);
+          }
+          to { 
+            opacity: 1; 
+            transform: translateY(0);
+          }
+        }
+        .animate-fade-in {
+          animation: fade-in 0.6s ease-out;
+        }
+        .animate-slide-up {
+          animation: slide-up 0.5s ease-out;
+        }
+      `}</style>
     </div>
   )
 }
