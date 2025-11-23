@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { faqData, FAQItem } from '../data/FAQdata';
-import { Search, ChevronDown, ChevronUp, Tag } from 'lucide-react';
+import { Search, ChevronDown, ChevronUp, Tag, ArrowLeft } from 'lucide-react';
 
 interface Props {
   onBack?: () => void;
@@ -165,82 +165,155 @@ const FAQ: React.FC<Props> = ({ onBack }) => {
   const toggle = (id: number) => setOpenIds((s) => ({ ...s, [id]: !s[id] }));
 
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
-        <div>
-          <h1 className="text-5xl sm:text-6xl font-extrabold text-slate-900 leading-tight">FAQ</h1>
-          <p className="mt-2 text-lg sm:text-xl text-slate-600">Questions fréquentes — guide rapide pour les agents</p>
-        </div>
-        {onBack && (
-          <button
-            onClick={onBack}
-            aria-label="Retour"
-            className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-md border border-red-700"
-          >
-            Retour
-          </button>
-        )}
-      </div>
-
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-6">
-        <div className="flex items-center w-full sm:w-1/2 bg-white p-2 rounded-lg shadow-sm">
-          <Search className="w-5 h-5 text-gray-400 mr-2" />
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Rechercher une question ou un mot-clé..."
-            className="w-full bg-transparent outline-none text-sm"
-          />
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="mb-8 animate-fade-in">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+            <div>
+              <h1 className="text-5xl sm:text-6xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">FAQ</h1>
+              <p className="mt-2 text-base sm:text-lg text-gray-600">Questions fréquentes — guide rapide pour les agents</p>
+            </div>
+            {onBack && (
+              <button
+                onClick={onBack}
+                aria-label="Retour"
+                className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-6 py-2.5 rounded-full text-sm font-semibold shadow-lg transition-all duration-200 transform hover:scale-105"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Retour
+              </button>
+            )}
+          </div>
         </div>
 
-        <div className="flex items-center gap-2 flex-wrap">
-          <button
-            onClick={() => setActiveCategory(null)}
-            className={`px-3 py-1 text-sm rounded-full ${activeCategory === null ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 shadow-sm'}`}>
-            Tous
-          </button>
-          {categories.map((cat) => (
+        {/* Search and Filters */}
+        <div className="mb-8 space-y-4 animate-slide-up">
+          {/* Search Bar */}
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-2xl blur opacity-75 group-hover:opacity-100 transition duration-1000" />
+            <div className="relative bg-white rounded-2xl p-1">
+              <div className="flex items-center bg-white px-4 py-3 rounded-xl shadow-lg">
+                <Search className="w-5 h-5 text-gray-400 mr-3" />
+                <input
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Rechercher une question ou un mot-clé..."
+                  className="w-full bg-transparent outline-none text-base text-gray-800 placeholder-gray-400"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Category Filter */}
+          <div className="flex flex-wrap items-center gap-2 p-4 bg-white rounded-2xl shadow-lg">
+            <span className="text-sm font-semibold text-gray-700">Filtrer par:</span>
             <button
-              key={cat}
-              onClick={() => setActiveCategory((c) => (c === cat ? null : cat))}
-                  className={`px-3 py-1 text-sm rounded-full ${activeCategory === cat ? CATEGORY_STYLES[cat].btnActive : CATEGORY_STYLES[cat].btnInactive}`}>
-                  <Tag className={`inline-block mr-1 -mt-1 ${CATEGORY_STYLES[cat].icon}`} /> {cat}
+              onClick={() => setActiveCategory(null)}
+              className={`px-4 py-2 text-sm font-semibold rounded-full transition-all duration-200 transform ${activeCategory === null ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg scale-105' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+              ✓ Tous
             </button>
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setActiveCategory((c) => (c === cat ? null : cat))}
+                className={`px-4 py-2 text-sm font-semibold rounded-full transition-all duration-200 transform flex items-center gap-2 ${
+                  activeCategory === cat 
+                    ? `${CATEGORY_STYLES[cat].btnActive} shadow-lg scale-105` 
+                    : `${CATEGORY_STYLES[cat].btnInactive} hover:shadow-md`
+                }`}
+              >
+                <Tag className="w-4 h-4" />
+                {cat}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* FAQ Items */}
+        <div className="space-y-4">
+          {filtered.length === 0 && (
+            <div className="text-center py-16">
+              <div className="text-gray-400 text-lg">🔍 Aucun résultat trouvé</div>
+              <p className="text-gray-500 text-sm mt-2">pour "{query}"</p>
+            </div>
+          )}
+
+          {filtered.map((item: FAQItem, index: number) => (
+            <article 
+              key={item.id} 
+              className="animate-fade-in"
+              style={{ animationDelay: `${index * 0.05}s` }}
+            >
+              <button
+                onClick={() => toggle(item.id)}
+                className={`w-full text-left transition-all duration-300 transform rounded-xl overflow-hidden border-l-4 ${CATEGORY_STYLES[item.category].border}`}
+              >
+                <div className={`bg-white shadow-md hover:shadow-xl p-5 sm:p-6 transform transition-all duration-300 ${openIds[item.id] ? 'ring-2 ring-blue-300/50' : 'hover:scale-[1.01]'}`}>
+                  {/* Header */}
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1">
+                      {/* Category Badge */}
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${CATEGORY_STYLES[item.category].badge}`}>
+                          {item.category}
+                        </span>
+                      </div>
+                      
+                      {/* Question */}
+                      <h3 className={`text-lg sm:text-xl font-bold transition-colors duration-200 ${openIds[item.id] ? 'text-blue-700' : 'text-gray-800'}`}>
+                        {highlightText(item.question, query)}
+                      </h3>
+                    </div>
+
+                    {/* Chevron Icon */}
+                    <div className={`flex-shrink-0 p-2 rounded-full transition-all duration-300 ${openIds[item.id] ? `${CATEGORY_STYLES[item.category].btnActive} text-white shadow-lg` : 'bg-gray-100 text-gray-500'}`}>
+                      {openIds[item.id] ? (
+                        <ChevronUp className="w-5 h-5" />
+                      ) : (
+                        <ChevronDown className="w-5 h-5" />
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Answer - Collapsible */}
+                  <div className={`overflow-hidden transition-all duration-300 ${openIds[item.id] ? 'max-h-[1000px] opacity-100 mt-4' : 'max-h-0 opacity-0'}`}>
+                    <div className="pt-4 border-t border-gray-200">
+                      <div className="prose prose-sm max-w-none text-gray-700">
+                        {renderFormattedAnswer(item.answer, query)}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </button>
+            </article>
           ))}
         </div>
-      </div>
 
-      <div className="space-y-3">
-        {filtered.length === 0 && (
-          <div className="text-center text-gray-500 py-8">Aucun résultat trouvé pour "{query}"</div>
-        )}
-
-        {filtered.map((item: FAQItem) => (
-          <article key={item.id} className={`group relative overflow-visible transform transition-all duration-350 hover:scale-110 hover:shadow-2xl hover:ring-4 hover:ring-blue-300/30 bg-white rounded-xl border-l-4 ${CATEGORY_STYLES[item.category].border}`}>
-            {/* subtle glowing backdrop that appears on hover */}
-            <div className="absolute inset-0 rounded-xl pointer-events-none opacity-0 group-hover:opacity-80 transition-opacity duration-300" style={{ background: 'linear-gradient(90deg, rgba(59,130,246,0.06), rgba(14,165,233,0.04))', filter: 'blur(18px)' }} />
-            {/* accent bar */}
-            <div className={`${CATEGORY_STYLES[item.category].btnActive} h-1 w-full`} />
-            <header className="relative z-10 flex items-center justify-between p-4 cursor-pointer" onClick={() => toggle(item.id)}>
-              <div className="flex-1">
-                <h3 className="text-md font-semibold text-gray-800 transition-colors duration-200 group-hover:text-slate-900">{highlightText(item.question, query)}</h3>
-                <div className="text-xs mt-1">
-                  <span className={`${CATEGORY_STYLES[item.category].badge} px-2 py-0.5 rounded-full text-xs font-medium`}>{item.category}</span>
-                </div>
-              </div>
-              <div className="ml-4 flex-shrink-0">
-                {openIds[item.id] ? (
-                  <ChevronUp className="w-5 h-5 text-gray-500" />
-                ) : (
-                  <ChevronDown className="w-5 h-5 text-gray-500" />
-                )}
-              </div>
-            </header>
-            <div className={`px-4 pb-4 transition-all ${openIds[item.id] ? 'pt-0' : 'hidden'}`}>
-              <div>{renderFormattedAnswer(item.answer, query)}</div>
-            </div>
-          </article>
-        ))}
+        {/* CSS Animations */}
+        <style>{`
+          @keyframes fade-in {
+            from { opacity: 0; }
+            to { opacity: 1; }
+          }
+          @keyframes slide-up {
+            from { 
+              opacity: 0; 
+              transform: translateY(20px);
+            }
+            to { 
+              opacity: 1; 
+              transform: translateY(0);
+            }
+          }
+          .animate-fade-in {
+            animation: fade-in 0.6s ease-out forwards;
+            opacity: 0;
+          }
+          .animate-slide-up {
+            animation: slide-up 0.5s ease-out;
+          }
+        `}</style>
       </div>
     </div>
   );
