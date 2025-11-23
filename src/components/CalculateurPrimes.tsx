@@ -289,7 +289,7 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
       </div>
 
       <div className="flex-1 overflow-y-auto p-6">
-        <div className="max-w-2xl mx-auto space-y-6">
+        <div className="max-w-2xl mx-auto space-y-3">
         {/* CSS Animations */}
         <style>{`
           @keyframes fade-in {
