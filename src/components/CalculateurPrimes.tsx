@@ -869,6 +869,5 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
           </div>
         </div>
       )}
-    </div>
   )
 }
