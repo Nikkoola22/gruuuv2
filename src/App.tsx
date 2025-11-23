@@ -901,6 +901,25 @@ ${contexte}
                 </div>
               </div>
 
+              {/* Styles for both mobile and desktop animations */}
+              <style>{`
+                @keyframes quizz-pulse {
+                  0% { transform: scale(1); }
+                  50% { transform: scale(1.16); }
+                  100% { transform: scale(1); }
+                }
+                @keyframes quizz-blink {
+                  0% { opacity: 1; }
+                  50% { opacity: 0.35; }
+                  100% { opacity: 1; }
+                }
+                .star-anim {
+                  transform-origin: 50% 50%;
+                  animation: quizz-pulse 1.1s ease-in-out infinite, quizz-blink 1.3s linear infinite;
+                  filter: drop-shadow(0 10px 30px rgba(217,119,6,0.45));
+                }
+              `}</style>
+
               {/* Desktop layout: absolute positioning */}
               <div className="hidden md:block relative w-full">
                 {/* fixed white circle behind the star (non-interactive) */}
@@ -970,24 +989,6 @@ ${contexte}
                 {/* Spacer for layout */}
                 <div className="h-64" />
               </div>
-
-              <style>{`
-                @keyframes quizz-pulse {
-                  0% { transform: scale(1); }
-                  50% { transform: scale(1.16); }
-                  100% { transform: scale(1); }
-                }
-                @keyframes quizz-blink {
-                  0% { opacity: 1; }
-                  50% { opacity: 0.35; }
-                  100% { opacity: 1; }
-                }
-                .star-anim {
-                  transform-origin: 50% 50%;
-                  animation: quizz-pulse 1.1s ease-in-out infinite, quizz-blink 1.3s linear infinite;
-                  filter: drop-shadow(0 10px 30px rgba(217,119,6,0.45));
-                }
-              `}</style>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
