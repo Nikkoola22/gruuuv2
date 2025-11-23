@@ -65,8 +65,6 @@ interface ChatbotState {
 const API_KEY = import.meta.env.VITE_APP_PERPLEXITY_KEY;
 const API_URL = "https://api.perplexity.ai/chat/completions";
 
-const fluxOriginal = "https://www.franceinfo.fr/politique.rss";
-
 // Fonction pour nettoyer les chaînes de caractères
 const nettoyerChaine = (chaine: string): string => {
   return chaine
@@ -847,14 +845,10 @@ ${contexte}
             </section>
 
             <div className="relative w-full flex items-center justify-center mb-12">
-              {/* fixed white circle behind the star (non-interactive) */}
-              <div className="absolute left-1/2 top-12 md:top-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none z-10">
-                <div className="w-24 h-24 sm:w-32 md:w-44 sm:h-32 md:h-44 rounded-full bg-white shadow-lg" />
-              </div>
-
-              {/* PRIMES Window on the left */}
-              <div className="absolute left-24 md:left-32 top-8 md:top-1/2 transform md:-translate-y-1/2 z-30">
-                <div className="relative z-10 p-4 rounded-2xl overflow-hidden w-auto max-w-[200px]">
+              {/* Mobile layout: vertical stacking */}
+              <div className="md:hidden w-full flex flex-col items-center gap-6">
+                {/* PRIMES button */}
+                <div className="relative z-10 p-4 rounded-2xl overflow-hidden w-auto max-w-[160px]">
                   <div className="absolute inset-0 bg-gradient-to-br from-cyan-500 via-blue-600 to-blue-700 opacity-70" />
                   <div className="flex flex-col items-center gap-4 relative z-20 text-white">
                     <div className={`relative p-5 bg-cyan-500 rounded-3xl shadow-lg ring-2 ring-cyan-300 ${isPrimesBlocked ? 'opacity-60' : ''}`}>
@@ -869,18 +863,16 @@ ${contexte}
                       disabled={isPrimesBlocked}
                       aria-label="Ouvrir Calculateur PRIMES"
                       title={isPrimesBlocked ? "Le bouton PRIMES est désactivé" : "Ouvrir Calculateur PRIMES"}
-                      className={`px-5 py-2 bg-cyan-500 hover:bg-cyan-600 rounded-full text-xl font-bold text-white shadow-md focus:outline-none ${isPrimesBlocked ? 'opacity-50 cursor-not-allowed hover:bg-cyan-500' : ''}`}
+                      className={`px-5 py-2 bg-cyan-500 hover:bg-cyan-600 rounded-full text-lg font-bold text-white shadow-md focus:outline-none ${isPrimesBlocked ? 'opacity-50 cursor-not-allowed hover:bg-cyan-500' : ''}`}
                     >
                       PRIMES
                     </button>
                   </div>
                 </div>
-              </div>
 
-              {/* Center the QUIZZ star horizontally above the FAQ card (absolute to match background circle) */}
-              <div className="absolute left-1/2 top-12 md:top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-30">
+                {/* QUIZZ button */}
                 <button onClick={() => setChatState(p => ({ ...p, currentView: 'quiz' }))} aria-label="Ouvrir QUIZZ" className="focus:outline-none">
-                  <div className="w-24 sm:w-32 md:w-40 h-24 sm:h-32 md:h-40">
+                  <div className="w-32 h-32">
                     <svg viewBox="0 0 100 100" className="w-full h-full star-anim cursor-pointer" aria-hidden="true">
                       <defs>
                         <linearGradient id="gStar" x1="0%" x2="100%">
@@ -894,21 +886,89 @@ ${contexte}
                     </svg>
                   </div>
                 </button>
-              </div>
 
-              <div className="pt-8 w-full flex justify-end pr-6 md:pr-12">
-                <div className="relative z-10 p-3 rounded-2xl overflow-hidden w-auto max-w-[160px] mr-8 md:mr-24">
+                {/* Questions fréquentes button */}
+                <div className="relative z-10 p-3 rounded-2xl overflow-hidden w-auto max-w-[160px]">
                   <div className="absolute inset-0 bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700 opacity-70" />
                   <div className="flex flex-col items-center gap-4 relative z-20 text-white">
                     <div className="relative p-4 bg-orange-500 rounded-3xl shadow-lg ring-2 ring-orange-300">
                       <Sparkles className="w-8 h-8 text-white" />
                     </div>
-                    <button onClick={() => setChatState(p => ({ ...p, currentView: 'public' }))} className="px-4 py-2 bg-orange-500 hover:bg-orange-600 rounded-full text-lg font-bold text-white shadow-md">
+                    <button onClick={() => setChatState(p => ({ ...p, currentView: 'public' }))} className="px-4 py-2 bg-orange-500 hover:bg-orange-600 rounded-full text-base font-bold text-white shadow-md">
                       Questions fréquentes
                     </button>
-                    {/* NewsTicker déplacé en bas de la page (au-dessus du footer) pour être full-width */}
                   </div>
                 </div>
+              </div>
+
+              {/* Desktop layout: absolute positioning */}
+              <div className="hidden md:block relative w-full">
+                {/* fixed white circle behind the star (non-interactive) */}
+                <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none z-10">
+                  <div className="w-44 h-44 rounded-full bg-white shadow-lg" />
+                </div>
+
+                {/* PRIMES Window on the left */}
+                <div className="absolute left-32 top-1/2 transform -translate-y-1/2 z-30">
+                  <div className="relative z-10 p-4 rounded-2xl overflow-hidden w-auto max-w-[200px]">
+                    <div className="absolute inset-0 bg-gradient-to-br from-cyan-500 via-blue-600 to-blue-700 opacity-70" />
+                    <div className="flex flex-col items-center gap-4 relative z-20 text-white">
+                      <div className={`relative p-5 bg-cyan-500 rounded-3xl shadow-lg ring-2 ring-cyan-300 ${isPrimesBlocked ? 'opacity-60' : ''}`}>
+                        <TrendingUp className="w-10 h-10 text-white" />
+                      </div>
+                      <button 
+                        onClick={() => {
+                          if (!isPrimesBlocked) {
+                            setShowCalculator(true);
+                          }
+                        }}
+                        disabled={isPrimesBlocked}
+                        aria-label="Ouvrir Calculateur PRIMES"
+                        title={isPrimesBlocked ? "Le bouton PRIMES est désactivé" : "Ouvrir Calculateur PRIMES"}
+                        className={`px-5 py-2 bg-cyan-500 hover:bg-cyan-600 rounded-full text-xl font-bold text-white shadow-md focus:outline-none ${isPrimesBlocked ? 'opacity-50 cursor-not-allowed hover:bg-cyan-500' : ''}`}
+                      >
+                        PRIMES
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Center the QUIZZ star */}
+                <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-30">
+                  <button onClick={() => setChatState(p => ({ ...p, currentView: 'quiz' }))} aria-label="Ouvrir QUIZZ" className="focus:outline-none">
+                    <div className="w-40 h-40">
+                      <svg viewBox="0 0 100 100" className="w-full h-full star-anim cursor-pointer" aria-hidden="true">
+                        <defs>
+                          <linearGradient id="gStar" x1="0%" x2="100%">
+                            <stop offset="0%" stopColor="#FFD54A" />
+                            <stop offset="50%" stopColor="#F59E0B" />
+                            <stop offset="100%" stopColor="#D97706" />
+                          </linearGradient>
+                        </defs>
+                        <polygon points="50,3 61,36 98,36 67,57 78,91 50,70 22,91 33,57 2,36 39,36" fill="url(#gStar)" />
+                        <text x="50%" y="56%" textAnchor="middle" dominantBaseline="middle" fontSize="26" fontWeight="700" fill="#3B2F00" stroke="#3B2F00" strokeWidth="1.0" paintOrder="stroke fill" letterSpacing="-0.45">QUIZZ</text>
+                      </svg>
+                    </div>
+                  </button>
+                </div>
+
+                {/* Questions fréquentes on the right */}
+                <div className="absolute right-32 top-1/2 transform -translate-y-1/2 z-30">
+                  <div className="relative z-10 p-3 rounded-2xl overflow-hidden w-auto max-w-[160px]">
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700 opacity-70" />
+                    <div className="flex flex-col items-center gap-4 relative z-20 text-white">
+                      <div className="relative p-4 bg-orange-500 rounded-3xl shadow-lg ring-2 ring-orange-300">
+                        <Sparkles className="w-8 h-8 text-white" />
+                      </div>
+                      <button onClick={() => setChatState(p => ({ ...p, currentView: 'public' }))} className="px-4 py-2 bg-orange-500 hover:bg-orange-600 rounded-full text-lg font-bold text-white shadow-md">
+                        Questions fréquentes
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Spacer for layout */}
+                <div className="h-64" />
               </div>
 
               <style>{`
