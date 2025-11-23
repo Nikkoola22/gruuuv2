@@ -263,18 +263,23 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
   )
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="min-h-screen bg-gradient-to-br from-cyan-50 via-blue-50 to-purple-50 flex flex-col">
       {/* Header avec bouton retour */}
-      <div className="bg-slate-800/50 py-6 text-left border-b border-slate-700 px-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-3xl font-bold text-white flex items-center gap-2">
-            <TrendingUp className="w-8 h-8 text-cyan-400" />
-            Calculateur PRIMES
-          </h2>
+      <div className="bg-gradient-to-r from-cyan-600 via-blue-600 to-purple-600 py-8 shadow-xl animate-fade-in">
+        <div className="px-6 flex items-center justify-between max-w-6xl mx-auto">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-white/20 rounded-full shadow-lg backdrop-blur-sm">
+              <TrendingUp className="w-8 h-8 text-white" />
+            </div>
+            <div>
+              <h1 className="text-3xl sm:text-4xl font-extrabold text-white">Calculateur PRIMES</h1>
+              <p className="text-blue-100 text-sm mt-1">Simulation complète - Calcul détaillé par étape</p>
+            </div>
+          </div>
           {onClose && (
             <button
               onClick={onClose}
-              className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-full font-semibold transition-all text-sm"
+              className="flex items-center gap-2 px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-full font-semibold transition-all duration-200 transform hover:scale-105 shadow-lg"
             >
               <ArrowLeft className="w-4 h-4" />
               Retour
@@ -283,7 +288,31 @@ export default function CalculateurPrimes({ onClose }: CalculateurPrimesProps) {
         </div>
       </div>
 
-      <div className="space-y-6 flex-1 overflow-y-auto p-6 max-w-2xl mx-auto w-full">
+      <div className="flex-1 overflow-y-auto p-6">
+        <div className="max-w-2xl mx-auto space-y-6">
+        {/* CSS Animations */}
+        <style>{`
+          @keyframes fade-in {
+            from { opacity: 0; }
+            to { opacity: 1; }
+          }
+          @keyframes slide-up {
+            from { 
+              opacity: 0; 
+              transform: translateY(20px);
+            }
+            to { 
+              opacity: 1; 
+              transform: translateY(0);
+            }
+          }
+          .animate-fade-in {
+            animation: fade-in 0.6s ease-out;
+          }
+          .animate-slide-up {
+            animation: slide-up 0.5s ease-out;
+          }
+        `}</style>
 
         {/* ÉTAPE 1: CATÉGORIE */}
         <div className={`transition-all duration-500 transform ${!selectedCategory ? 'ring-2 ring-blue-400/50 shadow-lg shadow-blue-500/30 bg-blue-500/10' : ''} ${currentStep === 1 ? 'ring-2 ring-blue-400/50 shadow-lg shadow-blue-500/20 scale-100' : 'opacity-95 hover:opacity-100'} bg-gradient-to-br from-indigo-950/70 via-slate-800/50 to-indigo-900/40 rounded-xl p-6 border border-indigo-700/30 hover:border-blue-400/30 backdrop-blur-sm`}>
