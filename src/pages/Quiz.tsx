@@ -729,6 +729,8 @@ export default function Quiz({ onBack }: QuizProps) {
   const [questions, setQuestions] = useState<Question[]>(randomQuestions);
   const [answers, setAnswers] = useState<(number | null)[]>(Array(randomQuestions.length).fill(null));
   const [submitted, setSubmitted] = useState(false);
+  const [selectedHovered, setSelectedHovered] = useState<number | null>(null);
+  const [animateScore, setAnimateScore] = useState(false);
 
   // helper to regenerate options for questions starting at startIdx (0-based)
   const regenerateFrom = (startIdx: number) => {
@@ -892,6 +894,7 @@ export default function Quiz({ onBack }: QuizProps) {
 
   const submit = () => {
     setSubmitted(true);
+    setAnimateScore(true);
   };
 
   const restart = () => {
@@ -900,94 +903,272 @@ export default function Quiz({ onBack }: QuizProps) {
     setAnswers(Array(newQuestions.length).fill(null));
     setIndex(0);
     setSubmitted(false);
+    setAnimateScore(false);
   };
 
   const score = answers.reduce((acc: number, ans, i) => (ans === questions[i].correctIndex ? acc + 1 : acc), 0);
+  const progressPercent = Math.round(((index + 1) / questions.length) * 100);
 
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-4xl font-extrabold">QUIZZ</h1>
-          <p className="text-sm text-gray-600">10 questions à choix multiple — obtenez votre score à la fin</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <button onClick={onBack} className="px-4 py-2 rounded-full bg-red-600 hover:bg-red-700 text-white font-semibold text-base">Retour</button>
-          <button onClick={restart} className="px-4 py-2 rounded-full bg-orange-600 text-white hover:bg-orange-700 text-base">Recommencer avec des nouvelles questions !</button>
-        </div>
-      </div>
-
-      {!submitted ? (
-        <div className="bg-white rounded-xl shadow p-6">
-          <div className="mb-4 flex items-center justify-between">
-            <div className="text-sm text-gray-500">Question {index + 1} / {questions.length}</div>
-            <div className="text-sm text-gray-500">Progression: {Math.round(((index + 1) / questions.length) * 100)}%</div>
-          </div>
-
-          <h2 className="text-lg font-semibold mb-4">{questions[index].question}</h2>
-          <div className="grid gap-3">
-            {questions[index].options.map((opt: string, i: number) => {
-              const checked = answers[index] === i;
-              return (
-                <label key={i} className={`block cursor-pointer rounded-md p-3 border ${checked ? 'bg-orange-50 border-orange-300' : 'bg-gray-50 border-gray-200'}`}>
-                  <input type="radio" name={`q-${index}`} checked={checked} onChange={() => selectOption(i)} className="mr-3" />
-                  <span className="align-middle">{opt}</span>
-                </label>
-              );
-            })}
-          </div>
-
-          <div className="mt-6 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <button onClick={prev} disabled={index === 0} className="px-3 py-2 rounded bg-white border disabled:opacity-50">Précédent</button>
-              <button onClick={next} disabled={index === questions.length - 1} className="px-3 py-2 rounded bg-white border disabled:opacity-50">Suivant</button>
-            </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-3xl mx-auto">
+        {/* Header */}
+        <div className="mb-8 animate-fade-in">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
             <div>
-              {index === questions.length - 1 ? (
-                <button onClick={submit} disabled={answers[index] === null || answers.includes(null)} className="px-4 py-2 rounded bg-green-600 text-white disabled:opacity-50">Terminer et voir le score</button>
-              ) : (
-                <button onClick={() => setIndex(index + 1)} disabled={answers[index] === null} className="px-4 py-2 rounded bg-blue-600 text-white disabled:opacity-50">Valider et continuer</button>
+              <h1 className="text-5xl sm:text-6xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">QUIZZ</h1>
+              <p className="text-sm sm:text-base text-gray-600 mt-2">10 questions à choix multiple — obtenez votre score à la fin</p>
+            </div>
+            <div className="flex flex-wrap gap-2 sm:gap-3">
+              <button onClick={onBack} className="px-4 py-2 rounded-full bg-red-600 hover:bg-red-700 text-white font-semibold text-sm transition-all duration-200 transform hover:scale-105">Retour</button>
+              <button onClick={restart} className="px-4 py-2 rounded-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold text-sm transition-all duration-200 transform hover:scale-105">Nouveau</button>
+            </div>
+          </div>
+        </div>
+
+        {!submitted ? (
+          <div className="space-y-6">
+            {/* Progress Bar */}
+            <div className="bg-white rounded-2xl shadow-lg p-6 animate-fade-in">
+              <div className="flex justify-between items-center mb-3">
+                <span className="text-sm font-semibold text-gray-700">Question {index + 1} / {questions.length}</span>
+                <span className="text-sm font-semibold text-gray-700">{progressPercent}%</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                <div 
+                  className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 h-full transition-all duration-500 ease-out rounded-full"
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
+            </div>
+
+            {/* Question Container */}
+            <div className="bg-white rounded-2xl shadow-xl overflow-hidden animate-slide-up">
+              <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 px-6 sm:px-8 py-6">
+                <h2 className="text-xl sm:text-2xl font-bold text-white leading-tight">{questions[index].question}</h2>
+              </div>
+
+              <div className="p-6 sm:p-8">
+                {/* Options */}
+                <div className="space-y-3">
+                  {questions[index].options.map((opt: string, i: number) => {
+                    const checked = answers[index] === i;
+                    const isHovered = selectedHovered === i;
+                    
+                    return (
+                      <label 
+                        key={i} 
+                        className="block cursor-pointer"
+                        onMouseEnter={() => setSelectedHovered(i)}
+                        onMouseLeave={() => setSelectedHovered(null)}
+                      >
+                        <div className={`
+                          relative rounded-xl border-2 p-4 sm:p-5 transition-all duration-300 transform
+                          ${checked 
+                            ? 'bg-gradient-to-r from-blue-100 to-purple-100 border-blue-500 shadow-lg scale-[1.02]' 
+                            : isHovered
+                            ? 'bg-gradient-to-r from-blue-50 to-purple-50 border-blue-300 shadow-md'
+                            : 'bg-gray-50 border-gray-200 hover:border-blue-300'
+                          }
+                        `}>
+                          <div className="flex items-start gap-3">
+                            <div className={`
+                              flex-shrink-0 w-5 h-5 mt-1 rounded-full border-2 flex items-center justify-center transition-all duration-300
+                              ${checked 
+                                ? 'bg-blue-500 border-blue-500' 
+                                : 'border-gray-400 group-hover:border-blue-400'
+                              }
+                            `}>
+                              {checked && (
+                                <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                </svg>
+                              )}
+                            </div>
+                            <input 
+                              type="radio" 
+                              name={`q-${index}`} 
+                              checked={checked} 
+                              onChange={() => selectOption(i)} 
+                              className="hidden" 
+                            />
+                            <span className="align-middle text-gray-800 font-medium text-sm sm:text-base">{opt}</span>
+                          </div>
+                        </div>
+                      </label>
+                    );
+                  })}
+                </div>
+
+                {/* Navigation Buttons */}
+                <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <button 
+                      onClick={prev} 
+                      disabled={index === 0} 
+                      className="px-4 sm:px-6 py-2.5 rounded-full bg-white border-2 border-gray-300 font-semibold transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 hover:border-gray-400"
+                    >
+                      ← Précédent
+                    </button>
+                    <button 
+                      onClick={next} 
+                      disabled={index === questions.length - 1} 
+                      className="px-4 sm:px-6 py-2.5 rounded-full bg-white border-2 border-gray-300 font-semibold transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 hover:border-gray-400"
+                    >
+                      Suivant →
+                    </button>
+                  </div>
+                  
+                  <div>
+                    {index === questions.length - 1 ? (
+                      <button 
+                        onClick={submit} 
+                        disabled={answers.includes(null)} 
+                        className="px-6 sm:px-8 py-3 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white font-bold text-sm sm:text-base shadow-lg hover:from-green-600 hover:to-emerald-600 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed transform hover:scale-105"
+                      >
+                        ✓ Terminer et voir le score
+                      </button>
+                    ) : (
+                      <button 
+                        onClick={() => setIndex(index + 1)} 
+                        disabled={answers[index] === null} 
+                        className="px-6 sm:px-8 py-3 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold text-sm sm:text-base shadow-lg hover:from-blue-600 hover:to-purple-600 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed transform hover:scale-105"
+                      >
+                        Valider et continuer →
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          /* Results Screen */
+          <div className="space-y-6">
+            {/* Score Card */}
+            <div className={`bg-white rounded-2xl shadow-2xl overflow-hidden transform transition-all duration-700 ${animateScore ? 'scale-100 opacity-100' : 'scale-95 opacity-0'}`}>
+              <div className="bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 px-6 sm:px-8 py-12 text-center">
+                <p className="text-white text-lg sm:text-xl font-semibold mb-3">Votre résultat</p>
+                <div className="flex items-baseline justify-center gap-2">
+                  <span className={`text-7xl sm:text-8xl font-extrabold text-white transform transition-all duration-1000 ${animateScore ? 'scale-100 opacity-100' : 'scale-50 opacity-0'}`}>
+                    {score}
+                  </span>
+                  <span className="text-4xl sm:text-5xl text-white/80 font-bold">/ {questions.length}</span>
+                </div>
+                <div className="mt-6 text-white/90 font-medium text-base sm:text-lg">
+                  {score === questions.length && <span>🎉 Parfait ! Vous maîtrisez le sujet !</span>}
+                  {score >= Math.ceil(questions.length * 0.8) && score < questions.length && <span>🌟 Excellent ! Vous connaissez bien le sujet !</span>}
+                  {score >= Math.ceil(questions.length * 0.6) && score < Math.ceil(questions.length * 0.8) && <span>👍 Bien ! Continuez vos efforts !</span>}
+                  {score < Math.ceil(questions.length * 0.6) && <span>📚 Continuez à vous former !</span>}
+                </div>
+              </div>
+
+              {/* Score Bar */}
+              <div className="px-6 sm:px-8 py-6">
+                <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
+                  <div 
+                    className="bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 h-full transition-all duration-1000 ease-out rounded-full"
+                    style={{ width: `${(score / questions.length) * 100}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Review Questions */}
+            <div className="space-y-4">
+              <h3 className="text-2xl font-bold text-gray-800 mb-6">Révision de vos réponses</h3>
+              <div className="grid gap-4">
+                {questions.map((q: Question, i: number) => {
+                  const user = answers[i];
+                  const correct = q.correctIndex;
+                  const isGood = user === correct;
+                  
+                  return (
+                    <div 
+                      key={q.id} 
+                      className={`rounded-xl border-l-4 p-5 sm:p-6 bg-white shadow-md transform transition-all duration-300 hover:shadow-lg ${
+                        isGood ? 'border-l-green-500 bg-gradient-to-br from-green-50 to-white' : 'border-l-red-500 bg-gradient-to-br from-red-50 to-white'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1">
+                          <div className="flex items-start gap-3">
+                            <span className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-bold text-white text-sm ${isGood ? 'bg-green-500' : 'bg-red-500'}`}>
+                              {i + 1}
+                            </span>
+                            <div className="flex-1">
+                              <div className="font-semibold text-gray-800 text-sm sm:text-base">{q.question}</div>
+                              <div className="mt-3 space-y-2">
+                                <div className="text-xs sm:text-sm">
+                                  <span className="font-semibold text-gray-600">Votre réponse: </span>
+                                  <span className={`font-semibold ${isGood ? 'text-green-700' : 'text-red-600'}`}>
+                                    {user !== null ? q.options[user] : '—'}
+                                  </span>
+                                </div>
+                                {!isGood && (
+                                  <div className="text-xs sm:text-sm">
+                                    <span className="font-semibold text-gray-600">Bonne réponse: </span>
+                                    <span className="text-green-700 font-semibold">{q.options[correct]}</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className={`ml-4 flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold ${isGood ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
+                          {isGood ? '✓' : '✕'}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6">
+              <button 
+                onClick={restart} 
+                className="w-full sm:w-auto px-8 py-3 rounded-full bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold shadow-lg hover:from-orange-600 hover:to-red-600 transition-all duration-200 transform hover:scale-105"
+              >
+                🔄 Refaire le quizz
+              </button>
+              {onBack && (
+                <button 
+                  onClick={onBack} 
+                  className="w-full sm:w-auto px-8 py-3 rounded-full bg-red-600 hover:bg-red-700 text-white font-bold shadow-lg transition-all duration-200 transform hover:scale-105"
+                >
+                  ← Retour au menu
+                </button>
               )}
             </div>
           </div>
-        </div>
-      ) : (
-        <div className="bg-white rounded-xl shadow p-6">
-          <h3 className="text-2xl font-bold mb-2">Résultat</h3>
-          <p className="mb-4">Vous avez obtenu <span className="font-extrabold text-orange-600">{score}</span> / {questions.length} bonnes réponses.</p>
+        )}
 
-          <div className="space-y-3">
-            {questions.map((q: Question, i: number) => {
-              const user = answers[i];
-              const correct = q.correctIndex;
-              const isGood = user === correct;
-              return (
-                <div key={q.id} className="p-3 border rounded-md">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <div className="font-semibold">{i + 1}. {q.question}</div>
-                      <div className="text-sm mt-1">
-                        Votre réponse: <span className={`${isGood ? 'text-green-700 font-semibold' : 'text-red-600 font-semibold'}`}>{user !== null ? q.options[user] : '—'}</span>
-                      </div>
-                      {!isGood && (
-                        <div className="text-sm mt-1">Bonne réponse: <span className="text-green-700 font-semibold">{q.options[correct]}</span></div>
-                      )}
-                    </div>
-                    <div className={`ml-4 shrink-0 rounded-full w-9 h-9 flex items-center justify-center ${isGood ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                      {isGood ? '✓' : '✕'}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="mt-6 flex items-center gap-3">
-            <button onClick={restart} className="px-5 py-3 rounded bg-orange-600 text-white text-base font-semibold">Refaire le quizz</button>
-            {onBack && <button onClick={onBack} className="px-5 py-3 rounded bg-red-600 hover:bg-red-700 text-white font-semibold text-base">Retour au menu</button>}
-          </div>
-        </div>
-      )}
+        {/* CSS Animations */}
+        <style>{`
+          @keyframes fade-in {
+            from { opacity: 0; }
+            to { opacity: 1; }
+          }
+          @keyframes slide-up {
+            from { 
+              opacity: 0; 
+              transform: translateY(20px);
+            }
+            to { 
+              opacity: 1; 
+              transform: translateY(0);
+            }
+          }
+          .animate-fade-in {
+            animation: fade-in 0.6s ease-out;
+          }
+          .animate-slide-up {
+            animation: slide-up 0.5s ease-out;
+          }
+        `}</style>
+      </div>
     </div>
   );
 }
