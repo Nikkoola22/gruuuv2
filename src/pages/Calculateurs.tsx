@@ -25,7 +25,7 @@ export default function Calculateurs({ onBack }: CalculateursProps) {
   }
   const [calculatorsStatus, setCalculatorsStatus] = useState<CalculatorStatus>(() => {
     const saved = localStorage.getItem('calculators-status');
-    return saved ? JSON.parse(saved) : { primes: true, cia: true, treizeme: true, grilles: true };
+    return saved ? JSON.parse(saved) : { primes: false, cia: false, treizeme: false, grilles: true };
   })
 
   useEffect(() => {
