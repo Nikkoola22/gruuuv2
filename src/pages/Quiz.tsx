@@ -1001,24 +1001,7 @@ export default function Quiz({ onBack }: QuizProps) {
                 </div>
 
                 {/* Navigation Buttons */}
-                <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-                  <div className="flex items-center gap-3">
-                    <button 
-                      onClick={prev} 
-                      disabled={index === 0} 
-                      className="px-4 sm:px-6 py-2.5 rounded-full bg-white border-2 border-gray-300 font-semibold transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 hover:border-gray-400"
-                    >
-                      ← Précédent
-                    </button>
-                    <button 
-                      onClick={next} 
-                      disabled={index === questions.length - 1} 
-                      className="px-4 sm:px-6 py-2.5 rounded-full bg-white border-2 border-gray-300 font-semibold transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 hover:border-gray-400"
-                    >
-                      Suivant →
-                    </button>
-                  </div>
-                  
+                <div className="mt-8 flex justify-center">
                   <div>
                     {index === questions.length - 1 ? (
                       <button 
