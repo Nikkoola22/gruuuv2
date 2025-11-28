@@ -640,8 +640,8 @@ Calcul détaillé du CIA:
                         <span className="font-bold text-orange-700">{ifseMensuel}€</span>
                       </div>
                       <div className="flex justify-between">
-                        <span>Week-ends valorisés ({weekendServices} × {weekendRate}€)</span>
-                        <span className="font-bold text-orange-700">{(weekendServices * weekendRate).toFixed(2)}€</span>
+                        <span>Week-ends déclarés ({finalWeekendServices} × {weekendRate}€)</span>
+                        <span className="font-bold text-orange-700">{(finalWeekendServices * weekendRate).toFixed(2)}€</span>
                       </div>
                       <div className="border-t border-gray-200 pt-2 flex justify-between bg-gray-50 -mx-5 px-5 py-2">
                         <span className="font-semibold text-gray-800">IFSE Mensuel retenu</span>

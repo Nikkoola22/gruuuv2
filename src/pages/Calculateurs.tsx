@@ -18,6 +18,11 @@ interface CalculatorStatus {
 
 export default function Calculateurs({ onBack }: CalculateursProps) {
   const [selectedCalculator, setSelectedCalculator] = useState<'primes' | 'cia' | '13eme' | 'metiers' | null>(null)
+
+  const openCalculator = (calc: 'primes' | 'cia' | '13eme' | 'metiers') => {
+    setSelectedCalculator(calc);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
   const [calculatorsStatus, setCalculatorsStatus] = useState<CalculatorStatus>(() => {
     const saved = localStorage.getItem('calculators-status');
     return saved ? JSON.parse(saved) : { primes: true, cia: true, treizeme: true, grilles: true };
@@ -50,7 +55,7 @@ export default function Calculateurs({ onBack }: CalculateursProps) {
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="text-4xl font-extrabold">Calculateurs</h1>
           <p className="text-sm text-gray-600">Choisissez un calculateur ou consultez les grilles</p>
@@ -69,7 +74,7 @@ export default function Calculateurs({ onBack }: CalculateursProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         {/* Calculateur PRIMES */}
         <button
-          onClick={() => setSelectedCalculator('primes')}
+          onClick={() => openCalculator('primes')}
           disabled={!calculatorsStatus.primes}
           className={`group relative overflow-hidden rounded-3xl p-8 transition-all duration-500 ${
             calculatorsStatus.primes
@@ -93,7 +98,7 @@ export default function Calculateurs({ onBack }: CalculateursProps) {
 
         {/* Calculateur CIA */}
         <button
-          onClick={() => setSelectedCalculator('cia')}
+          onClick={() => openCalculator('cia')}
           disabled={!calculatorsStatus.cia}
           className={`group relative overflow-hidden rounded-3xl p-8 transition-all duration-500 ${
             calculatorsStatus.cia
@@ -117,7 +122,7 @@ export default function Calculateurs({ onBack }: CalculateursProps) {
 
         {/* Calculateur 13ème Mois */}
         <button
-          onClick={() => setSelectedCalculator('13eme')}
+          onClick={() => openCalculator('13eme')}
           disabled={!calculatorsStatus.treizeme}
           className={`group relative overflow-hidden rounded-3xl p-8 transition-all duration-500 ${
             calculatorsStatus.treizeme
@@ -141,7 +146,7 @@ export default function Calculateurs({ onBack }: CalculateursProps) {
 
         {/* Grilles Indiciaires */}
         <button
-          onClick={() => setSelectedCalculator('metiers')}
+          onClick={() => openCalculator('metiers')}
           disabled={!calculatorsStatus.grilles}
           className={`group relative overflow-hidden rounded-3xl p-8 transition-all duration-500 ${
             calculatorsStatus.grilles

@@ -169,7 +169,7 @@ const FAQ: React.FC<Props> = ({ onBack }) => {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8 animate-fade-in">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+          <div className="flex flex-row items-center justify-between gap-4 mb-6">
             <div>
               <h1 className="text-5xl sm:text-6xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">FAQ</h1>
               <p className="mt-2 text-base sm:text-lg text-gray-600">Questions fréquentes — guide rapide pour les agents</p>

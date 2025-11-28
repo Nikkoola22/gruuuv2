@@ -914,7 +914,7 @@ export default function Quiz({ onBack }: QuizProps) {
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="mb-8 animate-fade-in">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+          <div className="flex flex-row items-center justify-between gap-4 mb-6">
             <div>
               <h1 className="text-5xl sm:text-6xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">QUIZZ</h1>
               <p className="text-sm sm:text-base text-gray-600 mt-2">10 questions à choix multiple — obtenez votre score à la fin</p>

@@ -921,9 +921,9 @@ ${contexte}
               `}</style>
 
               {/* Desktop layout: absolute positioning */}
-              <div className="hidden md:block relative w-full">
+              <div className="hidden md:block relative w-full min-h-[350px] h-[350px]">
                 {/* fixed white circle behind the star (non-interactive) */}
-                <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none z-10">
+                <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none z-20">
                   <div className="w-44 h-44 rounded-full bg-white shadow-lg" />
                 </div>
 
