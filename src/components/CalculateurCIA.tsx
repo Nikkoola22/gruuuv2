@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Euro, ArrowLeft, CheckCircle, ChevronRight, ChevronDown } from 'lucide-react';
+import { Euro, ArrowLeft, CheckCircle,  ChevronDown } from 'lucide-react';
 
 // CSS Animations for modern design
 const styles = `
@@ -55,8 +55,6 @@ export default function CalculateurCIA({ onClose }: CalculateurCIAProps) {
   const [tauxEvaluation, setTauxEvaluation] = useState<number>(0);
   const [joursAbsenceN1, setJoursAbsenceN1] = useState<number>(0);
   const [etapeActive, setEtapeActive] = useState<number>(1); // Suivi de l'étape active
-  const [absencesTouched, setAbsencesTouched] = useState<boolean>(false); // Track if user touched absences field
-  const [evaluationTouched, setEvaluationTouched] = useState<boolean>(false); // Track if user touched evaluation
   const [expandDetail, setExpandDetail] = useState<boolean>(false); // État pour détail du calcul
   const [weekendMode, setWeekendMode] = useState<'estimate' | 'exact'>('estimate'); // Mode estimation ou nombre exact
   const [weekendExact, setWeekendExact] = useState<number>(0); // Nombre exact de week-ends (max 52)
@@ -67,14 +65,8 @@ export default function CalculateurCIA({ onClose }: CalculateurCIAProps) {
   const finalWeekendServices = weekendMode === 'exact' && weekendExact > 0 ? weekendExact : weekendServices;
   const ifseMensuelTotal = ifseMensuel + finalWeekendServices * weekendRate;
   
-  // Auto-advance to next step when IFSE is filled (only advance to step 2, not beyond)
-  // Removed: étape 1 now stays visible even after filling IFSE
 
-  // Auto-advance to next step when Évaluation is selected
-  // Removed: étape 2 now stays visible, collapse happens via Valider button
 
-  // Auto-advance to next step when Absences is filled by user
-  // Removed: étape 3 now stays visible
   
   // Calcul du CIA
   const calculerCIA = () => {

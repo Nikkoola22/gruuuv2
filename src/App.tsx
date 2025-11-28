@@ -471,7 +471,6 @@ export default function App() {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      console.log('SpeechRecognition disponible:', !!SpeechRecognition);
       
       if (SpeechRecognition) {
         setIsVoiceSupported(true);
@@ -481,12 +480,10 @@ export default function App() {
         recognition.lang = 'fr-FR';
         
         recognition.onstart = () => {
-          console.log('Reconnaissance vocale démarrée');
           setIsListening(true);
         };
         
         recognition.onresult = (event: any) => {
-          console.log('Résultat de reconnaissance:', event);
           let finalTranscript = '';
           let interimTranscript = '';
           
@@ -500,11 +497,9 @@ export default function App() {
           }
           
           if (finalTranscript) {
-            console.log('Texte final:', finalTranscript);
             setInputValue(finalTranscript);
             setTimeout(() => {
               if (finalTranscript && finalTranscript.trim()) {
-                console.log('🎤 ENVOI AUTOMATIQUE TEXTE FINAL:', finalTranscript);
                 setInputValue(finalTranscript);
                 handleSendMessage();
               }
@@ -514,7 +509,6 @@ export default function App() {
               recognitionRef.current.stop();
             }
           } else if (interimTranscript) {
-            console.log('Texte intermédiaire:', interimTranscript);
             setInputValue(interimTranscript);
             
             if (silenceTimeoutRef.current) {
@@ -523,7 +517,6 @@ export default function App() {
             
             silenceTimeoutRef.current = setTimeout(() => {
               if (interimTranscript && interimTranscript.trim()) {
-                console.log('🎤 ENVOI AUTOMATIQUE APRÈS SILENCE:', interimTranscript);
                 setInputValue(interimTranscript);
                 handleSendMessage();
                 setIsListening(false);
@@ -542,7 +535,6 @@ export default function App() {
         };
         
         recognition.onend = () => {
-          console.log('Reconnaissance vocale terminée');
           setIsListening(false);
           if (silenceTimeoutRef.current) {
             clearTimeout(silenceTimeoutRef.current);
@@ -552,7 +544,6 @@ export default function App() {
         
         recognitionRef.current = recognition;
       } else {
-        console.log('Reconnaissance vocale non supportée');
         setIsVoiceSupported(false);
       }
     }
@@ -586,7 +577,6 @@ export default function App() {
 
   const startListening = () => {
     if (recognitionRef.current && !isListening) {
-      console.log('🎤 Démarrage de la reconnaissance vocale');
       setInputValue("");
       recognitionRef.current.start();
     }
@@ -594,7 +584,6 @@ export default function App() {
 
   const stopListening = () => {
     if (recognitionRef.current && isListening) {
-      console.log('🎤 Arrêt de la reconnaissance vocale');
       recognitionRef.current.stop();
       setIsListening(false);
     }
