@@ -834,30 +834,24 @@ ${contexte}
             </section>
 
             <div className="relative w-full flex items-center justify-center mb-12">
-              {/* Mobile layout: vertical stacking */}
+                            {/* Mobile layout: vertical stacking */}
               <div className="md:hidden w-full flex flex-col items-center gap-6">
-                {/* PRIMES button */}
-                <div className="relative z-10 p-4 rounded-2xl overflow-hidden w-auto max-w-[160px]">
-                  <div className="absolute inset-0 bg-gradient-to-br from-cyan-500 via-blue-600 to-blue-700 opacity-70" />
-                  <div className="flex flex-col items-center gap-4 relative z-20 text-white">
-                    <div className={`relative p-5 bg-cyan-500 rounded-3xl shadow-lg ring-2 ring-cyan-300 ${isPrimesBlocked ? 'opacity-60' : ''}`}>
-                      <TrendingUp className="w-10 h-10 text-white" />
+                {/* PRIMES button - Modern Glass Design */}
+                <button 
+                  onClick={() => { if (!isPrimesBlocked) setShowCalculator(true); }}
+                  disabled={isPrimesBlocked}
+                  className={`group relative overflow-hidden rounded-3xl p-1 transition-all duration-500 ${isPrimesBlocked ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105 hover:shadow-2xl'}`}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 rounded-3xl animate-gradient-x" />
+                  <div className="relative bg-slate-900/90 backdrop-blur-xl rounded-[22px] p-6 flex flex-col items-center gap-4">
+                    <div className={`relative p-4 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-2xl shadow-xl transition-transform duration-300 ${!isPrimesBlocked ? 'group-hover:rotate-6 group-hover:scale-110' : ''}`}>
+                      <TrendingUp className="w-8 h-8 text-white" />
+                      <div className="absolute inset-0 bg-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     </div>
-                    <button 
-                      onClick={() => {
-                        if (!isPrimesBlocked) {
-                          setShowCalculator(true);
-                        }
-                      }}
-                      disabled={isPrimesBlocked}
-                      aria-label="Ouvrir Calculateur PRIMES"
-                      title={isPrimesBlocked ? "Le bouton PRIMES est désactivé" : "Ouvrir Calculateur PRIMES"}
-                      className={`px-5 py-2 bg-cyan-500 hover:bg-cyan-600 rounded-full text-lg font-bold text-white shadow-md focus:outline-none ${isPrimesBlocked ? 'opacity-50 cursor-not-allowed hover:bg-cyan-500' : ''}`}
-                    >
-                      PRIMES
-                    </button>
+                    <span className="text-lg font-bold text-white tracking-wide">PRIMES</span>
+                    <span className="text-xs text-cyan-300/80">Calculateurs & Grilles</span>
                   </div>
-                </div>
+                </button>
 
                 {/* QUIZZ button */}
                 <button onClick={() => setChatState(p => ({ ...p, currentView: 'quiz' }))} aria-label="Ouvrir QUIZZ" className="focus:outline-none">
@@ -876,18 +870,21 @@ ${contexte}
                   </div>
                 </button>
 
-                {/* Questions fréquentes button */}
-                <div className="relative z-10 p-3 rounded-2xl overflow-hidden w-auto max-w-[160px]">
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700 opacity-70" />
-                  <div className="flex flex-col items-center gap-4 relative z-20 text-white">
-                    <div className="relative p-4 bg-orange-500 rounded-3xl shadow-lg ring-2 ring-orange-300">
+                {/* Questions fréquentes button - Modern Glass Design */}
+                <button 
+                  onClick={() => setChatState(p => ({ ...p, currentView: 'public' }))}
+                  className="group relative overflow-hidden rounded-3xl p-1 transition-all duration-500 hover:scale-105 hover:shadow-2xl"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-orange-400 via-pink-500 to-purple-600 rounded-3xl animate-gradient-x" />
+                  <div className="relative bg-slate-900/90 backdrop-blur-xl rounded-[22px] p-6 flex flex-col items-center gap-4">
+                    <div className="relative p-4 bg-gradient-to-br from-orange-400 to-pink-600 rounded-2xl shadow-xl transition-transform duration-300 group-hover:rotate-6 group-hover:scale-110">
                       <Sparkles className="w-8 h-8 text-white" />
+                      <div className="absolute inset-0 bg-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     </div>
-                    <button onClick={() => setChatState(p => ({ ...p, currentView: 'public' }))} className="px-4 py-2 bg-orange-500 hover:bg-orange-600 rounded-full text-base font-bold text-white shadow-md">
-                      Questions fréquentes
-                    </button>
+                    <span className="text-lg font-bold text-white tracking-wide">FAQ</span>
+                    <span className="text-xs text-orange-300/80">Questions fréquentes</span>
                   </div>
-                </div>
+                </button>
               </div>
 
               {/* Styles for both mobile and desktop animations */}
@@ -901,6 +898,14 @@ ${contexte}
                   0% { opacity: 1; }
                   50% { opacity: 0.35; }
                   100% { opacity: 1; }
+                }
+                @keyframes gradient-x {
+                  0%, 100% { background-position: 0% 50%; }
+                  50% { background-position: 100% 50%; }
+                }
+                .animate-gradient-x {
+                  background-size: 200% 200%;
+                  animation: gradient-x 3s ease infinite;
                 }
                 .star-anim {
                   transform-origin: 50% 50%;
@@ -916,29 +921,23 @@ ${contexte}
                   <div className="w-44 h-44 rounded-full bg-white shadow-lg" />
                 </div>
 
-                {/* PRIMES Window on the left */}
-                <div className="absolute left-32 top-1/2 transform -translate-y-1/2 z-30">
-                  <div className="relative z-10 p-4 rounded-2xl overflow-hidden w-auto max-w-[200px]">
-                    <div className="absolute inset-0 bg-gradient-to-br from-cyan-500 via-blue-600 to-blue-700 opacity-70" />
-                    <div className="flex flex-col items-center gap-4 relative z-20 text-white">
-                      <div className={`relative p-5 bg-cyan-500 rounded-3xl shadow-lg ring-2 ring-cyan-300 ${isPrimesBlocked ? 'opacity-60' : ''}`}>
+                {/* PRIMES Window on the left - Modern Glass Design */}
+                <div className="absolute left-24 top-1/2 transform -translate-y-1/2 z-30">
+                  <button 
+                    onClick={() => { if (!isPrimesBlocked) setShowCalculator(true); }}
+                    disabled={isPrimesBlocked}
+                    className={`group relative overflow-hidden rounded-3xl p-1 transition-all duration-500 ${isPrimesBlocked ? 'opacity-50 cursor-not-allowed' : 'hover:scale-110 hover:shadow-2xl'}`}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 rounded-3xl animate-gradient-x" />
+                    <div className="relative bg-slate-900/90 backdrop-blur-xl rounded-[22px] p-6 flex flex-col items-center gap-4 min-w-[140px]">
+                      <div className={`relative p-4 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-2xl shadow-xl transition-transform duration-300 ${!isPrimesBlocked ? 'group-hover:rotate-6 group-hover:scale-110' : ''}`}>
                         <TrendingUp className="w-10 h-10 text-white" />
+                        <div className="absolute inset-0 bg-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                       </div>
-                      <button 
-                        onClick={() => {
-                          if (!isPrimesBlocked) {
-                            setShowCalculator(true);
-                          }
-                        }}
-                        disabled={isPrimesBlocked}
-                        aria-label="Ouvrir Calculateur PRIMES"
-                        title={isPrimesBlocked ? "Le bouton PRIMES est désactivé" : "Ouvrir Calculateur PRIMES"}
-                        className={`px-5 py-2 bg-cyan-500 hover:bg-cyan-600 rounded-full text-xl font-bold text-white shadow-md focus:outline-none ${isPrimesBlocked ? 'opacity-50 cursor-not-allowed hover:bg-cyan-500' : ''}`}
-                      >
-                        PRIMES
-                      </button>
+                      <span className="text-xl font-bold text-white tracking-wide">PRIMES</span>
+                      <span className="text-xs text-cyan-300/80">Calculateurs & Grilles</span>
                     </div>
-                  </div>
+                  </button>
                 </div>
 
                 {/* Center the QUIZZ star */}
@@ -960,25 +959,29 @@ ${contexte}
                   </button>
                 </div>
 
-                {/* Questions fréquentes on the right */}
-                <div className="absolute right-32 top-1/2 transform -translate-y-1/2 z-30">
-                  <div className="relative z-10 p-3 rounded-2xl overflow-hidden w-auto max-w-[160px]">
-                    <div className="absolute inset-0 bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700 opacity-70" />
-                    <div className="flex flex-col items-center gap-4 relative z-20 text-white">
-                      <div className="relative p-4 bg-orange-500 rounded-3xl shadow-lg ring-2 ring-orange-300">
-                        <Sparkles className="w-8 h-8 text-white" />
+                {/* Questions fréquentes on the right - Modern Glass Design */}
+                <div className="absolute right-24 top-1/2 transform -translate-y-1/2 z-30">
+                  <button 
+                    onClick={() => setChatState(p => ({ ...p, currentView: 'public' }))}
+                    className="group relative overflow-hidden rounded-3xl p-1 transition-all duration-500 hover:scale-110 hover:shadow-2xl"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-orange-400 via-pink-500 to-purple-600 rounded-3xl animate-gradient-x" />
+                    <div className="relative bg-slate-900/90 backdrop-blur-xl rounded-[22px] p-6 flex flex-col items-center gap-4 min-w-[140px]">
+                      <div className="relative p-4 bg-gradient-to-br from-orange-400 to-pink-600 rounded-2xl shadow-xl transition-transform duration-300 group-hover:rotate-6 group-hover:scale-110">
+                        <Sparkles className="w-10 h-10 text-white" />
+                        <div className="absolute inset-0 bg-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                       </div>
-                      <button onClick={() => setChatState(p => ({ ...p, currentView: 'public' }))} className="px-4 py-2 bg-orange-500 hover:bg-orange-600 rounded-full text-lg font-bold text-white shadow-md">
-                        Questions fréquentes
-                      </button>
+                      <span className="text-xl font-bold text-white tracking-wide">FAQ</span>
+                      <span className="text-xs text-orange-300/80">Questions fréquentes</span>
                     </div>
-                  </div>
+                  </button>
                 </div>
 
                 {/* Spacer for layout */}
                 <div className="h-64" />
               </div>
             </div>
+
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
               <button
