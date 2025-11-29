@@ -822,14 +822,21 @@ ${contexte}
         ) : chatState.currentView === "menu" ? (
           <>
 
-            <section className="text-center -mt-6 mb-6 max-w-xl mx-auto">
-              <div className="inline-block bg-gradient-to-r from-blue-600/60 via-purple-600/60 to-indigo-600/60 px-4 py-3 rounded-xl shadow-md">
-                <h3 className="text-2xl sm:text-3xl font-bold text-white mb-1">
-                  Choisissez votre domaine d'assistance
-                </h3>
-                <p className="text-sm text-white/90 max-w-md mx-auto">
-                  <span className="animate-blink">Exclusivement à partir des documents de la mairie.</span>
-                </p>
+            <section className="text-center -mt-6 mb-8 max-w-2xl mx-auto px-4">
+              <div className="group relative overflow-hidden rounded-3xl p-1">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-3xl animate-gradient-x opacity-80" />
+                <div className="relative bg-slate-900/95 backdrop-blur-xl rounded-[22px] px-8 py-6">
+                  <div className="flex items-center justify-center gap-3 mb-2">
+                    <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+                    <h3 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-300 via-purple-300 to-pink-300 bg-clip-text text-transparent">
+                      Choisissez votre domaine d'assistance
+                    </h3>
+                    <div className="w-2 h-2 rounded-full bg-pink-400 animate-pulse" />
+                  </div>
+                  <p className="text-sm text-white/70 max-w-md mx-auto">
+                    <span className="animate-blink">✨ Exclusivement à partir des documents de la mairie</span>
+                  </p>
+                </div>
               </div>
             </section>
 
