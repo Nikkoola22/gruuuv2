@@ -697,10 +697,10 @@ ${contexte}
     <div className="min-h-screen relative font-sans">
       <Snow />
   <div className="fixed inset-0 bg-cover bg-center bg-no-repeat z-0 filter blur-md" style={{ backgroundImage: "url('./mairie.jpeg')" }} />
-  <div className="fixed inset-0 bg-black/20 z-0" />
+  <div className="fixed inset-0 bg-gradient-to-br from-blue-50 via-white to-purple-50 z-0" />
       <PodcastPlayer />
 
-      <header className="relative bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 shadow-2xl border-b border-slate-700 z-10">
+      <header className="relative bg-white/80 backdrop-blur-xl shadow-lg border-b border-gray-200/50 z-10">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex flex-col sm:flex-row items-center gap-8 flex-grow">
             <div className="relative w-24 h-24 sm:w-28 sm:h-28 overflow-hidden rounded-lg shadow-lg border-2 border-slate-200">
@@ -712,29 +712,29 @@ ${contexte}
             </div>
             <div className="text-center sm:text-left">
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-2 tracking-tight">
-                <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
                   Atlas
                 </span>
-                <span className="text-slate-200 mx-2">•</span>
-                <span className="text-slate-100">
+                <span className="text-gray-400 mx-2">•</span>
+                <span className="text-gray-800">
                   Chatbot CFDT
                 </span>
               </h1>
-              <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-slate-300 mb-3">
-                Mairie de <span className="text-cyan-400 font-bold">GENNEVILLIERS</span>
+              <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-gray-600 mb-3">
+                Mairie de <span className="text-blue-600 font-bold">GENNEVILLIERS</span>
               </h2>
-              <div className="flex items-center justify-center sm:justify-start gap-3 text-slate-400">
-                <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
+              <div className="flex items-center justify-center sm:justify-start gap-3 text-gray-500">
+                <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
                 <span className="text-sm sm:text-base font-medium">
                   Assistant syndical pour les agents municipaux
                 </span>
-                <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
+                <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
               </div>
             </div>
           </div>
           <div className="relative shrink-0">
-            <div className="absolute -inset-3 bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 rounded-full blur-2xl opacity-80 animate-pulse"></div>
-            <div className="relative bg-white rounded-full w-28 h-28 sm:w-32 sm:h-32 shadow-2xl overflow-hidden border-2 border-slate-200">
+            <div className="absolute -inset-3 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 rounded-full blur-2xl opacity-60 animate-pulse"></div>
+            <div className="relative bg-white rounded-full w-28 h-28 sm:w-32 sm:h-32 shadow-xl overflow-hidden border-4 border-white ring-2 ring-blue-100">
               <img
                 src="./logo-cfdt.jpg"
                 alt="Logo CFDT"
@@ -746,17 +746,17 @@ ${contexte}
       </header>
 
       {/* Bandeau News FPT déplacé sous le header et en full width */}
-      <section className="relative bg-orange-300 text-black overflow-hidden w-full rounded-none shadow-lg z-10">
+      <section className="relative bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white overflow-hidden w-full shadow-lg z-10">
         <div className="relative h-20 flex items-center overflow-hidden">
-            <div className="absolute left-0 top-0 h-full w-40 flex items-center justify-center bg-orange-400 z-20 shadow-md">
-            <span className="text-2xl font-bold">NEWS FPT:</span>
+            <div className="absolute left-0 top-0 h-full w-40 flex items-center justify-center bg-white/20 backdrop-blur-sm z-20">
+            <span className="text-xl font-bold text-white">📰 NEWS FPT</span>
           </div>
               <div className="animate-marquee whitespace-nowrap flex items-center pl-44" style={{ animation: "marquee 45s linear infinite" }}>
             {[...infoItems, ...infoItems].map((info, idx) => (
               <button
                 key={`${info.id}-${idx}`}
                 onClick={() => setSelectedInfo(info)}
-                className="text-2xl font-medium mx-8 hover:text-blue-200 transition-colors underline decoration-dotted cursor-pointer"
+                className="text-lg font-medium mx-8 hover:text-yellow-300 transition-all duration-300 hover:scale-105 cursor-pointer"
               >
                 #{info.id}: {info.title}
               </button>
@@ -822,19 +822,20 @@ ${contexte}
         ) : chatState.currentView === "menu" ? (
           <>
 
-            <section className="text-center -mt-6 mb-8 max-w-2xl mx-auto px-4">
-              <div className="group relative overflow-hidden rounded-3xl p-1">
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-3xl animate-gradient-x opacity-80" />
-                <div className="relative bg-slate-900/95 backdrop-blur-xl rounded-[22px] px-8 py-6">
-                  <div className="flex items-center justify-center gap-3 mb-2">
-                    <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
-                    <h3 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-300 via-purple-300 to-pink-300 bg-clip-text text-transparent">
-                      Choisissez votre domaine d'assistance
-                    </h3>
-                    <div className="w-2 h-2 rounded-full bg-pink-400 animate-pulse" />
+            <section className="text-center -mt-2 mb-10 max-w-3xl mx-auto px-4">
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-200 via-purple-200 to-pink-200 rounded-3xl blur-xl opacity-50 animate-pulse" />
+                <div className="relative bg-white/70 backdrop-blur-sm rounded-3xl px-8 py-8 shadow-xl border border-white/50">
+                  <div className="flex items-center justify-center gap-4 mb-3">
+                    <div className="h-px w-12 bg-gradient-to-r from-transparent via-blue-400 to-blue-400" />
+                    <span className="text-3xl">🎯</span>
+                    <div className="h-px w-12 bg-gradient-to-r from-purple-400 via-purple-400 to-transparent" />
                   </div>
-                  <p className="text-sm text-white/70 max-w-md mx-auto">
-                    <span className="animate-blink">✨ Exclusivement à partir des documents de la mairie</span>
+                  <h3 className="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-3">
+                    Choisissez votre domaine
+                  </h3>
+                  <p className="text-base text-gray-600 max-w-md mx-auto">
+                    ✨ Assistance personnalisée basée sur les documents officiels
                   </p>
                 </div>
               </div>
@@ -843,20 +844,19 @@ ${contexte}
             <div className="relative w-full flex items-center justify-center mb-12">
                             {/* Mobile layout: vertical stacking */}
               <div className="md:hidden w-full flex flex-col items-center gap-6">
-                {/* PRIMES button - Modern Glass Design */}
+                {/* PRIMES button - Light Modern Design */}
                 <button 
                   onClick={() => { if (!isPrimesBlocked) setShowCalculator(true); }}
                   disabled={isPrimesBlocked}
-                  className={`group relative overflow-hidden rounded-3xl p-1 transition-all duration-500 ${isPrimesBlocked ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105 hover:shadow-2xl'}`}
+                  className={`group relative overflow-hidden rounded-3xl transition-all duration-500 ${isPrimesBlocked ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105 hover:shadow-2xl hover:-translate-y-1'}`}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 rounded-3xl animate-gradient-x" />
-                  <div className="relative bg-slate-900/90 backdrop-blur-xl rounded-[22px] p-6 flex flex-col items-center gap-4">
-                    <div className={`relative p-4 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-2xl shadow-xl transition-transform duration-300 ${!isPrimesBlocked ? 'group-hover:rotate-6 group-hover:scale-110' : ''}`}>
+                  <div className="absolute inset-0 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-3xl" />
+                  <div className="relative bg-white/90 backdrop-blur-sm rounded-3xl p-6 m-[2px] flex flex-col items-center gap-3 shadow-inner">
+                    <div className={`relative p-4 bg-gradient-to-br from-emerald-500 to-cyan-600 rounded-2xl shadow-lg transition-all duration-300 ${!isPrimesBlocked ? 'group-hover:rotate-6 group-hover:scale-110 group-hover:shadow-emerald-300/50 group-hover:shadow-xl' : ''}`}>
                       <TrendingUp className="w-8 h-8 text-white" />
-                      <div className="absolute inset-0 bg-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     </div>
-                    <span className="text-lg font-bold text-white tracking-wide">PRIMES</span>
-                    <span className="text-xs text-cyan-300/80">Calculateurs & Grilles</span>
+                    <span className="text-lg font-bold text-gray-800 tracking-wide">PRIMES</span>
+                    <span className="text-xs text-emerald-600 font-medium">Calculateurs & Grilles</span>
                   </div>
                 </button>
 
@@ -877,19 +877,18 @@ ${contexte}
                   </div>
                 </button>
 
-                {/* Questions fréquentes button - Modern Glass Design */}
+                {/* Questions fréquentes button - Light Modern Design */}
                 <button 
                   onClick={() => setChatState(p => ({ ...p, currentView: 'public' }))}
-                  className="group relative overflow-hidden rounded-3xl p-1 transition-all duration-500 hover:scale-105 hover:shadow-2xl"
+                  className="group relative overflow-hidden rounded-3xl transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:-translate-y-1"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-orange-400 via-pink-500 to-purple-600 rounded-3xl animate-gradient-x" />
-                  <div className="relative bg-slate-900/90 backdrop-blur-xl rounded-[22px] p-6 flex flex-col items-center gap-4">
-                    <div className="relative p-4 bg-gradient-to-br from-orange-400 to-pink-600 rounded-2xl shadow-xl transition-transform duration-300 group-hover:rotate-6 group-hover:scale-110">
+                  <div className="absolute inset-0 bg-gradient-to-br from-orange-400 to-rose-500 rounded-3xl" />
+                  <div className="relative bg-white/90 backdrop-blur-sm rounded-3xl p-6 m-[2px] flex flex-col items-center gap-3 shadow-inner">
+                    <div className="relative p-4 bg-gradient-to-br from-orange-500 to-rose-600 rounded-2xl shadow-lg transition-all duration-300 group-hover:rotate-6 group-hover:scale-110 group-hover:shadow-orange-300/50 group-hover:shadow-xl">
                       <Sparkles className="w-8 h-8 text-white" />
-                      <div className="absolute inset-0 bg-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     </div>
-                    <span className="text-lg font-bold text-white tracking-wide">FAQ</span>
-                    <span className="text-xs text-orange-300/80">Questions fréquentes</span>
+                    <span className="text-lg font-bold text-gray-800 tracking-wide">FAQ</span>
+                    <span className="text-xs text-orange-600 font-medium">Questions fréquentes</span>
                   </div>
                 </button>
               </div>
@@ -928,21 +927,20 @@ ${contexte}
                   <div className="w-44 h-44 rounded-full bg-white shadow-lg" />
                 </div>
 
-                {/* PRIMES Window on the left - Modern Glass Design */}
-                <div className="absolute left-24 top-1/2 transform -translate-y-1/2 z-30">
+                {/* PRIMES Window on the left - Light Modern Design */}
+                <div className="absolute left-16 top-1/2 transform -translate-y-1/2 z-30">
                   <button 
                     onClick={() => { if (!isPrimesBlocked) setShowCalculator(true); }}
                     disabled={isPrimesBlocked}
-                    className={`group relative overflow-hidden rounded-3xl p-1 transition-all duration-500 ${isPrimesBlocked ? 'opacity-50 cursor-not-allowed' : 'hover:scale-110 hover:shadow-2xl'}`}
+                    className={`group relative overflow-hidden rounded-3xl transition-all duration-500 ${isPrimesBlocked ? 'opacity-50 cursor-not-allowed' : 'hover:scale-110 hover:shadow-2xl hover:-translate-y-2'}`}
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 rounded-3xl animate-gradient-x" />
-                    <div className="relative bg-slate-900/90 backdrop-blur-xl rounded-[22px] p-6 flex flex-col items-center gap-4 min-w-[140px]">
-                      <div className={`relative p-4 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-2xl shadow-xl transition-transform duration-300 ${!isPrimesBlocked ? 'group-hover:rotate-6 group-hover:scale-110' : ''}`}>
+                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-3xl" />
+                    <div className="relative bg-white/95 backdrop-blur-sm rounded-3xl p-6 m-[2px] flex flex-col items-center gap-4 min-w-[160px] shadow-inner">
+                      <div className={`relative p-5 bg-gradient-to-br from-emerald-500 to-cyan-600 rounded-2xl shadow-lg transition-all duration-300 ${!isPrimesBlocked ? 'group-hover:rotate-6 group-hover:scale-110 group-hover:shadow-emerald-300/50 group-hover:shadow-xl' : ''}`}>
                         <TrendingUp className="w-10 h-10 text-white" />
-                        <div className="absolute inset-0 bg-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                       </div>
-                      <span className="text-xl font-bold text-white tracking-wide">PRIMES</span>
-                      <span className="text-xs text-cyan-300/80">Calculateurs & Grilles</span>
+                      <span className="text-xl font-bold text-gray-800 tracking-wide">PRIMES</span>
+                      <span className="text-sm text-emerald-600 font-medium">Calculateurs & Grilles</span>
                     </div>
                   </button>
                 </div>
@@ -966,20 +964,19 @@ ${contexte}
                   </button>
                 </div>
 
-                {/* Questions fréquentes on the right - Modern Glass Design */}
-                <div className="absolute right-24 top-1/2 transform -translate-y-1/2 z-30">
+                {/* Questions fréquentes on the right - Light Modern Design */}
+                <div className="absolute right-16 top-1/2 transform -translate-y-1/2 z-30">
                   <button 
                     onClick={() => setChatState(p => ({ ...p, currentView: 'public' }))}
-                    className="group relative overflow-hidden rounded-3xl p-1 transition-all duration-500 hover:scale-110 hover:shadow-2xl"
+                    className="group relative overflow-hidden rounded-3xl transition-all duration-500 hover:scale-110 hover:shadow-2xl hover:-translate-y-2"
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-orange-400 via-pink-500 to-purple-600 rounded-3xl animate-gradient-x" />
-                    <div className="relative bg-slate-900/90 backdrop-blur-xl rounded-[22px] p-6 flex flex-col items-center gap-4 min-w-[140px]">
-                      <div className="relative p-4 bg-gradient-to-br from-orange-400 to-pink-600 rounded-2xl shadow-xl transition-transform duration-300 group-hover:rotate-6 group-hover:scale-110">
+                    <div className="absolute inset-0 bg-gradient-to-br from-orange-400 to-rose-500 rounded-3xl" />
+                    <div className="relative bg-white/95 backdrop-blur-sm rounded-3xl p-6 m-[2px] flex flex-col items-center gap-4 min-w-[160px] shadow-inner">
+                      <div className="relative p-5 bg-gradient-to-br from-orange-500 to-rose-600 rounded-2xl shadow-lg transition-all duration-300 group-hover:rotate-6 group-hover:scale-110 group-hover:shadow-orange-300/50 group-hover:shadow-xl">
                         <Sparkles className="w-10 h-10 text-white" />
-                        <div className="absolute inset-0 bg-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                       </div>
-                      <span className="text-xl font-bold text-white tracking-wide">FAQ</span>
-                      <span className="text-xs text-orange-300/80">Questions fréquentes</span>
+                      <span className="text-xl font-bold text-gray-800 tracking-wide">FAQ</span>
+                      <span className="text-sm text-orange-600 font-medium">Questions fréquentes</span>
                     </div>
                   </button>
                 </div>
@@ -993,40 +990,58 @@ ${contexte}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
               <button
                 onClick={() => handleDomainSelection(0)}
-                className="group relative overflow-hidden bg-orange-100/70 border-2 border-orange-200 rounded-3xl p-8 transition-all duration-500 hover:bg-orange-100 hover:border-orange-400 hover:shadow-2xl hover:-translate-y-2"
+                className="group relative bg-white rounded-3xl p-8 transition-all duration-500 hover:shadow-2xl hover:-translate-y-3 border border-gray-100 shadow-lg overflow-hidden"
               >
-                <div className="relative z-10 flex flex-col items-center gap-6">
-                  <div className="relative p-6 bg-gradient-to-br from-orange-500 to-red-600 rounded-3xl shadow-xl group-hover:rotate-3 group-hover:scale-110 transition-transform">
-                    <Clock className="w-12 h-12 text-white" />
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-400 via-red-500 to-pink-500" />
+                <div className="absolute inset-0 bg-gradient-to-br from-orange-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative z-10 flex flex-col items-center gap-5">
+                  <div className="relative p-5 bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl shadow-lg group-hover:scale-110 group-hover:rotate-3 group-hover:shadow-orange-300/50 group-hover:shadow-xl transition-all duration-300">
+                    <Clock className="w-10 h-10 text-white" />
                   </div>
-                  <h4 className="text-2xl font-bold text-gray-800 group-hover:text-orange-700">Temps de Travail</h4>
-                  <p className="text-center text-gray-600">Horaires, congés, ARTT, temps partiel, absences…</p>
+                  <h4 className="text-xl font-bold text-gray-800 group-hover:text-orange-600 transition-colors">Temps de Travail</h4>
+                  <p className="text-center text-gray-500 text-sm">Horaires, congés, ARTT, temps partiel, absences…</p>
+                  <div className="flex items-center gap-2 text-orange-500 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+                    <span className="text-sm font-medium">Explorer</span>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"/></svg>
+                  </div>
                 </div>
               </button>
 
               <button
                 onClick={() => handleDomainSelection(1)}
-                className="group relative overflow-hidden bg-purple-100/70 border-2 border-purple-200 rounded-3xl p-8 transition-all duration-500 hover:bg-purple-100 hover:border-purple-400 hover:shadow-2xl hover:-translate-y-2"
+                className="group relative bg-white rounded-3xl p-8 transition-all duration-500 hover:shadow-2xl hover:-translate-y-3 border border-gray-100 shadow-lg overflow-hidden"
               >
-                <div className="relative z-10 flex flex-col items-center gap-6">
-                  <div className="relative p-6 bg-gradient-to-br from-purple-500 to-blue-600 rounded-3xl shadow-xl group-hover:rotate-3 group-hover:scale-110 transition-transform">
-                    <GraduationCap className="w-12 h-12 text-white" />
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-400 via-indigo-500 to-blue-500" />
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative z-10 flex flex-col items-center gap-5">
+                  <div className="relative p-5 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl shadow-lg group-hover:scale-110 group-hover:rotate-3 group-hover:shadow-purple-300/50 group-hover:shadow-xl transition-all duration-300">
+                    <GraduationCap className="w-10 h-10 text-white" />
                   </div>
-                  <h4 className="text-2xl font-bold text-gray-800 group-hover:text-purple-700">Formation</h4>
-                  <p className="text-center text-gray-600">CPF, VAE, concours, bilans de compétences…</p>
+                  <h4 className="text-xl font-bold text-gray-800 group-hover:text-purple-600 transition-colors">Formation</h4>
+                  <p className="text-center text-gray-500 text-sm">CPF, VAE, concours, bilans de compétences…</p>
+                  <div className="flex items-center gap-2 text-purple-500 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+                    <span className="text-sm font-medium">Explorer</span>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"/></svg>
+                  </div>
                 </div>
               </button>
               
               <button
                 onClick={() => handleDomainSelection(2)}
-                className="group relative overflow-hidden bg-green-100/70 border-2 border-green-200 rounded-3xl p-8 transition-all duration-500 hover:bg-green-100 hover:border-green-400 hover:shadow-2xl hover:-translate-y-2"
+                className="group relative bg-white rounded-3xl p-8 transition-all duration-500 hover:shadow-2xl hover:-translate-y-3 border border-gray-100 shadow-lg overflow-hidden"
               >
-                <div className="relative z-10 flex flex-col items-center gap-6">
-                  <div className="relative p-6 bg-gradient-to-br from-green-500 to-teal-600 rounded-3xl shadow-xl group-hover:rotate-3 group-hover:scale-110 transition-transform">
-                    <Home className="w-12 h-12 text-white" />
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-500" />
+                <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative z-10 flex flex-col items-center gap-5">
+                  <div className="relative p-5 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl shadow-lg group-hover:scale-110 group-hover:rotate-3 group-hover:shadow-emerald-300/50 group-hover:shadow-xl transition-all duration-300">
+                    <Home className="w-10 h-10 text-white" />
                   </div>
-                  <h4 className="text-2xl font-bold text-gray-800 group-hover:text-green-700">Télétravail</h4>
-                  <p className="text-center text-gray-600">Charte, jours autorisés, indemnités, modalités…</p>
+                  <h4 className="text-xl font-bold text-gray-800 group-hover:text-emerald-600 transition-colors">Télétravail</h4>
+                  <p className="text-center text-gray-500 text-sm">Charte, jours autorisés, indemnités, modalités…</p>
+                  <div className="flex items-center gap-2 text-emerald-500 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+                    <span className="text-sm font-medium">Explorer</span>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"/></svg>
+                  </div>
                 </div>
               </button>
             </div>
