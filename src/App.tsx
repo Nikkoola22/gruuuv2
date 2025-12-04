@@ -29,6 +29,7 @@ import {
   Shield,
   CheckCircle,
   Zap,
+  HelpCircle,
 } from "lucide-react";
 
 import { sommaire } from "./data/sommaire.ts";
@@ -41,7 +42,6 @@ import LoginModal from "./components/LoginModal";
 import FAQ from "./pages/FAQ";
 import Quiz from "./pages/Quiz";
 import Calculateurs from "./pages/Calculateurs";
-import Snow from "./components/Snow";
 
 interface ChatMessage {
   type: "user" | "assistant";
@@ -695,21 +695,16 @@ ${contexte}
 
   return (
     <div className="min-h-screen relative font-sans">
-      <Snow />
-  <div className="fixed inset-0 bg-cover bg-center bg-no-repeat z-0 filter blur-md" style={{ backgroundImage: "url('./mairie.jpeg')" }} />
-  <div className="fixed inset-0 bg-gradient-to-br from-blue-50 via-white to-purple-50 z-0" />
+  <div className="fixed inset-0 bg-cover bg-center bg-no-repeat z-0" style={{ backgroundImage: "url('./unnamed.jpg')" }} />
+  <div className="fixed inset-0 bg-gradient-to-br from-blue-50/70 via-white/70 to-purple-50/70 z-0" />
       <PodcastPlayer />
 
-      <header className="relative bg-white/80 backdrop-blur-xl shadow-lg border-b border-gray-200/50 z-10">
+      <header className="relative bg-white/80 backdrop-blur-xl shadow-lg border-b border-gray-200/50 z-10 overflow-hidden">
+        {/* Image mairie en arrière-plan du header */}
+        <div className="absolute inset-0 bg-cover bg-center opacity-10" style={{ backgroundImage: "url('./mairie.jpeg')" }} />
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex flex-col sm:flex-row items-center gap-8 flex-grow">
-            <div className="relative w-24 h-24 sm:w-28 sm:h-28 overflow-hidden rounded-lg shadow-lg border-2 border-slate-200">
-              <img
-                src="./deco.jpg"
-                alt="Décoration"
-                className="w-full h-full object-cover"
-              />
-            </div>
+            
             <div className="text-center sm:text-left">
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-2 tracking-tight">
                 <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
@@ -803,7 +798,7 @@ ${contexte}
           }
         `}</style>
       </section>
-  <main className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 z-10">
+  <main className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 z-10">
         {selectedInfo && (
           <section className="info-detail bg-white/95 backdrop-blur-sm p-6 rounded-lg shadow-md mb-8 max-w-4xl mx-auto">
             <h3 className="text-xl font-bold mb-4">{selectedInfo.title}</h3>
@@ -822,44 +817,9 @@ ${contexte}
         ) : chatState.currentView === "menu" ? (
           <>
 
-            <section className="text-center -mt-2 mb-10 max-w-3xl mx-auto px-4">
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-200 via-purple-200 to-pink-200 rounded-3xl blur-xl opacity-50 animate-pulse" />
-                <div className="relative bg-white/70 backdrop-blur-sm rounded-3xl px-8 py-8 shadow-xl border border-white/50">
-                  <div className="flex items-center justify-center gap-4 mb-3">
-                    <div className="h-px w-12 bg-gradient-to-r from-transparent via-blue-400 to-blue-400" />
-                    <span className="text-3xl">🎯</span>
-                    <div className="h-px w-12 bg-gradient-to-r from-purple-400 via-purple-400 to-transparent" />
-                  </div>
-                  <h3 className="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-3">
-                    Choisissez votre domaine
-                  </h3>
-                  <p className="text-base text-gray-600 max-w-md mx-auto">
-                    ✨ Assistance personnalisée basée sur les documents officiels
-                  </p>
-                </div>
-              </div>
-            </section>
-
-            <div className="relative w-full flex items-center justify-center mb-12">
+            <div className="relative w-full flex items-center justify-center mb-2">
                             {/* Mobile layout: vertical stacking */}
-              <div className="md:hidden w-full flex flex-col items-center gap-6">
-                {/* PRIMES button - Light Modern Design */}
-                <button 
-                  onClick={() => { if (!isPrimesBlocked) setShowCalculator(true); }}
-                  disabled={isPrimesBlocked}
-                  className={`group relative overflow-hidden rounded-3xl transition-all duration-500 ${isPrimesBlocked ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105 hover:shadow-2xl hover:-translate-y-1'}`}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-3xl" />
-                  <div className="relative bg-white/90 backdrop-blur-sm rounded-3xl p-6 m-[2px] flex flex-col items-center gap-3 shadow-inner">
-                    <div className={`relative p-4 bg-gradient-to-br from-emerald-500 to-cyan-600 rounded-2xl shadow-lg transition-all duration-300 ${!isPrimesBlocked ? 'group-hover:rotate-6 group-hover:scale-110 group-hover:shadow-emerald-300/50 group-hover:shadow-xl' : ''}`}>
-                      <TrendingUp className="w-8 h-8 text-white" />
-                    </div>
-                    <span className="text-lg font-bold text-gray-800 tracking-wide">PRIMES</span>
-                    <span className="text-xs text-emerald-600 font-medium">Calculateurs & Grilles</span>
-                  </div>
-                </button>
-
+              <div className="md:hidden w-full flex flex-col items-center gap-2">
                 {/* QUIZZ button */}
                 <button onClick={() => setChatState(p => ({ ...p, currentView: 'quiz' }))} aria-label="Ouvrir QUIZZ" className="focus:outline-none">
                   <div className="w-32 h-32">
@@ -874,21 +834,6 @@ ${contexte}
                       <polygon points="50,3 61,36 98,36 67,57 78,91 50,70 22,91 33,57 2,36 39,36" fill="url(#gStar)" />
                       <text x="50%" y="56%" textAnchor="middle" dominantBaseline="middle" fontSize="26" fontWeight="700" fill="#3B2F00" stroke="#3B2F00" strokeWidth="1.0" paintOrder="stroke fill" letterSpacing="-0.45">QUIZZ</text>
                     </svg>
-                  </div>
-                </button>
-
-                {/* Questions fréquentes button - Light Modern Design */}
-                <button 
-                  onClick={() => setChatState(p => ({ ...p, currentView: 'public' }))}
-                  className="group relative overflow-hidden rounded-3xl transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:-translate-y-1"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-br from-orange-400 to-rose-500 rounded-3xl" />
-                  <div className="relative bg-white/90 backdrop-blur-sm rounded-3xl p-6 m-[2px] flex flex-col items-center gap-3 shadow-inner">
-                    <div className="relative p-4 bg-gradient-to-br from-orange-500 to-rose-600 rounded-2xl shadow-lg transition-all duration-300 group-hover:rotate-6 group-hover:scale-110 group-hover:shadow-orange-300/50 group-hover:shadow-xl">
-                      <Sparkles className="w-8 h-8 text-white" />
-                    </div>
-                    <span className="text-lg font-bold text-gray-800 tracking-wide">FAQ</span>
-                    <span className="text-xs text-orange-600 font-medium">Questions fréquentes</span>
                   </div>
                 </button>
               </div>
@@ -921,29 +866,13 @@ ${contexte}
               `}</style>
 
               {/* Desktop layout: absolute positioning */}
-              <div className="hidden md:block relative w-full min-h-[350px] h-[350px]">
+              <div className="hidden md:block relative w-full min-h-[180px] h-[180px]">
                 {/* fixed white circle behind the star (non-interactive) */}
                 <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none z-20">
                   <div className="w-44 h-44 rounded-full bg-white shadow-lg" />
                 </div>
 
-                {/* PRIMES Window on the left - Light Modern Design */}
-                <div className="absolute left-16 top-1/2 transform -translate-y-1/2 z-30">
-                  <button 
-                    onClick={() => { if (!isPrimesBlocked) setShowCalculator(true); }}
-                    disabled={isPrimesBlocked}
-                    className={`group relative overflow-hidden rounded-3xl transition-all duration-500 ${isPrimesBlocked ? 'opacity-50 cursor-not-allowed' : 'hover:scale-110 hover:shadow-2xl hover:-translate-y-2'}`}
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-3xl" />
-                    <div className="relative bg-white/95 backdrop-blur-sm rounded-3xl p-6 m-[2px] flex flex-col items-center gap-4 min-w-[160px] shadow-inner">
-                      <div className={`relative p-5 bg-gradient-to-br from-emerald-500 to-cyan-600 rounded-2xl shadow-lg transition-all duration-300 ${!isPrimesBlocked ? 'group-hover:rotate-6 group-hover:scale-110 group-hover:shadow-emerald-300/50 group-hover:shadow-xl' : ''}`}>
-                        <TrendingUp className="w-10 h-10 text-white" />
-                      </div>
-                      <span className="text-xl font-bold text-gray-800 tracking-wide">PRIMES</span>
-                      <span className="text-sm text-emerald-600 font-medium">Calculateurs & Grilles</span>
-                    </div>
-                  </button>
-                </div>
+                
 
                 {/* Center the QUIZZ star */}
                 <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-30">
@@ -964,30 +893,29 @@ ${contexte}
                   </button>
                 </div>
 
-                {/* Questions fréquentes on the right - Light Modern Design */}
-                <div className="absolute right-16 top-1/2 transform -translate-y-1/2 z-30">
-                  <button 
-                    onClick={() => setChatState(p => ({ ...p, currentView: 'public' }))}
-                    className="group relative overflow-hidden rounded-3xl transition-all duration-500 hover:scale-110 hover:shadow-2xl hover:-translate-y-2"
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-br from-orange-400 to-rose-500 rounded-3xl" />
-                    <div className="relative bg-white/95 backdrop-blur-sm rounded-3xl p-6 m-[2px] flex flex-col items-center gap-4 min-w-[160px] shadow-inner">
-                      <div className="relative p-5 bg-gradient-to-br from-orange-500 to-rose-600 rounded-2xl shadow-lg transition-all duration-300 group-hover:rotate-6 group-hover:scale-110 group-hover:shadow-orange-300/50 group-hover:shadow-xl">
-                        <Sparkles className="w-10 h-10 text-white" />
-                      </div>
-                      <span className="text-xl font-bold text-gray-800 tracking-wide">FAQ</span>
-                      <span className="text-sm text-orange-600 font-medium">Questions fréquentes</span>
-                    </div>
-                  </button>
-                </div>
-
                 {/* Spacer for layout */}
-                <div className="h-64" />
+                <div className="h-8" />
               </div>
             </div>
 
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+            
+            {/* Bouton PRIMES - au-dessus des 3 icônes */}
+            <div className="w-full flex justify-center mb-2">
+              <button 
+                onClick={() => { if (!isPrimesBlocked) setShowCalculator(true); }}
+                disabled={isPrimesBlocked}
+                className="group relative px-8 py-4 bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-500 rounded-full shadow-lg hover:shadow-xl hover:shadow-emerald-500/30 transition-all duration-300 hover:scale-105 hover:-translate-y-1"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-emerald-300 via-teal-300 to-cyan-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="relative flex items-center gap-3">
+                  <TrendingUp className="w-6 h-6 text-emerald-900" />
+                  <span className="text-lg font-bold text-emerald-900">PRIMES - Calculateurs & Grilles</span>
+                </div>
+              </button>
+            </div>
+
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
               <button
                 onClick={() => handleDomainSelection(0)}
                 className="group relative bg-white rounded-3xl p-8 transition-all duration-500 hover:shadow-2xl hover:-translate-y-3 border border-gray-100 shadow-lg overflow-hidden"
@@ -1165,8 +1093,23 @@ ${contexte}
         )}
       </main>
 
-      {/* Bandeau Flux RSS — full width, collé au-dessus du footer (fond bleu) */}
-  <section className="w-full bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white z-10">
+
+      {/* Bouton FAQ jaune au-dessus du footer */}
+      <div className="w-full flex justify-center py-4 bg-gradient-to-b from-transparent to-slate-900/20">
+        <button 
+          onClick={() => setChatState(p => ({ ...p, currentView: 'public' }))}
+          className="group relative px-8 py-4 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 rounded-full shadow-lg hover:shadow-xl hover:shadow-amber-500/30 transition-all duration-300 hover:scale-105 hover:-translate-y-1"
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-amber-300 via-yellow-300 to-amber-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="relative flex items-center gap-3">
+            <HelpCircle className="w-6 h-6 text-amber-900" />
+            <span className="text-lg font-bold text-amber-900">FAQ - Questions fréquentes</span>
+          </div>
+        </button>
+      </div>
+
+      {/* Bandeau Flux RSS */}
+      <section className="w-full bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white z-10">
         <div className="w-full px-0">
           <div className="relative bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white overflow-hidden w-full rounded-none shadow-none z-10">
             <div className="relative h-20 flex items-center overflow-hidden">
@@ -1309,7 +1252,7 @@ ${contexte}
           </div>
         </div>
       </footer>
-      
+
       <LoginModal
         isOpen={showLoginModal}
         onClose={() => setShowLoginModal(false)}
