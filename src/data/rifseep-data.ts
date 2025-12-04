@@ -758,7 +758,7 @@ export const ifse2Data: IFSE2Data[] = [
   {
     motif: 'Forfait HS',
     amount: 121.96,
-    jobs: ['Chefs d\'équipe'],
+    jobs: ['Chef d\'équipe'],
     direction: 'DE',
     service: 'GP'
   },
@@ -1075,3 +1075,9 @@ export const getDirectionFullName = (directionCode: string): string => {
   
   return directionNames[directionCode] || directionCode;
 };
+
+export const getServicesByDirection = (direction: string): string[] => {
+  const primes = getIFSE2ByDirection(direction)
+  const services = primes.map(p => p.service).filter((s): s is string => !!s && s !== '')
+  return [...new Set(services)].sort()
+}

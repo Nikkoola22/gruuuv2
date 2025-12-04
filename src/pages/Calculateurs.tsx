@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { ArrowLeft, TrendingUp, Calculator, DollarSign, BookOpen, Sparkles, CheckCircle2 } from 'lucide-react'
-import CalculateurPrimes from '../components/CalculateurPrimes'
-import CalculateurCIA from '../components/CalculateurCIA'
-import Calculateur13eme from '../components/Calculateur13eme'
+import CalculateurPrimesV2 from '../components/CalculateurPrimesV2'
+import CalculateurCIAV2 from '../components/CalculateurCIAV2'
+import Calculateur13emeV2 from '../components/Calculateur13emeV2'
 import Metiers from './Metiers'
 
 interface CalculateursProps {
@@ -54,15 +54,15 @@ export default function Calculateurs({ onBack }: CalculateursProps) {
   }
 
   if (selectedCalculator === 'primes') {
-    return <CalculateurPrimes onClose={() => setSelectedCalculator(null)} />
+    return <CalculateurPrimesV2 onClose={() => setSelectedCalculator(null)} />
   }
 
   if (selectedCalculator === 'cia') {
-    return <CalculateurCIA onClose={() => setSelectedCalculator(null)} />
+    return <CalculateurCIAV2 onClose={() => setSelectedCalculator(null)} />
   }
 
   if (selectedCalculator === '13eme') {
-    return <Calculateur13eme onClose={() => setSelectedCalculator(null)} />
+    return <Calculateur13emeV2 onClose={() => setSelectedCalculator(null)} />
   }
 
   if (selectedCalculator === 'metiers') {
@@ -104,25 +104,25 @@ export default function Calculateurs({ onBack }: CalculateursProps) {
               <button
                 key={calc.id}
                 onClick={() => openCalculator(calc.id)}
-                className={`group relative overflow-hidden rounded-2xl p-1 transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl \${calc.color.glow}`}
+                className={`group relative overflow-hidden rounded-2xl p-1 transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl ${calc.color.glow}`}
               >
                 {/* Bordure animée */}
-                <div className={`absolute inset-0 bg-gradient-to-r \${calc.color.bg} rounded-2xl animate-gradient-x opacity-80`} />
+                <div className={`absolute inset-0 bg-gradient-to-r ${calc.color.bg} rounded-2xl animate-gradient-x opacity-80`} />
                 
                 {/* Contenu */}
                 <div className="relative bg-slate-900/95 backdrop-blur-xl rounded-[14px] p-6 h-full flex flex-col">
                   <div className="flex items-start justify-between mb-4">
-                    <div className={`p-4 bg-gradient-to-br \${calc.color.bg} rounded-xl shadow-lg transition-transform duration-300 group-hover:rotate-6 group-hover:scale-110`}>
+                    <div className={`p-4 bg-gradient-to-br ${calc.color.bg} rounded-xl shadow-lg transition-transform duration-300 group-hover:rotate-6 group-hover:scale-110`}>
                       <Icon className="w-8 h-8 text-white" />
                     </div>
-                    <div className={`px-3 py-1 rounded-full text-xs font-medium \${calc.color.text} bg-slate-700/50 border \${calc.color.border}`}>
+                    <div className={`px-3 py-1 rounded-full text-xs font-medium ${calc.color.text} bg-slate-700/50 border ${calc.color.border}`}>
                       Actif
                     </div>
                   </div>
                   
                   <div className="flex-1">
                     <h3 className="text-xl font-bold text-white mb-1">{calc.title}</h3>
-                    <p className={`text-sm font-medium \${calc.color.text} mb-2`}>{calc.subtitle}</p>
+                    <p className={`text-sm font-medium ${calc.color.text} mb-2`}>{calc.subtitle}</p>
                     <p className="text-slate-400 text-sm">{calc.description}</p>
                   </div>
                   
