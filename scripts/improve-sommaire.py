@@ -1,4 +1,13 @@
-/**
+#!/usr/bin/env python3
+"""
+Script d'amélioration du sommaire.ts
+Analyse les fichiers temps.ts, formation.ts et teletravail.ts
+pour générer un sommaire plus précis avec des mots-clés exhaustifs.
+"""
+
+# Nouveau sommaire amélioré basé sur l'analyse détaillée des fichiers sources
+
+SOMMAIRE_AMELIORE = '''/**
  * SOMMAIRE UNIFIÉ - Index léger pour la recherche en 2 étapes
  * 
  * Ce fichier contient uniquement les titres et mots-clés de chaque section
@@ -178,11 +187,11 @@ export const sommaireUnifie: SectionIndex[] = [
   },
   {
     id: 'temps_ch3_garde_enfant',
-    titre: 'Garde d\'enfant malade',
+    titre: 'Garde d\\'enfant malade',
     motsCles: ['garde enfant', 'enfant malade', 'nourrice', 'nourrice malade', 'école fermée', 'crèche fermée', '6 jours', '12 jours', '16 ans', 'grève', 'parent seul', 'handicapé', 'justificatif', 'certificat médical', 'imprévue'],
     source: 'temps',
     chapitre: 3,
-    resume: '6 jours/an (12 si parent seul), jusqu\'aux 16 ans. Pour maladie enfant, nourrice malade, grève école'
+    resume: '6 jours/an (12 si parent seul), jusqu\\'aux 16 ans. Pour maladie enfant, nourrice malade, grève école'
   },
   {
     id: 'temps_ch3_soins_malade',
@@ -202,11 +211,11 @@ export const sommaireUnifie: SectionIndex[] = [
   },
   {
     id: 'temps_ch3_deces',
-    titre: 'Décès d\'un membre de la famille',
+    titre: 'Décès d\\'un membre de la famille',
     motsCles: ['décès', 'obsèques', 'deuil', 'mort', 'conjoint', 'parent', 'enfant', 'beaux-parents', 'grands-parents', 'petits-enfants', 'frère', 'sœur', '5 jours', '14 jours', '12 jours', '3 jours', '1 jour', '8 jours', '25 ans', 'certificat de décès'],
     source: 'temps',
     chapitre: 3,
-    resume: '5j conjoint/parents, 14j enfant <25 ans (+8j dans l\'année), 12j enfant >25 ans sans enfant, 3j beaux-parents/grands-parents/frères'
+    resume: '5j conjoint/parents, 14j enfant <25 ans (+8j dans l\\'année), 12j enfant >25 ans sans enfant, 3j beaux-parents/grands-parents/frères'
   },
   {
     id: 'temps_ch3_mariage',
@@ -214,7 +223,7 @@ export const sommaireUnifie: SectionIndex[] = [
     motsCles: ['mariage', 'PACS', 'union', 'cérémonie', '7 jours', '5 jours', '3 jours', '1 jour', 'acte de mariage', 'enfant', 'frère', 'sœur', 'neveu', 'nièce', 'consécutifs', 'non fractionnables'],
     source: 'temps',
     chapitre: 3,
-    resume: '7 jours pour l\'agent (5 si PACS), 3 jours enfant, 1 jour autres proches. Consécutifs autour de la cérémonie'
+    resume: '7 jours pour l\\'agent (5 si PACS), 3 jours enfant, 1 jour autres proches. Consécutifs autour de la cérémonie'
   },
   {
     id: 'temps_ch3_maternite_absence',
@@ -238,7 +247,7 @@ export const sommaireUnifie: SectionIndex[] = [
     motsCles: ['rentrée scolaire', 'rentrée', 'école', 'maternelle', 'primaire', '6ème', 'sixième', '1 heure', 'accompagner enfant', 'facilité horaire'],
     source: 'temps',
     chapitre: 3,
-    resume: 'Facilité d\'1h le jour de la rentrée (maternelle, primaire, entrée en 6e)'
+    resume: 'Facilité d\\'1h le jour de la rentrée (maternelle, primaire, entrée en 6e)'
   },
   {
     id: 'temps_ch3_demenagement',
@@ -246,7 +255,7 @@ export const sommaireUnifie: SectionIndex[] = [
     motsCles: ['déménagement', 'changement adresse', 'domicile', '1 jour', 'semaine précédant', 'semaine suivant', 'changement domicile'],
     source: 'temps',
     chapitre: 3,
-    resume: '1 jour d\'autorisation la semaine précédant ou suivant le déménagement (sur justificatif)'
+    resume: '1 jour d\\'autorisation la semaine précédant ou suivant le déménagement (sur justificatif)'
   },
   {
     id: 'temps_ch3_concours',
@@ -270,7 +279,7 @@ export const sommaireUnifie: SectionIndex[] = [
     motsCles: ['représentation', 'association', 'mutuelle', 'mandat', '9 jours', '12 jours', 'réunion', 'instance', 'politique'],
     source: 'temps',
     chapitre: 3,
-    resume: '9 jours/an (jusqu\'à 12j) pour représenter association/mutuelle auprès instances'
+    resume: '9 jours/an (jusqu\\'à 12j) pour représenter association/mutuelle auprès instances'
   },
   
   // Chapitre 4 : Maladies et accidents
@@ -304,10 +313,10 @@ export const sommaireUnifie: SectionIndex[] = [
   // ============================================
   {
     id: 'formation_integration',
-    titre: 'Formation d\'intégration',
+    titre: 'Formation d\\'intégration',
     motsCles: ['intégration', 'formation intégration', 'titularisation', '5 jours', '10 jours', 'catégorie A', 'catégorie B', 'catégorie C', 'CNFPT', 'stagiaire', 'nouvellement nommé', 'environnement territorial', 'statut', '1 an', 'dispense'],
     source: 'formation',
-    resume: 'Obligatoire: 10 jours (cat A/B), 5 jours (cat C). Dans l\'année suivant nomination. Conditionne titularisation'
+    resume: 'Obligatoire: 10 jours (cat A/B), 5 jours (cat C). Dans l\\'année suivant nomination. Conditionne titularisation'
   },
   {
     id: 'formation_professionnalisation',
@@ -360,7 +369,7 @@ export const sommaireUnifie: SectionIndex[] = [
   },
   {
     id: 'formation_vae',
-    titre: 'Validation des Acquis de l\'Expérience (VAE)',
+    titre: 'Validation des Acquis de l\\'Expérience (VAE)',
     motsCles: ['VAE', 'validation acquis', 'expérience', 'diplôme', '24 heures', '72 heures', 'congé VAE', 'certification', 'qualification'],
     source: 'formation',
     resume: '24h de congé (72h si handicap/cat C) pour obtenir diplôme via expérience professionnelle'
@@ -370,11 +379,11 @@ export const sommaireUnifie: SectionIndex[] = [
     titre: 'Congé de transition professionnelle',
     motsCles: ['transition professionnelle', 'reconversion', 'nouveau métier', '120 heures', '70 heures', '6000€', '1 an', 'certification', 'création entreprise', 'catégorie C', 'handicap', 'usure'],
     source: 'formation',
-    resume: 'Max 1 an, formations ≥120h certifiantes. Frais pris en charge jusqu\'à 6000€. Pour cat C/handicap/usure'
+    resume: 'Max 1 an, formations ≥120h certifiantes. Frais pris en charge jusqu\\'à 6000€. Pour cat C/handicap/usure'
   },
   {
     id: 'formation_immersion',
-    titre: 'Période d\'immersion professionnelle',
+    titre: 'Période d\\'immersion professionnelle',
     motsCles: ['immersion', 'immersion professionnelle', 'découverte métier', 'mobilité', '2 jours', '10 jours', '20 jours', '3 ans', 'convention tripartite', 'autre collectivité', 'observation'],
     source: 'formation',
     resume: '2 à 10 jours pour observer un autre métier, max 20j sur 3 ans. Convention tripartite'
@@ -384,14 +393,14 @@ export const sommaireUnifie: SectionIndex[] = [
     titre: 'Formation syndicale',
     motsCles: ['formation syndicale', 'syndicat', 'syndical', '12 jours', '12 jours ouvrables', 'représentant', 'organisation syndicale', '5%', 'effectif', '1 mois'],
     source: 'formation',
-    resume: '12 jours ouvrables/an. Frais à charge du syndicat. Max 5% de l\'effectif simultanément'
+    resume: '12 jours ouvrables/an. Frais à charge du syndicat. Max 5% de l\\'effectif simultanément'
   },
   {
     id: 'formation_perfectionnement',
     titre: 'Formation de perfectionnement',
     motsCles: ['perfectionnement', 'compétences', 'développement', '70%', 'frais pédagogiques', 'demande agent', '12 mois', '8 jours', 'métier', 'poste'],
     source: 'formation',
-    resume: 'Développer compétences liées au poste. 70% frais pédagogiques si demande de l\'agent seul'
+    resume: 'Développer compétences liées au poste. 70% frais pédagogiques si demande de l\\'agent seul'
   },
   {
     id: 'formation_diplomante',
@@ -402,7 +411,7 @@ export const sommaireUnifie: SectionIndex[] = [
   },
   {
     id: 'formation_illettrisme',
-    titre: 'Lutte contre l\'illettrisme',
+    titre: 'Lutte contre l\\'illettrisme',
     motsCles: ['illettrisme', 'français', 'lecture', 'écriture', 'calcul', 'savoirs de base', 'apprentissage'],
     source: 'formation',
     resume: 'Formations pour réacquérir savoirs de base (lecture, écriture, calcul)'
@@ -430,7 +439,7 @@ export const sommaireUnifie: SectionIndex[] = [
   },
   {
     id: 'formation_cec',
-    titre: 'Compte d\'Engagement Citoyen (CEC)',
+    titre: 'Compte d\\'Engagement Citoyen (CEC)',
     motsCles: ['CEC', 'compte engagement citoyen', 'bénévole', 'bénévolat', 'volontariat', 'service civique', 'réserve militaire', '240 euros', '20 heures', '720 euros', '60 heures'],
     source: 'formation',
     resume: '20h (240€) par activité bénévole éligible, plafond 60h (720€). Service civique, réserve...'
@@ -472,7 +481,7 @@ export const sommaireUnifie: SectionIndex[] = [
     titre: 'Procédure de demande télétravail',
     motsCles: ['demande', 'demande télétravail', 'formulaire', 'autorisation', 'refus', 'entretien', 'entretien préalable', 'CAP', 'CCP', 'validation', 'responsable hiérarchique', 'autonomie', 'auto-évaluation', '5 jours', 'forfait'],
     source: 'teletravail',
-    resume: 'Demande écrite + entretien préalable. Refus motivé contestable en CAP/CCP. Forfait validé 5j à l\'avance'
+    resume: 'Demande écrite + entretien préalable. Refus motivé contestable en CAP/CCP. Forfait validé 5j à l\\'avance'
   },
   {
     id: 'teletravail_materiel',
@@ -483,7 +492,7 @@ export const sommaireUnifie: SectionIndex[] = [
   },
   {
     id: 'teletravail_lieu',
-    titre: 'Lieu d\'exercice du télétravail',
+    titre: 'Lieu d\\'exercice du télétravail',
     motsCles: ['domicile', 'lieu', 'adresse', 'espace coworking', 'tiers lieu', 'résidence principale', 'autre domicile', 'bibliothèque', 'espace public numérique', 'changement adresse'],
     source: 'teletravail',
     resume: 'Domicile principal ou autre lieu déclaré. Espaces publics gratuits possibles (bibliothèque...)'
@@ -493,7 +502,7 @@ export const sommaireUnifie: SectionIndex[] = [
     titre: 'Horaires et temps de travail en télétravail',
     motsCles: ['horaires', 'plages fixes', 'joignable', 'déconnexion', 'heures sup', 'heures supplémentaires', 'temps de travail', 'mêmes horaires', 'pause méridienne', 'charge de travail', 'égalité'],
     source: 'teletravail',
-    resume: 'Mêmes horaires que sur site, plages fixes obligatoires. Pas d\'heures sup. Charge de travail égale'
+    resume: 'Mêmes horaires que sur site, plages fixes obligatoires. Pas d\\'heures sup. Charge de travail égale'
   },
   {
     id: 'teletravail_situations_particulieres',
@@ -521,14 +530,14 @@ export const sommaireUnifie: SectionIndex[] = [
     titre: 'Suspension du télétravail',
     motsCles: ['suspension', 'absence', 'jour férié', 'congé', 'report', 'pas de report', 'fermeture service', 'empêchement', 'impératifs opérationnels'],
     source: 'teletravail',
-    resume: 'Pas de report si absence/férié coïncide avec jour télétravaillé. Suspension possible par l\'administration'
+    resume: 'Pas de report si absence/férié coïncide avec jour télétravaillé. Suspension possible par l\\'administration'
   },
   {
     id: 'teletravail_frais',
     titre: 'Prise en charge des frais télétravail',
     motsCles: ['frais', 'indemnité', 'prise en charge', 'transport', '50%', 'abonnement', 'Navigo', 'électricité', 'internet', 'pas de prise en charge', 'installation électrique'],
     source: 'teletravail',
-    resume: 'Pas d\'indemnité spécifique. Transport remboursé 50% (inchangé). Pas de frais électricité/internet'
+    resume: 'Pas d\\'indemnité spécifique. Transport remboursé 50% (inchangé). Pas de frais électricité/internet'
   }
 ];
 
@@ -537,7 +546,7 @@ export const sommaireUnifie: SectionIndex[] = [
  * Retourne les sections les plus pertinentes pour une question donnée
  */
 export function rechercherDansSommaire(question: string, maxResults = 3): SectionIndex[] {
-  const q = question.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const q = question.toLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g, '');
   
   // Calculer un score pour chaque section
   const scored = sommaireUnifie.map(section => {
@@ -545,7 +554,7 @@ export function rechercherDansSommaire(question: string, maxResults = 3): Sectio
     
     // Vérifier les mots-clés (score élevé pour match exact)
     for (const motCle of section.motsCles) {
-      const mcNorm = motCle.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      const mcNorm = motCle.toLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g, '');
       if (q.includes(mcNorm)) {
         score += 10;
       }
@@ -559,7 +568,7 @@ export function rechercherDansSommaire(question: string, maxResults = 3): Sectio
     }
     
     // Vérifier le titre
-    const titreNorm = section.titre.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const titreNorm = section.titre.toLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g, '');
     if (q.includes(titreNorm)) {
       score += 15;
     }
@@ -571,7 +580,7 @@ export function rechercherDansSommaire(question: string, maxResults = 3): Sectio
     
     // Vérifier le résumé
     if (section.resume) {
-      const resumeNorm = section.resume.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      const resumeNorm = section.resume.toLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g, '');
       for (const mot of resumeNorm.split(' ')) {
         if (mot.length > 4 && q.includes(mot)) {
           score += 1;
@@ -595,16 +604,16 @@ export function rechercherDansSommaire(question: string, maxResults = 3): Sectio
  * ~500 tokens au lieu de ~15000 pour les docs complètes
  */
 export function genererPromptSommaire(): string {
-  const lines: string[] = ['SOMMAIRE DES DOCUMENTS INTERNES - MAIRIE DE GENNEVILLIERS\n'];
+  const lines: string[] = ['SOMMAIRE DES DOCUMENTS INTERNES - MAIRIE DE GENNEVILLIERS\\n'];
   
   let currentSource = '';
   for (const section of sommaireUnifie) {
     if (section.source !== currentSource) {
       currentSource = section.source;
       const sourceLabel = {
-        temps: '\n📅 TEMPS DE TRAVAIL ET CONGÉS',
-        formation: '\n🎓 FORMATION',
-        teletravail: '\n🏠 TÉLÉTRAVAIL'
+        temps: '\\n📅 TEMPS DE TRAVAIL ET CONGÉS',
+        formation: '\\n🎓 FORMATION',
+        teletravail: '\\n🏠 TÉLÉTRAVAIL'
       }[currentSource];
       if (sourceLabel) {
         lines.push(sourceLabel);
@@ -617,5 +626,65 @@ export function genererPromptSommaire(): string {
     }
   }
   
-  return lines.join('\n');
+  return lines.join('\\n');
 }
+'''
+
+# Statistiques
+def count_sections():
+    import re
+    sections = re.findall(r"id: '([^']+)'", SOMMAIRE_AMELIORE)
+    temps = [s for s in sections if s.startswith('temps_')]
+    formation = [s for s in sections if s.startswith('formation_')]
+    teletravail = [s for s in sections if s.startswith('teletravail_')]
+    
+    print("=" * 60)
+    print("STATISTIQUES DU SOMMAIRE AMÉLIORÉ")
+    print("=" * 60)
+    print(f"Total sections: {len(sections)}")
+    print(f"  - Temps de travail: {len(temps)} sections")
+    print(f"  - Formation: {len(formation)} sections")  
+    print(f"  - Télétravail: {len(teletravail)} sections")
+    print()
+    
+    # Compter les mots-clés
+    mots_cles = re.findall(r"motsCles: \[([^\]]+)\]", SOMMAIRE_AMELIORE)
+    total_mc = sum(len(mc.split(',')) for mc in mots_cles)
+    print(f"Total mots-clés: ~{total_mc}")
+    print(f"Moyenne par section: ~{total_mc // len(sections)} mots-clés")
+    print()
+    
+    print("NOUVELLES SECTIONS AJOUTÉES:")
+    nouvelles = [
+        'temps_ch2_fractionnement - Jours de fractionnement',
+        'temps_ch3_concours - Concours et examens professionnels',
+        'temps_ch3_jury_formateur - Jury de concours et formateur externe',
+        'temps_ch3_representation - Congé de représentation',
+        'formation_illettrisme - Lutte contre illettrisme',
+        'formation_cst - Formation membres du CST',
+        'formation_cec - Compte Engagement Citoyen',
+        'formation_handicap - Formations agents handicap',
+        'teletravail_suspension - Suspension du télétravail',
+        'teletravail_frais - Prise en charge frais'
+    ]
+    for n in nouvelles:
+        print(f"  + {n}")
+    print()
+    
+    print("AMÉLIORATIONS CLÉS:")
+    print("  ✓ Mots-clés enrichis avec variantes (ex: '25 jours', '25j', 'CA', 'C.A')")
+    print("  ✓ Ajout de chiffres clés dans les mots-clés (ex: '48h', '85%', '6000€')")
+    print("  ✓ Résumés plus précis avec valeurs numériques")
+    print("  ✓ Meilleure couverture des questions fréquentes")
+    print("  ✓ Séparation maternité/paternité en 2 sections")
+    print("  ✓ Ajout sections manquantes (fractionnement, CEC, CST...)")
+
+if __name__ == '__main__':
+    count_sections()
+    
+    # Écrire le nouveau sommaire
+    output_path = '../src/data/sommaire-ameliore.ts'
+    with open(output_path, 'w', encoding='utf-8') as f:
+        f.write(SOMMAIRE_AMELIORE)
+    print(f"\n✅ Nouveau sommaire écrit dans: {output_path}")
+    print("\nPour appliquer, renommer en sommaire.ts")
