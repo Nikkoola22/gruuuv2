@@ -63,7 +63,7 @@ interface ChatbotState {
 }
 
 // API Perplexity directe
-const API_URL = "https://api.perplexity.ai/chat/completions";
+const API_URL = "/api/chat";
 const API_KEY = import.meta.env.VITE_PERPLEXITY_API_KEY || "";
 
 // Fonction pour nettoyer les chaînes de caractères
@@ -659,10 +659,7 @@ export default function App() {
   const appelPerplexity = async (messages: any[]): Promise<string> => {
     const response = await fetch(API_URL, {
       method: "POST",
-      headers: { 
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${API_KEY}`
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ model: "sonar-pro", messages }),
     });
     if (!response.ok) {

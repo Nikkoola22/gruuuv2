@@ -1,72 +1,55 @@
-const https = require('https');
+// API serverless pour proxy Perplexity (évite les erreurs CORS)
 
 module.exports = async (req, res) => {
-  // Only allow POST requests
-  if (req.method !== 'POST') {
-    res.status(405).json({ error: 'Method not allowed' });
-    return;
-  }
-
-  // Set CORS headers
+  // Gérer CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  // Handle preflight
   if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
+    return res.status(200).end();
   }
 
-  const apiKey = process.env.VITE_APP_PERPLEXITY_KEY || process.env.PERPLEXITY_API_KEY;
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const API_KEY = process.env.PERPLEXITY_API_KEY;
   
-  if (!apiKey) {
-    res.status(500).json({ error: 'API key not configured' });
-    return;
+  if (!API_KEY) {
+    console.error('PERPLEXITY_API_KEY non définie');
+    return res.status(500).json({ error: 'Configuration serveur manquante' });
   }
 
   try {
     const { model, messages } = req.body;
 
-    const postData = JSON.stringify({
-      model: model || 'sonar-pro',
-      messages: messages
-    });
-
-    const options = {
-      hostname: 'api.perplexity.ai',
-      path: '/chat/completions',
+    const response = await fetch('https://api.perplexity.ai/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
+        'Authorization': `Bearer ${API_KEY}`,
         'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(postData)
-      }
-    };
-
-    const proxyReq = https.request(options, (proxyRes) => {
-      let data = '';
-      
-      proxyRes.on('data', (chunk) => {
-        data += chunk;
-      });
-
-      proxyRes.on('end', () => {
-        res.setHeader('Content-Type', 'application/json');
-        res.status(proxyRes.statusCode).send(data);
-      });
+      },
+      body: JSON.stringify({
+        model: model || 'sonar-pro',
+        messages: messages,
+      }),
     });
 
-    proxyReq.on('error', (error) => {
-      console.error('Proxy request error:', error);
-      res.status(502).json({ error: 'Failed to connect to Perplexity API' });
-    });
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Erreur Perplexity:', response.status, errorText);
+      return res.status(response.status).json({ 
+        error: `Erreur API Perplexity (${response.status})`,
+        details: errorText
+      });
+    }
 
-    proxyReq.write(postData);
-    proxyReq.end();
+    const data = await response.json();
+    return res.status(200).json(data);
 
   } catch (error) {
-    console.error('Server error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('Erreur proxy chat:', error);
+    return res.status(500).json({ error: error.message });
   }
 };
