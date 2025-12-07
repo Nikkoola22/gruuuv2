@@ -1,4 +1,5 @@
 // API serverless pour proxy Perplexity (évite les erreurs CORS)
+const https = require('https');
 
 module.exports = async (req, res) => {
   // Gérer CORS
@@ -23,30 +24,62 @@ module.exports = async (req, res) => {
 
   try {
     const { model, messages } = req.body;
+    
+    const postData = JSON.stringify({
+      model: model || 'sonar-pro',
+      messages: messages,
+    });
 
-    const response = await fetch('https://api.perplexity.ai/chat/completions', {
+    const options = {
+      hostname: 'api.perplexity.ai',
+      port: 443,
+      path: '/chat/completions',
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${API_KEY}`,
         'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(postData),
       },
-      body: JSON.stringify({
-        model: model || 'sonar-pro',
-        messages: messages,
-      }),
-    });
+    };
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Erreur Perplexity:', response.status, errorText);
-      return res.status(response.status).json({ 
-        error: `Erreur API Perplexity (${response.status})`,
-        details: errorText
+    return new Promise((resolve, reject) => {
+      const apiReq = https.request(options, (apiRes) => {
+        let data = '';
+        
+        apiRes.on('data', (chunk) => {
+          data += chunk;
+        });
+        
+        apiRes.on('end', () => {
+          try {
+            if (apiRes.statusCode !== 200) {
+              console.error('Erreur Perplexity:', apiRes.statusCode, data);
+              res.status(apiRes.statusCode).json({ 
+                error: `Erreur API Perplexity (${apiRes.statusCode})`,
+                details: data
+              });
+            } else {
+              const jsonData = JSON.parse(data);
+              res.status(200).json(jsonData);
+            }
+            resolve();
+          } catch (e) {
+            console.error('Erreur parsing:', e);
+            res.status(500).json({ error: 'Erreur de parsing de la réponse' });
+            resolve();
+          }
+        });
       });
-    }
-
-    const data = await response.json();
-    return res.status(200).json(data);
+      
+      apiReq.on('error', (e) => {
+        console.error('Erreur requête:', e);
+        res.status(500).json({ error: e.message });
+        resolve();
+      });
+      
+      apiReq.write(postData);
+      apiReq.end();
+    });
 
   } catch (error) {
     console.error('Erreur proxy chat:', error);
