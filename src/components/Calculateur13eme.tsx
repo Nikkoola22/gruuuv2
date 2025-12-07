@@ -174,7 +174,7 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
     const prorataGlobal = tempsRatio * prorataAnnee * ancienneteRatio
 
     // CORRECTION 2025: complément = SMIC entier (pas /2)
-    const fixedPart = prorataGlobal * smicReference
+    const fixedPart = (smicReference * 1.0) * prorataGlobal // NO DIV BY 2
     const smicVerse = prorataGlobal * smicReference
     const remunerationProratisee = prorataGlobal * remunerationBase
     const variableBase = remunerationProratisee - smicVerse
