@@ -62,8 +62,8 @@ interface ChatbotState {
   isProcessing: boolean;
 }
 
-const API_KEY = import.meta.env.VITE_APP_PERPLEXITY_KEY;
-const API_URL = "https://api.perplexity.ai/chat/completions";
+// Use proxy API to avoid CORS issues
+const API_URL = "/api/chat/route";
 
 // Fonction pour nettoyer les chaînes de caractères
 const nettoyerChaine = (chaine: string): string => {
@@ -614,7 +614,7 @@ export default function App() {
   const appelPerplexity = async (messages: any[]): Promise<string> => {
     const response = await fetch(API_URL, {
       method: "POST",
-      headers: { Authorization: `Bearer ${API_KEY}`, "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ model: "sonar-pro", messages }),
     });
     if (!response.ok) {
@@ -642,7 +642,7 @@ Sois précis mais concis , utilise un ton AMICAL et ne cite pas le titre du chap
 ${contexte}
 --- FIN DE LA DOCUMENTATION PERTINENTE ---
     `;
-    const history = chatState.messages.slice(1).map((msg) => ({
+    const history = chatState.messages.slice(-4).map((msg) => ({  // Limité à 4 messages pour éviter erreur 431
       role: msg.type === "user" ? "user" : "assistant",
       content: msg.content,
     }));

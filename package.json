@@ -5,7 +5,8 @@
   "type": "module",
   "homepage": "https://Nikkoola22.github.io/gruuuu",
   "scripts": {
-    "dev": "vite",
+    "dev": "vercel dev",
+    "dev:vite": "vite",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
