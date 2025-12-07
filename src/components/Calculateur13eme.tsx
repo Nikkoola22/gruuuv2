@@ -74,7 +74,7 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
 
   const indiciaireTI = indiceToEuro(im)
   const indiciaireNBIValue = indiceToEuro(nbi)
-  const indiciaireIRValue = (indiciaireTI + indiciaireNBIValue) * IR_RATE
+  const indiciaireIRValue = indiciaireTI * IR_RATE
   const horaireTI = indiceToEuro(horaireIM)
   const horaireIRValue = (horaireTI + 0) * IR_RATE
 
@@ -173,7 +173,7 @@ export default function Calculateur13eme({ onClose }: Calculateur13emeProps) {
     const ancienneteRatio = Math.max(0, Math.min(1, anciennete / 12))
     const prorataGlobal = tempsRatio * prorataAnnee * ancienneteRatio
 
-    const fixedPart = prorataGlobal * (smicReference / 2)
+    const fixedPart = prorataGlobal * smicReference
     const smicVerse = prorataGlobal * smicReference
     const remunerationProratisee = prorataGlobal * remunerationBase
     const variableBase = remunerationProratisee - smicVerse
