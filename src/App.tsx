@@ -801,10 +801,10 @@ ${contexte}
       {/* Bandeau News FPT déplacé sous le header et en full width */}
       <section className="relative bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white overflow-hidden w-full shadow-lg z-10">
         <div className="relative h-20 flex items-center overflow-hidden">
-            <div className="absolute left-0 top-0 h-full w-44 flex items-center justify-center bg-gradient-to-r from-blue-600 via-blue-600 to-transparent z-20">
+            <div className="absolute left-0 top-0 h-full w-52 flex items-center justify-start pl-4 bg-blue-600 z-30 shadow-lg">
             <span className="text-xl font-bold text-white bg-white/20 backdrop-blur-sm px-4 py-2 rounded-r-lg">📰 NEWS FPT</span>
           </div>
-              <div className="animate-marquee whitespace-nowrap flex items-center ml-48" style={{ animation: "marquee 45s linear infinite" }}>
+              <div className="animate-marquee whitespace-nowrap flex items-center ml-56" style={{ animation: "marquee 45s linear infinite" }}>
             {[...infoItems, ...infoItems].map((info, idx) => (
               <button
                 key={`${info.id}-${idx}`}
