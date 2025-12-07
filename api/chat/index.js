@@ -1,7 +1,7 @@
 // API serverless pour proxy Perplexity (évite les erreurs CORS)
-const https = require('https');
+import https from 'https';
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   // Gérer CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -42,7 +42,7 @@ module.exports = async (req, res) => {
       },
     };
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       const apiReq = https.request(options, (apiRes) => {
         let data = '';
         
@@ -85,4 +85,4 @@ module.exports = async (req, res) => {
     console.error('Erreur proxy chat:', error);
     return res.status(500).json({ error: error.message });
   }
-};
+}

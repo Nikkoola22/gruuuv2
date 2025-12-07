@@ -1,7 +1,7 @@
-const https = require('https');
+import https from 'https';
 
-module.exports = (req, res) => {
-  https.get('https://www.franceinfo.fr/politique.rss', {
+export default function handler(req, res) {
+  https.get('https://www.cfdt.fr/rss/feed/fil-actus', {
     headers: { 'User-Agent': 'Mozilla/5.0' }
   }, (response) => {
     if (response.statusCode !== 200) {
@@ -46,4 +46,4 @@ module.exports = (req, res) => {
   }).on('error', (error) => {
     res.status(502).json({ error: error.message });
   });
-};
+}
