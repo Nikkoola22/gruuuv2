@@ -32,7 +32,7 @@ import {
   HelpCircle,
 } from "lucide-react";
 
-import { sommaire } from "./data/sommaire.ts";
+import { sommaireUnifie, rechercherDansSommaire, type SectionIndex } from "./data/sommaire.ts";
 import { chapitres } from "./data/temps.ts";
 import { formation } from "./data/formation.ts";
 import { teletravailData } from "./data/teletravail.ts";
@@ -62,8 +62,9 @@ interface ChatbotState {
   isProcessing: boolean;
 }
 
-// Use proxy API to avoid CORS issues
-const API_URL = "/api/chat/route";
+// API Perplexity directe
+const API_URL = "https://api.perplexity.ai/chat/completions";
+const API_KEY = import.meta.env.VITE_PERPLEXITY_API_KEY || "";
 
 // Fonction pour nettoyer les chaînes de caractères
 const nettoyerChaine = (chaine: string): string => {
@@ -76,8 +77,7 @@ const nettoyerChaine = (chaine: string): string => {
     .trim();
 };
 
-// Parser les données du sommaire
-const sommaireData = JSON.parse(sommaire);
+// Les données sont maintenant typées directement dans sommaireUnifie
 
 const actualitesSecours = [
   { title: "Réforme des retraites : nouvelles négociations prévues", link: "#", pubDate: new Date().toISOString(), guid: "1" },
@@ -187,35 +187,80 @@ const NewsTicker: React.FC = () => {
 };
 
 const trouverContextePertinent = (question: string): string => {
-  const qNet = nettoyerChaine(question);
-  const mots = qNet.split(/\s+/).filter(Boolean);
-  const scores = new Map<number, number>();
-
-  sommaireData.chapitres.forEach((chap: any, i: number) => {
-    let score = 0;
-    const keys = [...(chap.mots_cles || []), ...(chap.articles?.flatMap((a: any) => a.mots_cles) || [])];
-    keys.forEach((mc: string) => {
-      const m = nettoyerChaine(mc);
-      if (mots.includes(m)) score += 10;
-      else if (qNet.includes(m)) score += 5;
-    });
-    if (score) scores.set(i + 1, (scores.get(i + 1) || 0) + score);
-  });
-
-  if (!scores.size) {
-    return "Aucun chapitre spécifique trouvé. Thèmes : " + sommaireData.chapitres.map((c: any) => c.titre).join(", ");
+  console.log("🔍 Recherche pour:", question);
+  
+  // Étape 1: Utiliser le sommaire unifié pour trouver les sections pertinentes
+  const sectionsRelevantes = rechercherDansSommaire(question, 2);
+  console.log("📚 Sections trouvées:", sectionsRelevantes.map(s => s.titre));
+  
+  if (sectionsRelevantes.length === 0) {
+    return "Aucune section pertinente trouvée. Domaines disponibles : Temps de travail, Formation, Télétravail.";
   }
-
-  const top = Array.from(scores.entries())
-    .sort(([, a], [, b]) => b - a)
-    .slice(0, 3)
-    .map(([id]) => {
-      const titre = sommaireData.chapitres[id - 1].titre;
-      const contenu = (chapitres as Record<number, string>)[id] || "";
-      return `Source: ${titre}\nContenu: ${contenu}`;
-    });
-
-  return top.join("\n\n---\n\n");
+  
+  // Étape 2: Charger le contenu des sections trouvées
+  const resultats: string[] = [];
+  const qNet = nettoyerChaine(question);
+  const mots = qNet.split(/\s+/).filter(m => m.length > 2);
+  
+  for (const section of sectionsRelevantes) {
+    let contenu = "";
+    
+    // Récupérer le contenu selon la source
+    if (section.source === 'temps' && section.chapitre) {
+      contenu = (chapitres as Record<number, string>)[section.chapitre] || "";
+    } else if (section.source === 'formation') {
+      contenu = JSON.stringify(formation, null, 2);
+    } else if (section.source === 'teletravail') {
+      contenu = teletravailData;
+    }
+    
+    if (!contenu) continue;
+    
+    // Extraction intelligente: chercher la partie contenant les mots-clés
+    if (contenu.length > 3000 && mots.length > 0) {
+      const contenuLower = contenu.toLowerCase();
+      let bestPos = -1;
+      let bestMot = "";
+      
+      // Chercher le mot-clé le plus pertinent
+      for (const motCle of section.motsCles) {
+        const mcNorm = nettoyerChaine(motCle);
+        const pos = contenuLower.indexOf(mcNorm);
+        if (pos !== -1 && (bestPos === -1 || pos < bestPos)) {
+          bestPos = pos;
+          bestMot = motCle;
+        }
+      }
+      
+      // Sinon chercher les mots de la question
+      if (bestPos === -1) {
+        for (const mot of mots) {
+          const pos = contenuLower.indexOf(mot);
+          if (pos !== -1) {
+            bestPos = pos;
+            bestMot = mot;
+            break;
+          }
+        }
+      }
+      
+      if (bestPos !== -1) {
+        const start = Math.max(0, bestPos - 1500);
+        const end = Math.min(contenu.length, bestPos + 2500);
+        contenu = (start > 0 ? "..." : "") + contenu.substring(start, end) + (end < contenu.length ? "..." : "");
+        console.log(`✂️ Extraction autour de "${bestMot}" (pos: ${bestPos})`);
+      } else {
+        contenu = contenu.substring(0, 3000) + "... [contenu tronqué]";
+      }
+    } else if (contenu.length > 4000) {
+      contenu = contenu.substring(0, 4000) + "... [contenu tronqué]";
+    }
+    
+    resultats.push(`📌 ${section.titre}${section.resume ? " - " + section.resume : ""}\nContenu:\n${contenu}`);
+  }
+  
+  console.log(`✅ ${resultats.length} section(s) chargée(s)`);
+  return resultats.join("\n\n---\n\n");
 };
 
 const PodcastPlayer: React.FC = () => {
@@ -614,7 +659,10 @@ export default function App() {
   const appelPerplexity = async (messages: any[]): Promise<string> => {
     const response = await fetch(API_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { 
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${API_KEY}`
+      },
       body: JSON.stringify({ model: "sonar-pro", messages }),
     });
     if (!response.ok) {
@@ -631,6 +679,7 @@ export default function App() {
     if (chatState.selectedDomain === 0) contexte = trouverContextePertinent(question);
     else if (chatState.selectedDomain === 1) contexte = JSON.stringify(formation, null, 2);
     else if (chatState.selectedDomain === 2) contexte = teletravailData;
+    console.log("Contexte trouvé (longueur=" + contexte.length + "):", contexte.substring(0, 500));
 
     const systemPrompt = `
 Tu es un collègue syndical spécialiste pour la mairie de Gennevilliers.
@@ -642,11 +691,23 @@ Sois précis mais concis , utilise un ton AMICAL et ne cite pas le titre du chap
 ${contexte}
 --- FIN DE LA DOCUMENTATION PERTINENTE ---
     `;
-    const history = chatState.messages.slice(-4).map((msg) => ({  // Limité à 4 messages pour éviter erreur 431
+    // Filtrer l'historique: exclure le message de bienvenue (premier) 
+    // La question actuelle sera ajoutée à la fin, donc on ne la prend pas de l'historique
+    const allMessages = chatState.messages.slice(1, -1);  // Exclure bienvenue (premier) et question actuelle (dernier)
+    const recentMessages = allMessages.slice(-4);  // Garder les 4 derniers
+    
+    const history = recentMessages.map((msg) => ({
       role: msg.type === "user" ? "user" : "assistant",
       content: msg.content,
     }));
-    const apiMessages = [{ role: "system", content: systemPrompt }, ...history, { role: "user", content: question }];
+    
+    // S'assurer que l'historique commence par un message user si non vide
+    const cleanHistory = history.length > 0 && history[0].role === "assistant" 
+      ? history.slice(1) 
+      : history;
+    
+    // Simplifier: system + user uniquement (pas d'historique pour éviter erreur 400)
+    const apiMessages = [{ role: "system", content: systemPrompt }, { role: "user", content: question }];
     return await appelPerplexity(apiMessages);
   };
 

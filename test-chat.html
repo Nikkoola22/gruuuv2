@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Chat CFDT - 5 Questions</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      min-height: 100vh;
+      color: #fff;
+    }
+    h1 {
+      text-align: center;
+      background: linear-gradient(90deg, #10b981, #06b6d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 30px;
+    }
+    .test-card {
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    .question {
+      font-weight: bold;
+      color: #10b981;
+      margin-bottom: 10px;
+    }
+    .expected {
+      background: rgba(16, 185, 129, 0.2);
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+    .expected-label {
+      color: #10b981;
+      font-size: 12px;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+    .response {
+      background: rgba(6, 182, 212, 0.2);
+      padding: 10px;
+      border-radius: 8px;
+      min-height: 60px;
+      font-size: 14px;
+    }
+    .response-label {
+      color: #06b6d4;
+      font-size: 12px;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+    .status {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      margin-left: 10px;
+    }
+    .status.pending { background: #fbbf24; color: #000; }
+    .status.success { background: #10b981; color: #fff; }
+    .status.fail { background: #ef4444; color: #fff; }
+    .status.loading { background: #3b82f6; color: #fff; }
+    button {
+      background: linear-gradient(90deg, #10b981, #06b6d4);
+      border: none;
+      color: white;
+      padding: 15px 30px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      display: block;
+      margin: 30px auto;
+      font-weight: bold;
+    }
+    button:hover { opacity: 0.9; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .summary {
+      text-align: center;
+      padding: 20px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      margin-top: 20px;
+    }
+    .score {
+      font-size: 48px;
+      font-weight: bold;
+      background: linear-gradient(90deg, #10b981, #06b6d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧪 Test Chat CFDT - 5 Questions</h1>
+  
+  <div id="tests"></div>
+  
+  <button id="runTests" onclick="runAllTests()">▶️ Lancer les 5 tests</button>
+  
+  <div id="summary" class="summary" style="display:none;">
+    <div class="score" id="scoreDisplay">0/5</div>
+    <p id="summaryText"></p>
+  </div>
+
+  <script>
+    const API_KEY = "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";
+    const API_URL = "https://api.perplexity.ai/chat/completions";
+    
+    // Import des données (copié depuis les fichiers)
+    const tests = [
+      {
+        id: 1,
+        question: "Combien de jours pour un déménagement ?",
+        expectedKeywords: ["1 jour", "une journée", "journée"],
+        expectedAnswer: "1 journée d'autorisation d'absence"
+      },
+      {
+        id: 2,
+        question: "Quel est le montant du 13ème mois ?",
+        expectedKeywords: ["indice", "IMC", "mensuel", "traitement"],
+        expectedAnswer: "Basé sur l'indice majoré (traitement mensuel)"
+      },
+      {
+        id: 3,
+        question: "Combien de jours de télétravail par semaine ?",
+        expectedKeywords: ["2 jours", "deux jours", "3 jours", "trois jours"],
+        expectedAnswer: "2 à 3 jours maximum par semaine"
+      },
+      {
+        id: 4,
+        question: "Combien de jours pour un mariage ?",
+        expectedKeywords: ["5 jours", "cinq jours"],
+        expectedAnswer: "5 jours ouvrables"
+      },
+      {
+        id: 5,
+        question: "Qu'est-ce que le CIA ?",
+        expectedKeywords: ["complément", "indemnitaire", "annuel", "manière de servir"],
+        expectedAnswer: "Complément Indemnitaire Annuel lié à la manière de servir"
+      }
+    ];
+
+    // Charger les données pour le contexte
+    // Note: En prod, ces données viennent des imports
+    const sommaireData = {
+      chapitres: [
+        { titre: "Chapitre 1 : Principes généraux", articles: [{ mots_cles: ["principes", "règles"] }] },
+        { titre: "Chapitre 2 : Congés annuels", articles: [{ mots_cles: ["conges", "vacances", "annuels"] }] },
+        { titre: "Chapitre 3 : Autorisations spéciales d'absence", articles: [
+          { mots_cles: ["demenagement", "demenager"] },
+          { mots_cles: ["mariage", "pacs"] },
+          { mots_cles: ["naissance", "enfant"] },
+          { mots_cles: ["deces", "obseques"] }
+        ]},
+        { titre: "Chapitre 4 : Autres dispositions", articles: [{ mots_cles: ["autres"] }] }
+      ]
+    };
+
+    const chapitres = {
+      3: `CHAPITRE 3 - AUTORISATIONS SPECIALE D'ABSENCES
+Le congé annuel ne peut pas être interrompu par une autorisation d'absence.
+
+ARTICLE 4 - MARIAGE ou PACS
+Le mariage ou pacs d'un agent ouvre droit à 5 jours ouvrables d'autorisation d'absence.
+
+ARTICLE 10 – DEMENAGEMENT
+A l'occasion d'un déménagement, les agents bénéficient, la semaine précédant ou la semaine suivant le déménagement, d'une journée d'autorisation d'absence (justifié par le changement d'adresse).`
+    };
+
+    function renderTests() {
+      const container = document.getElementById('tests');
+      container.innerHTML = tests.map(test => `
+        <div class="test-card" id="test-${test.id}">
+          <div class="question">
+            Q${test.id}: ${test.question}
+            <span class="status pending" id="status-${test.id}">En attente</span>
+          </div>
+          <div class="expected">
+            <div class="expected-label">✅ Réponse attendue</div>
+            ${test.expectedAnswer}
+          </div>
+          <div class="response">
+            <div class="response-label">🤖 Réponse obtenue</div>
+            <div id="response-${test.id}">-</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function nettoyerChaine(str) {
+      return str.toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]/g, " ")
+        .trim();
+    }
+
+    function trouverContexte(question) {
+      const qNet = nettoyerChaine(question);
+      const mots = qNet.split(/\s+/).filter(m => m.length > 2);
+      
+      let scores = new Map();
+      sommaireData.chapitres.forEach((chap, i) => {
+        let score = 0;
+        chap.articles?.forEach(art => {
+          art.mots_cles?.forEach(mc => {
+            const m = nettoyerChaine(mc);
+            if (mots.includes(m)) score += 10;
+            else if (qNet.includes(m)) score += 5;
+          });
+        });
+        if (score) scores.set(i + 1, score);
+      });
+
+      if (!scores.size) return "Aucun contexte trouvé";
+      
+      const [bestId] = Array.from(scores.entries()).sort(([,a], [,b]) => b - a)[0];
+      return chapitres[bestId] || "Contenu non disponible";
+    }
+
+    async function testQuestion(test) {
+      const statusEl = document.getElementById(`status-${test.id}`);
+      const responseEl = document.getElementById(`response-${test.id}`);
+      
+      statusEl.className = 'status loading';
+      statusEl.textContent = 'Test en cours...';
+      
+      const contexte = trouverContexte(test.question);
+      
+      const systemPrompt = `Tu es un collègue syndical spécialiste pour la mairie de Gennevilliers.
+Réponds en te basant EXCLUSIVEMENT sur la documentation fournie.
+Si l'info n'est pas dans la doc, réponds "Je ne trouve pas l'information".
+Sois précis et concis.
+--- DOCUMENTATION ---
+${contexte}
+--- FIN ---`;
+
+      try {
+        const response = await fetch(API_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${API_KEY}`
+          },
+          body: JSON.stringify({
+            model: "sonar-pro",
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: test.question }
+            ]
+          })
+        });
+
+        if (!response.ok) throw new Error(`API Error: ${response.status}`);
+        
+        const data = await response.json();
+        const answer = data.choices[0].message.content;
+        
+        responseEl.textContent = answer;
+        
+        // Vérifier si la réponse contient les mots-clés attendus
+        const answerLower = answer.toLowerCase();
+        const hasKeyword = test.expectedKeywords.some(kw => answerLower.includes(kw.toLowerCase()));
+        const isNotFound = answerLower.includes("je ne trouve pas");
+        
+        if (hasKeyword && !isNotFound) {
+          statusEl.className = 'status success';
+          statusEl.textContent = '✅ Réussi';
+          return true;
+        } else {
+          statusEl.className = 'status fail';
+          statusEl.textContent = '❌ Échec';
+          return false;
+        }
+      } catch (error) {
+        responseEl.textContent = `Erreur: ${error.message}`;
+        statusEl.className = 'status fail';
+        statusEl.textContent = '❌ Erreur';
+        return false;
+      }
+    }
+
+    async function runAllTests() {
+      const btn = document.getElementById('runTests');
+      btn.disabled = true;
+      btn.textContent = '⏳ Tests en cours...';
+      
+      let passed = 0;
+      
+      for (const test of tests) {
+        const success = await testQuestion(test);
+        if (success) passed++;
+        // Pause entre les tests pour éviter rate limiting
+        await new Promise(r => setTimeout(r, 1500));
+      }
+      
+      // Afficher le résumé
+      const summary = document.getElementById('summary');
+      const score = document.getElementById('scoreDisplay');
+      const text = document.getElementById('summaryText');
+      
+      summary.style.display = 'block';
+      score.textContent = `${passed}/5`;
+      
+      if (passed === 5) {
+        text.textContent = "🎉 Parfait ! Toutes les questions ont une réponse correcte.";
+      } else if (passed >= 3) {
+        text.textContent = "👍 Bon résultat, mais quelques améliorations possibles.";
+      } else {
+        text.textContent = "⚠️ Des ajustements sont nécessaires dans la recherche de contexte.";
+      }
+      
+      btn.disabled = false;
+      btn.textContent = '🔄 Relancer les tests';
+    }
+
+    // Initialiser
+    renderTests();
+  </script>
+</body>
+</html>
