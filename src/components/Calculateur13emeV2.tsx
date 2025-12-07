@@ -143,7 +143,7 @@ export default function Calculateur13emeV2({ onClose }: Calculateur13emeProps) {
   // Calculs dérivés
   const indiciaireTI = indiceToEuro(im)
   const indiciaireNBIValue = indiceToEuro(nbi)
-  const indiciaireIRValue = indiciaireTI * IR_RATE
+  const indiciaireIRValue = (indiciaireTI + indiciaireNBIValue) * IR_RATE  // IR sur (TI + NBI) selon procédure officielle
   const horaireTI = indiceToEuro(horaireIM)
   const horaireIRValue = horaireTI * IR_RATE
 
