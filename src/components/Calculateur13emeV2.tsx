@@ -938,15 +938,49 @@ export default function Calculateur13emeV2({ onClose }: Calculateur13emeProps) {
             Ventilation par échéance
           </p>
           <div className="space-y-3">
-            {result.breakdown.map((item: any, index: number) => (
-              <div key={index} className="flex items-center justify-between p-3 bg-slate-900/30 rounded-lg">
-                <div>
-                  <p className="text-white font-medium">{item.month}</p>
-                  <p className="text-xs text-slate-400">{item.note || `${(item.ratio * 100).toFixed(0)}%`}</p>
+            {indiciaireProfile === 'permanent' ? (
+              result.breakdown.map((item: any, index: number) => {
+                // Calcul des montants TIT pour chaque part
+                const totalPart = item.amount;
+                // Répartition TIT :
+                // Complément rémunération TIT (rubrique 7447) = part fixe
+                // Prime semestrielle TIT (rubrique 8445) = part variable
+                const partFixe = result.compRem * item.ratio;
+                const partVariable = result.primeSem * item.ratio;
+                return (
+                  <div key={index} className="bg-slate-900/30 rounded-lg p-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-white font-medium">{item.month}</p>
+                        <p className="text-xs text-slate-400">{item.note || `${(item.ratio * 100).toFixed(0)}%`}</p>
+                      </div>
+                      <p className={`text-lg font-medium text-${accentColor}-400`}>{formatEUR(totalPart)}</p>
+                    </div>
+                    <div className="mt-2 text-xs text-slate-300 space-y-1">
+                      <div>
+                        <strong>Rubrique 7447 (Compl. rémunération TIT):</strong> {formatEUR(partFixe)}
+                      </div>
+                      <div>
+                        <strong>Rubrique 8445 (Prime semestrielle TIT):</strong> {formatEUR(partVariable)}
+                      </div>
+                      <div>
+                        <strong>Total par échéance:</strong> {formatEUR(partFixe + partVariable)}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              result.breakdown.map((item: any, index: number) => (
+                <div key={index} className="flex items-center justify-between p-3 bg-slate-900/30 rounded-lg">
+                  <div>
+                    <p className="text-white font-medium">{item.month}</p>
+                    <p className="text-xs text-slate-400">{item.note || `${(item.ratio * 100).toFixed(0)}%`}</p>
+                  </div>
+                  <p className={`text-lg font-medium text-${accentColor}-400`}>{formatEUR(item.amount)}</p>
                 </div>
-                <p className={`text-lg font-medium text-${accentColor}-400`}>{formatEUR(item.amount)}</p>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
 
