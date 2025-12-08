@@ -874,7 +874,7 @@ export default function Quiz({ onBack }: QuizProps) {
   // On mount, regenerate answers starting from question 4 (index 3)
   useEffect(() => {
     regenerateFrom(3);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   const selectOption = (opt: number) => {
