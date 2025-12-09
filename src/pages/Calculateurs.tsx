@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { ArrowLeft, TrendingUp, Calculator, DollarSign, BookOpen, Sparkles, CheckCircle2, PiggyBank } from 'lucide-react'
 import CalculateurPrimesV2 from '../components/CalculateurPrimesV2'
-import CalculateurCIA from '../components/CalculateurCIA'
-import Calculateur13eme from '../components/Calculateur13eme'
+import CalculateurCIA from '../components/CalculateurCIAV2'
+import Calculateur13eme from '../components/Calculateur13emeV2'
 import SimulateurRetraite from '../components/SimulateurRetraite'
 import Metiers from './Metiers'
 
@@ -106,6 +106,7 @@ export default function Calculateurs({ onBack }: CalculateursProps) {
             </button>
           )}
         </div>
+      </div>
       {/* Grille des calculateurs */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -119,7 +120,6 @@ export default function Calculateurs({ onBack }: CalculateursProps) {
               >
                 {/* Bordure animée */}
                 <div className={`absolute inset-0 bg-gradient-to-r ${calc.color.bg} rounded-2xl animate-gradient-x opacity-80`} />
-                
                 {/* Contenu */}
                 <div className="relative bg-slate-900/95 backdrop-blur-xl rounded-[14px] p-6 h-full flex flex-col">
                   <div className="flex items-start justify-between mb-4">
@@ -130,13 +130,11 @@ export default function Calculateurs({ onBack }: CalculateursProps) {
                       Actif
                     </div>
                   </div>
-                  
                   <div className="flex-1">
                     <h3 className="text-xl font-bold text-white mb-1">{calc.title}</h3>
                     <p className={`text-sm font-medium ${calc.color.text} mb-2`}>{calc.subtitle}</p>
                     <p className="text-slate-400 text-sm">{calc.description}</p>
                   </div>
-                  
                   <div className="mt-4 flex items-center gap-2 text-slate-400 group-hover:text-white transition-colors">
                     <span className="text-sm font-medium">Ouvrir</span>
                     <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -148,7 +146,6 @@ export default function Calculateurs({ onBack }: CalculateursProps) {
             )
           })}
         </div>
-        
         {/* Info footer */}
         <div className="mt-8 p-4 bg-slate-800/50 rounded-xl border border-slate-700/50 flex items-center gap-3">
           <CheckCircle2 className="w-5 h-5 text-green-400 flex-shrink-0" />
@@ -157,8 +154,6 @@ export default function Calculateurs({ onBack }: CalculateursProps) {
           </p>
         </div>
       </div>
-      
-      
     </div>
   )
 }
