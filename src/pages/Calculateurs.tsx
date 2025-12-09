@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { ArrowLeft, TrendingUp, Calculator, DollarSign, BookOpen, Sparkles, CheckCircle2 } from 'lucide-react'
+import { ArrowLeft, TrendingUp, Calculator, DollarSign, BookOpen, Sparkles, CheckCircle2, PiggyBank } from 'lucide-react'
 import CalculateurPrimesV2 from '../components/CalculateurPrimesV2'
-import CalculateurCIAV2 from '../components/CalculateurCIAV2'
-import Calculateur13emeV2 from '../components/Calculateur13emeV2'
+import CalculateurCIA from '../components/CalculateurCIA'
+import Calculateur13eme from '../components/Calculateur13eme'
+import SimulateurRetraite from '../components/SimulateurRetraite'
 import Metiers from './Metiers'
 
 interface CalculateursProps {
@@ -42,13 +43,21 @@ const CALCULATORS = [
     description: 'Consultez les grilles indiciaires',
     icon: BookOpen,
     color: { bg: 'from-amber-500 to-orange-600', border: 'border-amber-400/50', text: 'text-amber-300', glow: 'shadow-amber-500/30' }
+  },
+  {
+    id: 'retraite' as const,
+    title: 'Retraite',
+    subtitle: 'Simulation',
+    description: 'Simulez votre pension de retraite',
+    icon: PiggyBank,
+    color: { bg: 'from-indigo-500 to-purple-600', border: 'border-indigo-400/50', text: 'text-indigo-300', glow: 'shadow-indigo-500/30' }
   }
 ]
 
 export default function Calculateurs({ onBack }: CalculateursProps) {
-  const [selectedCalculator, setSelectedCalculator] = useState<'primes' | 'cia' | '13eme' | 'metiers' | null>(null)
+  const [selectedCalculator, setSelectedCalculator] = useState<'primes' | 'cia' | '13eme' | 'metiers' | 'retraite' | null>(null)
 
-  const openCalculator = (calc: 'primes' | 'cia' | '13eme' | 'metiers') => {
+  const openCalculator = (calc: 'primes' | 'cia' | '13eme' | 'metiers' | 'retraite') => {
     setSelectedCalculator(calc);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -58,15 +67,19 @@ export default function Calculateurs({ onBack }: CalculateursProps) {
   }
 
   if (selectedCalculator === 'cia') {
-    return <CalculateurCIAV2 onClose={() => setSelectedCalculator(null)} />
+    return <CalculateurCIA onClose={() => setSelectedCalculator(null)} />
   }
 
   if (selectedCalculator === '13eme') {
-    return <Calculateur13emeV2 onClose={() => setSelectedCalculator(null)} />
+    return <Calculateur13eme onClose={() => setSelectedCalculator(null)} />
   }
 
   if (selectedCalculator === 'metiers') {
     return <Metiers onClose={() => setSelectedCalculator(null)} />
+  }
+
+  if (selectedCalculator === 'retraite') {
+    return <SimulateurRetraite onClose={() => setSelectedCalculator(null)} />
   }
 
   return (
@@ -93,8 +106,6 @@ export default function Calculateurs({ onBack }: CalculateursProps) {
             </button>
           )}
         </div>
-      </div>
-
       {/* Grille des calculateurs */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
